@@ -17,21 +17,21 @@
 
 "use strict";
 
-/**
- * CharacterClass
- * @param {number} class_id
- * @param {string} class_name
- * @param {boolean} is_always_invoke
- * @param {boolean} is_grouping
- * @param {number} max_length
- * @constructor
- */
-function CharacterClass(class_id, class_name, is_always_invoke, is_grouping, max_length) {
-    this.class_id = class_id;
-    this.class_name = class_name;
-    this.is_always_invoke = is_always_invoke;
-    this.is_grouping = is_grouping;
-    this.max_length = max_length;
+import TokenizerBuilder, { type TokenizerBuilderOption } from "./TokenizerBuilder";
+import DictionaryBuilder from "./dict/builder/DictionaryBuilder";
+
+export {
+    TokenizerBuilder,
+    type TokenizerBuilderOption,
+    DictionaryBuilder
 }
 
-module.exports = CharacterClass;
+// Public methods
+export default {
+    builder: (option: TokenizerBuilderOption) => {
+        return new TokenizerBuilder(option);
+    },
+    dictionaryBuilder: () => {
+        return new DictionaryBuilder();
+    }
+};

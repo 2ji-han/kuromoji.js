@@ -15,47 +15,45 @@
  * limitations under the License.
  */
 
-var fs = require("fs");
-var expect = require("chai").expect;
+import fs from "fs";
+import { expect, describe, beforeEach, it } from "bun:test";
 
-var kuromoji = require("../../../src/kuromoji");
-var Tokenizer = require("../../../src/Tokenizer");
+import kuromoji from "../../../src/kuromoji";
+import Tokenizer from "../../../src/Tokenizer";
+import type DynamicDictionaries from "../../../src/dict/DynamicDictionaries";
 
-var DIC_DIR = "test/resource/minimum-dic/";
-var connection_costs_file = DIC_DIR + "matrix.def";
-var char_def_file = DIC_DIR + "char.def";
-var unk_def_file = DIC_DIR + "unk.def";
-var tid_dic_file = DIC_DIR + "minimum.csv";
+const DIC_DIR = "test/_resource/minimum-dic/";
+const connection_costs_file = DIC_DIR + "matrix.def";
+const char_def_file = DIC_DIR + "char.def";
+const unk_def_file = DIC_DIR + "unk.def";
+const tid_dic_file = DIC_DIR + "minimum.csv";
 
-describe("DictionaryBuilder", function () {
-    this.timeout(30000);
-
-    var kuromoji_dic = null;  // target object of DynamicDictionaries to build
-
-    before("Build", function (done) {
+describe("DictionaryBuilder", () => {
+    let kuromoji_dic: DynamicDictionaries | null = null;  // target object of DynamicDictionaries to build
+    beforeEach((done) => {
         // Build token info dictionary
-        var builder = kuromoji.dictionaryBuilder();
-        var tokenInfo = fs.readFileSync(tid_dic_file, "utf-8");
-        tokenInfo.split("\n").map(function (line) {
+        const builder = kuromoji.dictionaryBuilder();
+        const tokenInfo = fs.readFileSync(tid_dic_file, "utf-8");
+        tokenInfo.split("\n").map((line) => {
             builder.addTokenInfoDictionary(line);
         });
 
         // Build connection costs matrix
-        var cc_text = fs.readFileSync(connection_costs_file, "ascii");
-        var cc_lines = cc_text.split("\n");
-        cc_lines.map(function (line) {
+        const cc_text = fs.readFileSync(connection_costs_file, "ascii");
+        const cc_lines = cc_text.split("\n");
+        cc_lines.map((line) => {
             builder.putCostMatrixLine(line);
         });
 
         // Build unknown dictionary
-        var cd_text = fs.readFileSync(char_def_file, "utf-8");
-        var cd_lines = cd_text.split("\n");
-        cd_lines.map(function (line) {
+        const cd_text = fs.readFileSync(char_def_file, "utf-8");
+        const cd_lines = cd_text.split("\n");
+        cd_lines.map((line) => {
             builder.putCharDefLine(line);
         });
-        var unk_text = fs.readFileSync(unk_def_file, "utf-8");
-        var unk_lines = unk_text.split("\n");
-        unk_lines.map(function (line) {
+        const unk_text = fs.readFileSync(unk_def_file, "utf-8");
+        const unk_lines = unk_text.split("\n");
+        unk_lines.map((line) => {
             builder.putUnkDefLine(line);
         });
 
@@ -64,27 +62,45 @@ describe("DictionaryBuilder", function () {
         done();
     });
 
-    it("Dictionary not to be null", function () {
-        expect(kuromoji_dic).not.to.be.null;
+    it("Dictionary not to be null", () => {
+        if (!kuromoji_dic) {
+            throw new Error("kuromoji_dic is null")
+        }
+        expect(kuromoji_dic).not.toBeNull();
     });
-    it("TokenInfoDictionary not to be null", function () {
-        expect(kuromoji_dic.token_info_dictionary).not.to.be.null;
+    it("TokenInfoDictionary not to be null", () => {
+        if (!kuromoji_dic) {
+            throw new Error("kuromoji_dic is null")
+        }
+        expect(kuromoji_dic.token_info_dictionary).not.toBeNull();
     });
-    it("TokenInfoDictionary", function () {
+    it("TokenInfoDictionary", () => {
+        if (!kuromoji_dic) {
+            throw new Error("kuromoji_dic is null")
+        }
         // expect(kuromoji_dic.token_info_dictionary.getFeatures("1467000")).to.have.length.above(1);
-        expect(kuromoji_dic.token_info_dictionary.dictionary.buffer).to.have.length.above(1);
+        expect(kuromoji_dic.token_info_dictionary.dictionary.buffer.length).toBeGreaterThanOrEqual(1);
     });
-    it("DoubleArray not to be null", function () {
-        expect(kuromoji_dic.trie).not.to.be.null;
+    it("DoubleArray not to be null", () => {
+        if (!kuromoji_dic) {
+            throw new Error("kuromoji_dic is null")
+        }
+        expect(kuromoji_dic.trie).not.toBeNull();
     });
-    it("ConnectionCosts not to be null", function () {
-        expect(kuromoji_dic.connection_costs).not.to.be.null;
+    it("ConnectionCosts not to be null", () => {
+        if (!kuromoji_dic) {
+            throw new Error("kuromoji_dic is null")
+        }
+        expect(kuromoji_dic.connection_costs).not.toBeNull();
     });
-    it("Tokenize simple test", function () {
-        var tokenizer = new Tokenizer(kuromoji_dic);
-        var path = tokenizer.tokenize("すもももももももものうち");
+    it("Tokenize simple test", () => {
+        if (!kuromoji_dic) {
+            throw new Error("kuromoji_dic is null")
+        }
+        const tokenizer = new Tokenizer(kuromoji_dic);
+        const path = tokenizer.tokenize("すもももももももものうち");
 
-        var expected_tokens = [
+        const expected_tokens: { [key: string]: any; }[] = [
             {
                 word_type: "KNOWN",
                 word_position: 1,
@@ -125,7 +141,8 @@ describe("DictionaryBuilder", function () {
                 conjugated_form: "*",
                 basic_form: "もも",
                 reading: "モモ",
-                pronunciation: "モモ" },
+                pronunciation: "モモ"
+            },
             {
                 word_type: "KNOWN",
                 word_position: 7,
@@ -184,13 +201,12 @@ describe("DictionaryBuilder", function () {
             }
         ];
 
-        expect(path).to.have.length(7);
-
-        for (var i = 0; i < expected_tokens.length; i++) {
-            var expected_token = expected_tokens[i];
-            var target_token = path[i];
-            for (var key in expected_token) {
-                expect(target_token).to.have.property(key, expected_token[key]);
+        expect(path).toHaveLength(7);
+        for (let i = 0; i < expected_tokens.length; i++) {
+            const expected_token = expected_tokens[i];
+            const target_token = path[i];
+            for (const key in expected_token) {
+                expect(target_token).toHaveProperty(key, expected_token[key]);
             }
         }
     });
