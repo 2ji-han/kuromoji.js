@@ -1,3 +1,4 @@
+// DoubleArray.ts MIT License
 // Copyright (c) 2014 Takuya Asano All Rights Reserved.
 
 /*
