@@ -14,15 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ *
+ * rewrite by f1w3_ | 2024
+ * All rights reserved by Takuya Asano.
+ * See above for more information.
+ *  
+ */
 
-"use strict";
+import kuromoji from "../src/kuromoji";
 
-var kuromoji = require("../src/kuromoji");
-var DIC_DIR = "dict/";
-
-// Load dictionaries from file, and prepare tokenizer
-kuromoji.builder({ dicPath: DIC_DIR }).build(function (error, tokenizer) {
-    var path = tokenizer.tokenize("すもももももももものうち");
+kuromoji.builder({ dicPath: "dict" }).build((err, tokenizer) => {
+    // tokenizer is ready
+    const path = tokenizer.tokenize("すもももももももものうち");
     console.log(path);
-    module.exports = tokenizer;
 });

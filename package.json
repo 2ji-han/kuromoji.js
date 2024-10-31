@@ -8,8 +8,7 @@
   },
   "main": "./src/kuromoji.ts",
   "devDependencies": {
-    "@types/bun": "latest",
-    "benny": "^3.7.1"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -30,9 +29,5 @@
     "pos tagger",
     "tokenizer"
   ],
-  "license": "Apache-2.0",
-  "dependencies": {
-    "async": "^3.2.6",
-    "doublearray": "^0.0.2"
-  }
+  "license": "Apache-2.0"
 }
