@@ -42,10 +42,7 @@ class ViterbiLattice {
             this.eos_pos = last_pos;
         }
 
-        let prev_nodes = this.nodes_end_at[last_pos];
-        if (prev_nodes == null) {
-            prev_nodes = [];
-        }
+        let prev_nodes = this.nodes_end_at[last_pos] ?? [];
         prev_nodes.push(node);
 
         this.nodes_end_at[last_pos] = prev_nodes;

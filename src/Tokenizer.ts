@@ -24,6 +24,7 @@ import IpadicFormatter, { type TOKEN } from "./util/IpadicFormatter";
 import type DynamicDictionaries from "./dict/DynamicDictionaries";
 import type UnknownDictionary from "./dict/UnknownDictionary";
 import type TokenInfoDictionary from "./dict/TokenInfoDictionary";
+import type ViterbiNode from "./viterbi/ViterbiNode";
 
 const PUNCTUATION = /、|。/g;
 
@@ -42,19 +43,17 @@ class Tokenizer {
     }
 
     static splitByPunctuation(input: string): string[] {
-        const matches = input.matchAll(PUNCTUATION);
         const sentences = [];
         let lastIndex = 0;
-        for (const match of matches) {
+        for (const match of input.matchAll(PUNCTUATION)) {
             const index = match.index!;
-            sentences.push(input.substring(lastIndex, index + 1));
+            sentences.push(input.slice(lastIndex, index + 1));
             lastIndex = index + 1;
         }
         if (lastIndex < input.length) {
-            sentences.push(input.substring(lastIndex));
+            sentences.push(input.slice(lastIndex));
         }
         return sentences;
-        //return input.split(PUNCTUATION);
     };
 
     tokenize(text: string) {
@@ -66,49 +65,34 @@ class Tokenizer {
         return tokens;
     };
 
-    tokenizeForSentence(sentence: string, tokens: TOKEN[]) {
-        if (tokens == null) {
-            tokens = [];
-        }
+    tokenizeForSentence(sentence: string, tokens: TOKEN[] = []) {
         const lattice = this.getLattice(sentence);
         const best_path = this.viterbi_searcher.search(lattice);
-        let last_pos = 0;
-        if (tokens.length > 0) {
-            last_pos = tokens[tokens.length - 1].word_position;
-        }
+        const last_pos = (tokens.length > 0) ? tokens[tokens.length - 1].word_position : 0
 
-        for (let j = 0; j < best_path.length; j++) {
-            const node = best_path[j];
-
-            let token: TOKEN;
-            let features: string[] = [];
-            let features_line: string | null = null;
-            if (node.type === "KNOWN") {
-                features_line = this.token_info_dictionary.getFeatures(node.name.toString());
-                if (features_line == null) {
-                    features = [];
-                } else {
-                    features = features_line.split(",");
-                }
-                token = this.formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, features);
-            } else if (node.type === "UNKNOWN") {
-                // Unknown word
-                features_line = this.unknown_dictionary.getFeatures(node.name.toString());
-                if (features_line == null) {
-                    features = [];
-                } else {
-                    features = features_line.split(",");
-                }
-                token = this.formatter.formatUnknownEntry(node.name, last_pos + node.start_pos, node.type, features, node.surface_form);
-            } else {
-                // TODO User dictionary
-                token = this.formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, []);
-            }
+        for (const node of best_path) {
+            const token: TOKEN = this.getTokenFromNode(node, last_pos);
             tokens.push(token);
         }
 
         return tokens;
     };
+
+    getTokenFromNode(node: ViterbiNode, last_pos: number): TOKEN {
+        if (node.type === "KNOWN") {
+            const features_line = this.token_info_dictionary.getFeatures(node.name.toString());
+            const features = features_line == null ? [] : features_line.split(",");
+            return this.formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, features);
+        } else if (node.type === "UNKNOWN") {
+            // Unknown word
+            const features_line = this.unknown_dictionary.getFeatures(node.name.toString());
+            const features = features_line == null ? [] : features_line.split(",")
+            return this.formatter.formatUnknownEntry(node.name, last_pos + node.start_pos, node.type, features, node.surface_form);
+        } else {
+            // TODO User dictionary
+            return this.formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, []);
+        }
+    }
 
     getLattice(text: string) {
         return this.viterbi_builder.build(text);
