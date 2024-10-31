@@ -6,7 +6,7 @@ I was inspired by the following repositories
 
 Once again, I would like to thank you!
 
-### :partying_face: Tests Passed 100% :party_popper::
+### :partying_face: Tests Passed 100%
 
 futures
 -------
