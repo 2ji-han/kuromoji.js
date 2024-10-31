@@ -135,10 +135,10 @@ class UnknownDictionary {
         return this;
     };
 
-    getFeatures(token_info_id_str: string) {
+    getFeatures(token_info_id_str: string): string | null {
         const token_info_id = parseInt(token_info_id_str);
         if (isNaN(token_info_id)) {
-            throw new Error("Invalid token_info_id: " + token_info_id_str);
+            return null;
         }
         const pos_id = this.dictionary.getInt(token_info_id + 6);
         return this.pos_buffer.getString(pos_id);
