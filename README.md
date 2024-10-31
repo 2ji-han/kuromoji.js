@@ -44,11 +44,7 @@ Usage
 You can tokenize sentences with only 5 lines of code.
 If you need working examples, you can see the files under the demo or example directory.
 
-### Node.js
-
-Install with npm package manager:
-
-    npm install kuromoji
+### Node.js/Bunjs
 
 Load this library as follows:
 
