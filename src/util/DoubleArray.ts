@@ -1,9 +1,8 @@
 // DoubleArray.ts MIT License
 // Copyright (c) 2014 Takuya Asano All Rights Reserved.
-
 /*
  *
- * rewrite by @f1w3_ | 2024
+ * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
  *  

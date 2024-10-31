@@ -14,10 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ *
+ * rewrite by f1w3_ | 2024
+ * All rights reserved by Takuya Asano.
+ * See above for more information.
+ *  
+ */
 
 "use strict";
 
-//import ViterbiBuilder from "../old/viterbi/ViterbiBuilder";
 import ViterbiBuilder from "./viterbi/ViterbiBuilder";
 import ViterbiSearcher from "./viterbi/ViterbiSearcher";
 import IpadicFormatter, { type TOKEN } from "./util/IpadicFormatter";
@@ -68,7 +74,7 @@ class Tokenizer {
     tokenizeForSentence(sentence: string, tokens: TOKEN[] = []) {
         const lattice = this.getLattice(sentence);
         const best_path = this.viterbi_searcher.search(lattice);
-        const last_pos = (tokens.length > 0) ? tokens[tokens.length - 1].word_position : 0
+        const last_pos = (tokens.length > 0) ? tokens[tokens.length - 1].word_position : 0;
 
         for (const node of best_path) {
             const token: TOKEN = this.getTokenFromNode(node, last_pos);
@@ -86,7 +92,7 @@ class Tokenizer {
         } else if (node.type === "UNKNOWN") {
             // Unknown word
             const features_line = this.unknown_dictionary.getFeatures(node.name.toString());
-            const features = features_line == null ? [] : features_line.split(",")
+            const features = features_line == null ? [] : features_line.split(",");
             return this.formatter.formatUnknownEntry(node.name, last_pos + node.start_pos, node.type, features, node.surface_form);
         } else {
             // TODO User dictionary

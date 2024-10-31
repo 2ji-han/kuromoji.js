@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /*
  *
  * rewrite by f1w3_ | 2024
@@ -25,11 +24,11 @@
 
 "use strict";
 
-import Tokenizer from "./Tokenizer"
-import DictionaryLoader from "./loader/NodeDictionaryLoader"
+import Tokenizer from "./Tokenizer";
+import DictionaryLoader from "./loader/NodeDictionaryLoader";
 
 export type TokenizerBuilderOption = {
-    dicPath?: string | undefined
+    dicPath?: string | undefined;
 }
 
 class TokenizerBuilder {

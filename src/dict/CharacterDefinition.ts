@@ -14,6 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ *
+ * rewrite by f1w3_ | 2024
+ * All rights reserved by Takuya Asano.
+ * See above for more information.
+ *  
+ */
 
 "use strict";
 
@@ -23,15 +30,15 @@ import SurrogateAwareString from "../util/SurrogateAwareString";
 
 const DEFAULT_CATEGORY = "DEFAULT";
 
-/**
- * CharacterDefinition represents char.def file and
- * defines behavior of unknown word processing
- * @constructor
- */
 class CharacterDefinition {
     character_category_map: Uint8Array;
     compatible_category_map: Uint32Array;
     invoke_definition_map: null | InvokeDefinitionMap;
+    /**
+     * CharacterDefinition represents char.def file and
+     * defines behavior of unknown word processing
+     * @constructor
+     */
     constructor() {
         this.character_category_map = new Uint8Array(65536);  // for all UCS2 code points
         this.compatible_category_map = new Uint32Array(65536);  // for all UCS2 code points
@@ -163,10 +170,11 @@ class CharacterDefinition {
             throw new Error("CharacterDefinition.lookupCompatibleCategory: invoke_definition_map is null");
         }
         /*
-         if (SurrogateAwareString.isSurrogatePair(ch)) {
-         // Surrogate pair character codes can not be defined by char.def
-         return classes;
-         }*/
+        if (SurrogateAwareString.isSurrogatePair(ch)) {
+        // Surrogate pair character codes can not be defined by char.def
+        return classes;
+        }
+        */
         const code = ch.charCodeAt(0);
         let integer: number | null = null;
         if (code < this.compatible_category_map.length) {

@@ -14,6 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ *
+ * rewrite by f1w3_ | 2024
+ * All rights reserved by Takuya Asano.
+ * See above for more information.
+ *  
+ */
 
 "use strict";
 
@@ -44,8 +51,6 @@ class ViterbiSearcher {
 
     forward(lattice: ViterbiLattice) {
         let i: number = 1;
-        let j: number = 0;
-        let k: number = 0;
         for (i = 1; i <= lattice.eos_pos; i++) {
             const nodes = lattice.nodes_end_at[i];
             if (nodes == null) continue;

@@ -14,6 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ *
+ * rewrite by f1w3_ | 2024
+ * All rights reserved by Takuya Asano.
+ * See above for more information.
+ *  
+ */
 
 "use strict";
 
@@ -93,10 +100,6 @@ class SurrogateAwareString {
             return false;
         }
     };
-
-    [Symbol.toPrimitive]() {
-        return this.toString();
-    }
 }
 
 export default SurrogateAwareString;

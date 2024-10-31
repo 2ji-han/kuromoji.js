@@ -14,21 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ *
+ * rewrite by f1w3_ | 2024
+ * All rights reserved by Takuya Asano.
+ * See above for more information.
+ *  
+ */
 
 "use strict";
 
 import CharacterDefinition from "./CharacterDefinition";
 import ByteBuffer from "../util/ByteBuffer";
 
-/**
- * UnknownDictionary
- * @constructor
- */
 class UnknownDictionary {
     dictionary: ByteBuffer;
     target_map: { [key: number]: number[] };
     pos_buffer: ByteBuffer;
     character_definition: CharacterDefinition | null = null;
+    
+    /**
+     * UnknownDictionary
+     * @constructor
+     */
     constructor() {
         this.dictionary = new ByteBuffer(10 * 1024 * 1024);
         this.target_map = {};  // trie_id (of surface form) -> token_info_id (of token)
