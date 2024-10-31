@@ -9,9 +9,6 @@
   "bugs": {
     "url": "https://github.com/f1w3/kuromoji.js/issues"
   },
-  "dependencies": {
-    "@types/bun": "latest"
-  },
   "homepage": "https://github.com/f1w3/kuromoji.js",
   "keywords": [
     "japanese",
@@ -29,5 +26,8 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
   }
 }
