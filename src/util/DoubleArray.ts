@@ -20,6 +20,9 @@ const BASE_BYTES = 4;
 const CHECK_BYTES = 4;
 const MEMORY_EXPAND_RATIO = 2;
 
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
 // Array utility functions
 const newArrayBuffer = (signed: boolean, bytes: number, size: number) => {
     if (signed) {
@@ -53,100 +56,6 @@ const arrayCopy = (src: Uint8Array, src_offset: number, length: number) => {
     var srcU8 = src.subarray(src_offset, length);
     dstU8.set(srcU8);
     return dstU8;
-};
-
-/**
- * Convert String (UTF-16) to UTF-8 ArrayBuffer
- *
- * @param {String} str UTF-16 string to convert
- * @return {Uint8Array | null} Byte sequence encoded by UTF-8
- */
-const stringToUtf8Bytes = (str: string): Uint8Array | null => {
-    const bytes = new Uint8Array(str.length * 4);
-    let j = 0;
-    for (let i = 0; i < str.length; i++) {
-        let unicode_code = str.charCodeAt(i);
-        if (unicode_code >= 0xD800 && unicode_code <= 0xDBFF) {
-            // surrogate pair
-            if (i + 1 < str.length) {
-                const lower = str.charCodeAt(++i);
-                if (lower >= 0xDC00 && lower <= 0xDFFF) {
-                    unicode_code = ((unicode_code - 0xD800) << 10) + (lower - 0xDC00) + 0x10000;
-                } else {
-                    return null; // malformed surrogate pair
-                }
-            } else {
-                return null; // malformed surrogate pair at end of string
-            }
-        }
-
-        if (unicode_code < 0x80) {
-            bytes[j++] = unicode_code;
-        } else if (unicode_code < 0x800) {
-            bytes[j++] = 0xC0 | (unicode_code >>> 6);
-            bytes[j++] = 0x80 | (unicode_code & 0x3F);
-        } else if (unicode_code < 0x10000) {
-            bytes[j++] = 0xE0 | (unicode_code >>> 12);
-            bytes[j++] = 0x80 | ((unicode_code >>> 6) & 0x3F);
-            bytes[j++] = 0x80 | (unicode_code & 0x3F);
-        } else if (unicode_code < 0x110000) {
-            bytes[j++] = 0xF0 | (unicode_code >>> 18);
-            bytes[j++] = 0x80 | ((unicode_code >>> 12) & 0x3F);
-            bytes[j++] = 0x80 | ((unicode_code >>> 6) & 0x3F);
-            bytes[j++] = 0x80 | (unicode_code & 0x3F);
-        } else {
-            return null; // malformed UCS4 code
-        }
-    }
-
-    return bytes.subarray(0, j);
-};
-
-/**
- * Convert UTF-8 ArrayBuffer to String (UTF-16)
- *
- * @param {Uint8Array} bytes UTF-8 byte sequence to convert
- * @return {String} String encoded by UTF-16
- */
-const utf8BytesToString = (bytes: Uint8Array): string => {
-    const strArray = [];
-    let i = 0;
-
-    while (i < bytes.length) {
-        const b1 = bytes[i++];
-        let code;
-
-        if (b1 < 0x80) {
-            // 1 byte
-            code = b1;
-        } else if ((b1 >> 5) === 0x06) {
-            // 2 bytes
-            const b2 = bytes[i++];
-            code = ((b1 & 0x1f) << 6) | (b2 & 0x3f);
-        } else if ((b1 >> 4) === 0x0e) {
-            // 3 bytes
-            const b2 = bytes[i++];
-            const b3 = bytes[i++];
-            code = ((b1 & 0x0f) << 12) | ((b2 & 0x3f) << 6) | (b3 & 0x3f);
-        } else {
-            // 4 bytes
-            const b2 = bytes[i++];
-            const b3 = bytes[i++];
-            const b4 = bytes[i++];
-            code = ((b1 & 0x07) << 18) | ((b2 & 0x3f) << 12) | ((b3 & 0x3f) << 6) | (b4 & 0x3f);
-        }
-
-        if (code < 0x10000) {
-            strArray.push(String.fromCharCode(code));
-        } else {
-            // surrogate pair
-            code -= 0x10000;
-            strArray.push(String.fromCharCode(0xD800 | (code >> 10)));
-            strArray.push(String.fromCharCode(0xDC00 | (code & 0x3FF)));
-        }
-    }
-
-    return strArray.join('');
 };
 
 type ArrayBuffer = Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array;
@@ -412,7 +321,7 @@ class DoubleArrayBuilder {
         // Convert key string to ArrayBuffer
         let buff_keys: { k: any; v: number; }[] | null = keys.map((k) => {
             return {
-                k: stringToUtf8Bytes(k.k + TERM_CHAR),
+                k: encoder.encode(k.k + TERM_CHAR),
                 v: k.v
             };
         });
@@ -645,10 +554,7 @@ class DoubleArray {
     contain(key: string) {
         const bc = this.bc;
         key += TERM_CHAR;
-        const buffer = stringToUtf8Bytes(key);
-        if (!buffer) {
-            throw new Error('invalid key');
-        }
+        const buffer = encoder.encode(key);
         let parent = ROOT_ID;
         let child = NOT_FOUND;
         for (let i = 0; i < buffer.length; i++) {
@@ -679,10 +585,7 @@ class DoubleArray {
     */
     lookup(key: string) {
         key += TERM_CHAR;
-        const buffer = stringToUtf8Bytes(key);
-        if (!buffer) {
-            throw new Error('invalid key');
-        }
+        const buffer = encoder.encode(key);
         let parent = ROOT_ID;
         let child = NOT_FOUND;
         for (let i = 0; i < buffer.length; i++) {
@@ -712,10 +615,7 @@ class DoubleArray {
     * respectively) properties assigned to matched string
     */
     commonPrefixSearch(key: string) {
-        const buffer = stringToUtf8Bytes(key);
-        if (!buffer) {
-            throw new Error('invalid key');
-        }
+        const buffer = encoder.encode(key);
         const result = [];
         let parent = ROOT_ID;
         let child = NOT_FOUND;
@@ -738,7 +638,7 @@ class DoubleArray {
                         r.v = - base - 1;
                     }
                     // If child is a leaf node, add word to result
-                    r.k = utf8BytesToString(arrayCopy(buffer, 0, i + 1));
+                    r.k = decoder.decode(arrayCopy(buffer, 0, i + 1));
                     result.push(r);
                 }
                 continue;

@@ -24,91 +24,13 @@
 
 "use strict";
 
-const stringToUtf8Bytes = (str: string): Uint8Array | null => {
-    const bytes = new Uint8Array(str.length * 4);
-    let j = 0;
-    for (let i = 0; i < str.length; i++) {
-        let unicode_code = str.charCodeAt(i);
-        if (unicode_code >= 0xD800 && unicode_code <= 0xDBFF) {
-            // surrogate pair
-            if (i + 1 < str.length) {
-                const lower = str.charCodeAt(++i);
-                if (lower >= 0xDC00 && lower <= 0xDFFF) {
-                    unicode_code = ((unicode_code - 0xD800) << 10) + (lower - 0xDC00) + 0x10000;
-                } else {
-                    return null; // malformed surrogate pair
-                }
-            } else {
-                return null; // malformed surrogate pair at end of string
-            }
-        }
 
-        if (unicode_code < 0x80) {
-            bytes[j++] = unicode_code;
-        } else if (unicode_code < 0x800) {
-            bytes[j++] = 0xC0 | (unicode_code >>> 6);
-            bytes[j++] = 0x80 | (unicode_code & 0x3F);
-        } else if (unicode_code < 0x10000) {
-            bytes[j++] = 0xE0 | (unicode_code >>> 12);
-            bytes[j++] = 0x80 | ((unicode_code >>> 6) & 0x3F);
-            bytes[j++] = 0x80 | (unicode_code & 0x3F);
-        } else if (unicode_code < 0x110000) {
-            bytes[j++] = 0xF0 | (unicode_code >>> 18);
-            bytes[j++] = 0x80 | ((unicode_code >>> 12) & 0x3F);
-            bytes[j++] = 0x80 | ((unicode_code >>> 6) & 0x3F);
-            bytes[j++] = 0x80 | (unicode_code & 0x3F);
-        } else {
-            return null; // malformed UCS4 code
-        }
-    }
-
-    return bytes.subarray(0, j);
-};
-
-const utf8BytesToString = (bytes: Uint8Array): string => {
-    const strArray = [];
-    let i = 0;
-
-    while (i < bytes.length) {
-        const b1 = bytes[i++];
-        let code;
-
-        if (b1 < 0x80) {
-            // 1 byte
-            code = b1;
-        } else if ((b1 >> 5) === 0x06) {
-            // 2 bytes
-            const b2 = bytes[i++];
-            code = ((b1 & 0x1f) << 6) | (b2 & 0x3f);
-        } else if ((b1 >> 4) === 0x0e) {
-            // 3 bytes
-            const b2 = bytes[i++];
-            const b3 = bytes[i++];
-            code = ((b1 & 0x0f) << 12) | ((b2 & 0x3f) << 6) | (b3 & 0x3f);
-        } else {
-            // 4 bytes
-            const b2 = bytes[i++];
-            const b3 = bytes[i++];
-            const b4 = bytes[i++];
-            code = ((b1 & 0x07) << 18) | ((b2 & 0x3f) << 12) | ((b3 & 0x3f) << 6) | (b4 & 0x3f);
-        }
-
-        if (code < 0x10000) {
-            strArray.push(String.fromCharCode(code));
-        } else {
-            // surrogate pair
-            code -= 0x10000;
-            strArray.push(String.fromCharCode(0xD800 | (code >> 10)));
-            strArray.push(String.fromCharCode(0xDC00 | (code & 0x3FF)));
-        }
-    }
-
-    return strArray.join('');
-};
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 
 class ByteBuffer {
-    buffer: Uint8Array
-    position = 0
+    buffer: Uint8Array;
+    position = 0;
 
     constructor(arg?: number | Uint8Array) {
         if (arg == undefined) {
@@ -233,7 +155,7 @@ class ByteBuffer {
     };
 
     putString(str: string) {
-        const bytes = stringToUtf8Bytes(str);
+        const bytes = encoder.encode(str);
         if (!bytes) throw new Error("bytes null.");
         for (const byte of bytes) {
             this.put(byte);
@@ -253,7 +175,7 @@ class ByteBuffer {
         }
 
         this.position = index;
-        return utf8BytesToString(new Uint8Array(buf));
+        return decoder.decode(new Uint8Array(buf));
     };
 
     getUtf32(index: number | null = null): number {
