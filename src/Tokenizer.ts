@@ -17,6 +17,7 @@
 
 "use strict";
 
+//import ViterbiBuilder from "../old/viterbi/ViterbiBuilder";
 import ViterbiBuilder from "./viterbi/ViterbiBuilder";
 import ViterbiSearcher from "./viterbi/ViterbiSearcher";
 import IpadicFormatter, { type TOKEN } from "./util/IpadicFormatter";

@@ -80,6 +80,10 @@ class SurrogateAwareString {
         return this.str;
     };
 
+    add(other: SurrogateAwareString): SurrogateAwareString {
+        return new SurrogateAwareString(this.str + other.str);
+    }
+
     static isSurrogatePair(ch: string) {
         const utf16_code = ch.charCodeAt(0);
         if (utf16_code >= 0xD800 && utf16_code <= 0xDBFF) {

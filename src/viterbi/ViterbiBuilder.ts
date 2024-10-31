@@ -73,17 +73,17 @@ class ViterbiBuilder {
             const surrogate_aware_tail = new SurrogateAwareString(tail);
             const head_char = new SurrogateAwareString(surrogate_aware_tail.charAt(0));
             const head_char_class = this.unknown_dictionary.lookup(head_char.toString());
-            if (vocabulary == null || vocabulary.length === 0 || head_char_class.is_always_invoke === true) {
+            if (vocabulary == null || vocabulary.length === 0 || head_char_class.is_always_invoke) {
                 // Process unknown word
-                let key: string = head_char.toString();
-                if (head_char_class.is_grouping === true && 1 < surrogate_aware_tail.length) {
+                let key: SurrogateAwareString = head_char;
+                if (head_char_class.is_grouping && 1 < surrogate_aware_tail.length) {
                     for (let k = 1; k < surrogate_aware_tail.length; k++) {
                         const next_char = surrogate_aware_tail.charAt(k);
                         const next_char_class = this.unknown_dictionary.lookup(next_char);
                         if (head_char_class.class_name !== next_char_class.class_name) {
                             break;
                         }
-                        key = key + next_char;
+                        key = key.add(new SurrogateAwareString(next_char));
                     }
                 }
 
