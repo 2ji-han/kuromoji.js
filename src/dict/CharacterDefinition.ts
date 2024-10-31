@@ -53,7 +53,7 @@ class CharacterDefinition {
     * @returns {CharacterDefinition}
     */
     load(cat_map_buffer: Uint8Array, compat_cat_map_buffer: Uint32Array, invoke_def_buffer: Uint8Array) {
-        var char_def = new CharacterDefinition();
+        const char_def = new CharacterDefinition();
         char_def.character_category_map = cat_map_buffer;
         char_def.compatible_category_map = compat_cat_map_buffer;
         char_def.invoke_definition_map = InvokeDefinitionMap.load(invoke_def_buffer);
@@ -117,7 +117,8 @@ class CharacterDefinition {
         // Initialize map by DEFAULT class
         let code_point: number = 0;
         if (category_mapping != null) {
-            for (let i = 0; i < category_mapping.length; i++) {
+            const category_mapping_length = category_mapping.length;
+            for (let i = 0; i < category_mapping_length; i++) {
                 const mapping = category_mapping[i];
                 const end = mapping.end || mapping.start;
                 for (code_point = mapping.start; code_point <= end; code_point++) {
@@ -150,7 +151,8 @@ class CharacterDefinition {
         if (default_id == null) {
             return;
         }
-        for (code_point = 0; code_point < this.character_category_map.length; code_point++) {
+        const ccm_length = this.compatible_category_map.length;
+        for (code_point = 0; code_point < ccm_length; code_point++) {
             // 他に何のクラスも定義されていなかったときだけ DEFAULT
             if (this.character_category_map[code_point] === 0) {
                 // DEFAULT class ID に対応するビットだけ1を立てる

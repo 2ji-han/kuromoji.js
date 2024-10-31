@@ -71,7 +71,8 @@ class InvokeDefinitionMap {
         if (character_category_definition == null) {
             return;
         }
-        for (let i = 0; i < character_category_definition.length; i++) {
+        const ccd_length = character_category_definition.length;
+        for (let i = 0; i < ccd_length; i++) {
             const character_class = character_category_definition[i];
             this.map[i] = character_class;
             this.lookup_table[character_class.class_name] = i;

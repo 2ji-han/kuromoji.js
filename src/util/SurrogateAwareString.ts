@@ -36,7 +36,8 @@ class SurrogateAwareString {
     constructor(str: string) {
         this.str = str;
         this.index_mapping = [];
-        for (let pos = 0; pos < str.length; pos++) {
+        const str_length = str.length
+        for (let pos = 0; pos < str_length; pos++) {
             const ch = str.charAt(pos);
             this.index_mapping.push(pos);
             if (SurrogateAwareString.isSurrogatePair(ch)) {
@@ -89,6 +90,10 @@ class SurrogateAwareString {
 
     add(other: SurrogateAwareString): SurrogateAwareString {
         return new SurrogateAwareString(this.str + other.str);
+    }
+
+    append(str: string): SurrogateAwareString {
+        return new SurrogateAwareString(this.str + str);
     }
 
     static isSurrogatePair(ch: string) {

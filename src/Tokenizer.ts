@@ -32,9 +32,9 @@ import type UnknownDictionary from "./dict/UnknownDictionary";
 import type TokenInfoDictionary from "./dict/TokenInfoDictionary";
 import type ViterbiNode from "./viterbi/ViterbiNode";
 
-const PUNCTUATION = /、|。/g;
-
 class Tokenizer {
+    private static readonly PUNCTUATION_REGEX = /、|。/g;
+
     token_info_dictionary: TokenInfoDictionary;
     unknown_dictionary: UnknownDictionary;
     viterbi_builder: ViterbiBuilder;
@@ -49,9 +49,10 @@ class Tokenizer {
     }
 
     static splitByPunctuation(input: string): string[] {
+        const matches = input.matchAll(Tokenizer.PUNCTUATION_REGEX);
         const sentences = [];
         let lastIndex = 0;
-        for (const match of input.matchAll(PUNCTUATION)) {
+        for (const match of matches) {
             const index = match.index!;
             sentences.push(input.slice(lastIndex, index + 1));
             lastIndex = index + 1;
@@ -76,7 +77,9 @@ class Tokenizer {
         const best_path = this.viterbi_searcher.search(lattice);
         const last_pos = (tokens.length > 0) ? tokens[tokens.length - 1].word_position : 0;
 
-        for (const node of best_path) {
+        const best_path_length = best_path.length;
+        for (let i = 0; i < best_path_length; i++) {
+            const node = best_path[i];
             const token: TOKEN = this.getTokenFromNode(node, last_pos);
             tokens.push(token);
         }
@@ -86,12 +89,12 @@ class Tokenizer {
 
     getTokenFromNode(node: ViterbiNode, last_pos: number): TOKEN {
         if (node.type === "KNOWN") {
-            const features_line = this.token_info_dictionary.getFeatures(node.name.toString());
+            const features_line = this.token_info_dictionary.getFeatures(node.name);
             const features = features_line == null ? [] : features_line.split(",");
             return this.formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, features);
         } else if (node.type === "UNKNOWN") {
             // Unknown word
-            const features_line = this.unknown_dictionary.getFeatures(node.name.toString());
+            const features_line = this.unknown_dictionary.getFeatures(node.name);
             const features = features_line == null ? [] : features_line.split(",");
             return this.formatter.formatUnknownEntry(node.name, last_pos + node.start_pos, node.type, features, node.surface_form);
         } else {

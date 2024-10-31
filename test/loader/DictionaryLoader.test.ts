@@ -48,7 +48,7 @@ describe("DictionaryLoader", () => {
         if (!dictionaries) {
             throw new Error("dictionaries is null")
         }
-        expect(dictionaries.token_info_dictionary.getFeatures("0").length).toBeGreaterThanOrEqual(1);
+        expect(dictionaries.token_info_dictionary.getFeatures(0)?.length).toBeGreaterThanOrEqual(1);
     });
 });
 

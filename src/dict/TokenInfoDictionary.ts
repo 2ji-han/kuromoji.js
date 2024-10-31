@@ -136,8 +136,7 @@ class TokenInfoDictionary {
         return this;
     };
 
-    getFeatures(token_info_id_str: string): string | null {
-        const token_info_id = parseInt(token_info_id_str);
+    getFeatures(token_info_id: number): string | null {
         if (isNaN(token_info_id)) {
             return null;
         }

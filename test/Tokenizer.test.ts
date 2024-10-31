@@ -192,7 +192,6 @@ describe("Tokenizer for IPADic", () => {
             throw new Error("tokenizer is null");
         }
         const path = tokenizer.tokenize("𠮷野屋");
-        console.log(path);
         expect(path).toHaveLength(3);
         expect(path[0].word_position).toEqual(1);
         expect(path[1].word_position).toEqual(2);

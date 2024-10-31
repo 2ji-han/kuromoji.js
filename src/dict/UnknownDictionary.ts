@@ -47,7 +47,8 @@ class UnknownDictionary {
     // ^ this position is token_info_id
     buildDictionary(entries: string[][]): { [word_id: number]: string } {
         const dictionary_entries: { [word_id: number]: string } = {}; // using as hashmap, string -> string (word_id -> surface_form) to build dictionary
-        for (let i = 0; i < entries.length; i++) {
+        const entries_length = entries.length;
+        for (let i = 0; i < entries_length; i++) {
             const entry = entries[i];
             if (entry.length < 4) {
                 continue;
@@ -143,8 +144,7 @@ class UnknownDictionary {
         return this;
     };
 
-    getFeatures(token_info_id_str: string): string | null {
-        const token_info_id = parseInt(token_info_id_str);
+    getFeatures(token_info_id: number): string | null {
         if (isNaN(token_info_id)) {
             return null;
         }

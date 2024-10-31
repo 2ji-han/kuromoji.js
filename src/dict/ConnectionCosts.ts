@@ -47,7 +47,7 @@ class ConnectionCosts {
     };
 
     get(forward_id: number, backward_id: number) {
-        var index = forward_id * this.backward_dimension + backward_id + 2;
+        const index = forward_id * this.backward_dimension + backward_id + 2;
         if (this.buffer.length < index + 1) {
             throw "ConnectionCosts buffer overflow";
         }
