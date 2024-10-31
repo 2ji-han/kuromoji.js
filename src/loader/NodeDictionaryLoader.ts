@@ -17,10 +17,11 @@
 
 "use strict";
 
+import { existsSync } from "fs"
+import { readFile } from "fs/promises"
 import path from "path";
 import zlib from "zlib";
 import DynamicDictionaries from "../dict/DynamicDictionaries";
-
 class NodeDictionaryLoader {
     dic: DynamicDictionaries;
     dic_path: string;
@@ -30,13 +31,9 @@ class NodeDictionaryLoader {
     }
 
     loadArrayBuffer = (file: string) => new Promise<ArrayBufferLike>(async (resolve, reject) => {
-        const content = Bun.file(file);
-        const isExists = await content.exists();
-        if (!isExists) {
-            return reject(new Error(`${file} does not exist`));
-        }
-        const buffer = await content.arrayBuffer();
-        zlib.gunzip(buffer, (err, binary) => {
+        if (!existsSync(file)) return reject(new Error(`${file} does not exist`));
+        const buffer = await readFile(file);
+        zlib.gunzip(new Uint8Array(buffer), (err, binary) => {
             if (err) return reject(err);
             const typed_array = new Uint8Array(binary);
             resolve(typed_array.buffer);
