@@ -11,6 +11,7 @@ Once again, I would like to thank you!
 futures
 -------
 - [x] async to promise/await
+- [ ] Support and build for browser
 - [ ] Asynchronization of init functions(eg. `await kuromoji.builder()`)
 - [ ] Support Stream
 - [ ] kuromoji-server
