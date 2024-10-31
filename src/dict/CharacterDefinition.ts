@@ -110,7 +110,7 @@ class CharacterDefinition {
     * Initializing method
     * @param {Array} category_mapping Array of category mapping
     */
-    initCategoryMappings(category_mapping: { start: number, end?: number, default: string, compatible: string[] }[]) {//TODO any
+    initCategoryMappings(category_mapping: { start: number, end?: number, default: string, compatible: string[] }[]) {
         if (!this.invoke_definition_map) {
             throw new Error("CharacterDefinition.initCategoryMappings: invoke_definition_map is null");
         }
