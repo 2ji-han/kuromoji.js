@@ -1,6 +1,6 @@
 # kuromoji.js
 
-[English](/docs/README-en.md)・[日本語](/docs/README-ja.md)
+[English](/kuromoji.js/docs/README-en.md)・[日本語](/kuromoji.js/docs/README-ja.md)
 
 ## this is fork of [@takuyaa/kuromoji.js](https://github.com/takuyaa/kuromoji.js)
 
