@@ -34,7 +34,7 @@ export type TokenizerBuilderOption = {
 class TokenizerBuilder {
     dic_path: string;
 
-    constructor(option: TokenizerBuilderOption) {
+    constructor(option: TokenizerBuilderOption = {}) {
         if (option.dicPath == undefined) {
             this.dic_path = "dict/";
         } else {

@@ -35,7 +35,7 @@ export {
 
 // Public methods
 export default {
-    builder: (option: TokenizerBuilderOption) => {
+    builder: (option: TokenizerBuilderOption = {}) => {
         return new TokenizerBuilder(option);
     },
     dictionaryBuilder: () => {
