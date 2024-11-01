@@ -44,7 +44,8 @@ kuromoji.jsがどのように動くかは[オンラインデモ](https://takuyaa
 ## Usage
 
 わずか5行のコードで文章をトークン化できます。
-もっと動作例が必要な場合は、exampleディレクトリの下のファイルを参照してください。
+
+もっと動作例が必要な場合は、[exampleディレクトリ](/kuromoji.js/example/)の下のファイルを参照してください。
 
 ```typescript
 import kuromoji from "./src/kuromoji";
