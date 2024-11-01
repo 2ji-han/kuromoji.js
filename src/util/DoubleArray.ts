@@ -51,11 +51,7 @@ const newArrayBuffer = (signed: boolean, bytes: number, size: number) => {
 };
 
 const arrayCopy = (src: Uint8Array, src_offset: number, length: number) => {
-    var buffer = new ArrayBuffer(length);
-    var dstU8 = new Uint8Array(buffer, 0, length);
-    var srcU8 = src.subarray(src_offset, length);
-    dstU8.set(srcU8);
-    return dstU8;
+    return src.slice(src_offset, src_offset + length);
 };
 
 type ArrayBuffer = Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array;
@@ -66,232 +62,209 @@ type BaseCheck = {
     array: ArrayBuffer | null
 };
 
-const newBC = (initial_size: number = 1024) => {
-    const initBase = (_base: ArrayBuffer, start: number, end: number) => {  // 'end' index does not include
-        if (!check.array) {
-            throw new Error("check array is not initialized");
+class BufferController {
+    private first_unused_node: number;
+    private base: BaseCheck;
+    private check: BaseCheck;
+
+    constructor(initial_size: number = 1024) {
+        this.first_unused_node = ROOT_ID + 1;
+
+        this.base = {
+            signed: BASE_SIGNED,
+            bytes: BASE_BYTES,
+            array: newArrayBuffer(BASE_SIGNED, BASE_BYTES, initial_size)
+        };
+
+        this.check = {
+            signed: CHECK_SIGNED,
+            bytes: CHECK_BYTES,
+            array: newArrayBuffer(CHECK_SIGNED, CHECK_BYTES, initial_size)
+        };
+
+        if (!this.base.array || !this.check.array) {
+            throw new Error("Initialization failed: Arrays are null");
+        }
+
+        // Initialize root node
+        this.base.array[ROOT_ID] = 1;
+        this.check.array[ROOT_ID] = ROOT_ID;
+
+        // Initialize BASE and CHECK arrays
+        this.initBase(this.base.array, ROOT_ID + 1, this.base.array.length);
+        this.initCheck(this.check.array, ROOT_ID + 1, this.check.array.length);
+    }
+
+    private initBase(_base: ArrayBuffer, start: number, end: number) {
+        if (!this.base.array || !this.check.array) {
+            throw new Error("initBase() failed: Arrays not initialized");
         }
         for (let i = start; i < end; i++) {
-            _base[i] = - i + 1;  // inversed previous empty node index
+            _base[i] = -i + 1;
         }
-        if (0 < check.array[check.array.length - 1]) {
-            let last_used_id = check.array.length - 2;
-            while (0 < check.array[last_used_id]) {
+        if (0 < this.check.array[this.check.array.length - 1]) {
+            let last_used_id = this.check.array.length - 2;
+            while (0 < this.check.array[last_used_id]) {
                 last_used_id--;
             }
-            _base[start] = - last_used_id;
+            _base[start] = -last_used_id;
         }
-    };
+    }
 
-    const initCheck = (_check: ArrayBuffer, start: number, end: number) => {
+    private initCheck(_check: ArrayBuffer, start: number, end: number) {
         for (let i = start; i < end; i++) {
-            _check[i] = - i - 1;  // inversed next empty node index
+            _check[i] = -i - 1;
         }
-    };
+    }
 
-    const realloc = (min_size: number) => {
-        // expand arrays size by given ratio
+    private realloc(min_size: number) {
+        if (!this.base.array || !this.check.array) {
+            throw new Error("initBase() failed: Arrays not initialized");
+        }
         const new_size = min_size * MEMORY_EXPAND_RATIO;
-        // console.log('re-allocate memory to ' + new_size);
+        const base_new_array = newArrayBuffer(this.base.signed, this.base.bytes, new_size);
+        this.initBase(base_new_array, this.base.array.length, new_size);
+        base_new_array.set(this.base.array);
+        this.base.array = base_new_array;
 
-        const base_new_array = newArrayBuffer(base.signed, base.bytes, new_size);
-        if (!base.array) throw new Error('realloc failed. base.array is null');
-        initBase(base_new_array, base.array.length, new_size);  // init BASE in new range
-        base_new_array.set(base.array);
-        base.array = null;  // explicit GC
-        base.array = base_new_array;
-
-        const check_new_array = newArrayBuffer(check.signed, check.bytes, new_size);
-        if (!check.array) throw new Error('realloc failed. check.array is null');
-        initCheck(check_new_array, check.array.length, new_size);  // init CHECK in new range
-        check_new_array.set(check.array);
-        check.array = null;  // explicit GC
-        check.array = check_new_array;
-    };
-
-    let first_unused_node = ROOT_ID + 1;
-
-    const base: BaseCheck = {
-        signed: BASE_SIGNED,
-        bytes: BASE_BYTES,
-        array: newArrayBuffer(BASE_SIGNED, BASE_BYTES, initial_size)
-    };
-
-    const check: BaseCheck = {
-        signed: CHECK_SIGNED,
-        bytes: CHECK_BYTES,
-        array: newArrayBuffer(CHECK_SIGNED, CHECK_BYTES, initial_size)
-    };
-
-    // init root node
-    if (!base.array) {
-        throw new Error("base.array is null");
+        const check_new_array = newArrayBuffer(this.check.signed, this.check.bytes, new_size);
+        this.initCheck(check_new_array, this.check.array.length, new_size);
+        check_new_array.set(this.check.array);
+        this.check.array = check_new_array;
     }
-    if (!check.array) {
-        throw new Error("check.array is null");
+
+    getBaseBuffer() {
+        return this.base.array;
     }
-    base.array[ROOT_ID] = 1;
-    check.array[ROOT_ID] = ROOT_ID;
 
-    // init BASE
-    initBase(base.array, ROOT_ID + 1, base.array.length);
+    getCheckBuffer() {
+        return this.check.array;
+    }
 
-    // init CHECK
-    initCheck(check.array, ROOT_ID + 1, check.array.length);
+    loadBaseBuffer(base_buffer: ArrayBuffer) {
+        this.base.array = base_buffer;
+        return this;
+    }
 
-    return {
-        getBaseBuffer: () => {
-            return base.array;
-        },
-        getCheckBuffer: () => {
-            return check.array;
-        },
-        loadBaseBuffer: (base_buffer: Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array) => {
-            base.array = base_buffer;
-            return this;
-        },
-        loadCheckBuffer: (check_buffer: Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array) => {
-            check.array = check_buffer;
-            return this;
-        },
-        size: () => {
-            if (!base.array) {
-                throw new Error("base.array is null");
-            }
-            if (!check.array) {
-                throw new Error("check.array is null");
-            }
-            return Math.max(base.array.length, check.array.length);
-        },
-        getBase: (index: number) => {
-            if (!base.array) {
-                throw new Error("base.array is null");
-            }
-            if (base.array.length - 1 < index) {
-                return - index + 1;
-                // realloc(index);
-            }
-            // if (!Number.isFinite(base.array[index])) {
-            //     console.log('getBase:' + index);
-            //     throw 'getBase' + index;
-            // }
-            return base.array[index];
-        },
-        getCheck: (index: number) => {
-            if (!check.array) {
-                throw new Error("check.array is null");
-            }
-            if (check.array.length - 1 < index) {
-                return - index - 1;
-                // realloc(index);
-            }
-            // if (!Number.isFinite(check.array[index])) {
-            //     console.log('getCheck:' + index);
-            //     throw 'getCheck' + index;
-            // }
-            return check.array[index];
-        },
-        setBase: (index: number, base_value: number) => {
-            if (!base.array) {
-                throw new Error("base.array is null");
-            }
-            if (base.array.length - 1 < index) {
-                realloc(index);
-            }
-            base.array[index] = base_value;
-        },
-        setCheck: (index: number, check_value: number) => {
-            if (!check.array) {
-                throw new Error("check.array is null");
-            }
-            if (check.array.length - 1 < index) {
-                realloc(index);
-            }
-            check.array[index] = check_value;
-        },
-        setFirstUnusedNode: (index: number) => {
-            // if (!Number.isFinite(index)) {
-            //     throw 'assertion error: setFirstUnusedNode ' + index + ' is not finite number';
-            // }
-            first_unused_node = index;
-        },
-        getFirstUnusedNode: () => {
-            // if (!Number.isFinite(first_unused_node)) {
-            //     throw 'assertion error: getFirstUnusedNode ' + first_unused_node + ' is not finite number';
-            // }
-            return first_unused_node;
-        },
-        shrink: () => {
-            if (!base.array) {
-                throw new Error("base.array is null");
-            }
-            if (!check.array) {
-                throw new Error("check.array is null");
-            }
-            let last_index = Math.max(base.array.length, check.array.length); - 1;
-            while (true) {
-                if (0 <= check.array[last_index]) {
-                    break;
-                }
-                last_index--;
-            }
-            base.array = base.array.subarray(0, last_index + 2);   // keep last unused node
-            check.array = check.array.subarray(0, last_index + 2); // keep last unused node
-        },
-        calc: () => {
-            if (!base.array) {
-                throw new Error("base.array is null");
-            }
-            if (!check.array) {
-                throw new Error("check.array is null");
-            }
-            let unused_count = 0;
-            const size = check.array.length;
-            for (let i = 0; i < size; i++) {
-                if (check.array[i] < 0) {
-                    unused_count++;
-                }
-            }
-            return {
-                all: size,
-                unused: unused_count,
-                efficiency: (size - unused_count) / size
-            };
-        },
-        dump: () => {
-            // for debug
-            if (!base.array) {
-                throw new Error("base.array is null");
-            }
-            if (!check.array) {
-                throw new Error("check.array is null");
-            }
+    loadCheckBuffer(check_buffer: ArrayBuffer) {
+        this.check.array = check_buffer;
+        return this;
+    }
 
-            let dump_base = "";
-            let dump_check = "";
-
-            for (const data of base.array) {
-                dump_base = dump_base + " " + data;
-            }
-            for (const data of check.array) {
-                dump_check = dump_check + " " + data;
-            }
-            console.log("base:" + dump_base);
-            console.log("chck:" + dump_check);
-
-            return "base:" + dump_base + " chck:" + dump_check;
+    size() {
+        if (!this.base.array || !this.check.array) {
+            throw new Error("failed: Arrays not initialized");
         }
-    };
-};
+        return Math.max(this.base.array.length, this.check.array.length);
+    }
+
+    getBase(index: number) {
+        if (!this.base.array) {
+            throw new Error("failed: Arrays not initialized");
+        }
+        if (this.base.array.length - 1 < index) {
+            return -index + 1;
+        }
+        return this.base.array[index];
+    }
+
+    getCheck(index: number) {
+        if (!this.check.array) {
+            throw new Error("failed: Arrays not initialized");
+        }
+        if (this.check.array.length - 1 < index) {
+            return -index - 1;
+        }
+        return this.check.array[index];
+    }
+
+    setBase(index: number, base_value: number) {
+        if (!this.base.array) {
+            throw new Error("failed: Arrays not initialized");
+        }
+        if (this.base.array.length - 1 < index) {
+            this.realloc(index);
+        }
+        this.base.array[index] = base_value;
+    }
+
+    setCheck(index: number, check_value: number) {
+        if (!this.check.array) {
+            throw new Error("failed: Arrays not initialized");
+        }
+        if (this.check.array.length - 1 < index) {
+            this.realloc(index);
+        }
+        this.check.array[index] = check_value;
+    }
+
+    setFirstUnusedNode(index: number) {
+        this.first_unused_node = index;
+    }
+
+    getFirstUnusedNode() {
+        return this.first_unused_node;
+    }
+
+    shrink() {
+        if (!this.base.array || !this.check.array) {
+            throw new Error("failed: Arrays not initialized");
+        }
+        let last_index = Math.max(this.base.array.length, this.check.array.length) - 1;
+        while (0 <= this.check.array[last_index]) {
+            last_index--;
+        }
+        this.base.array = this.base.array.subarray(0, last_index + 2);
+        this.check.array = this.check.array.subarray(0, last_index + 2);
+    }
+
+    calc() {
+        if (!this.base.array || !this.check.array) {
+            throw new Error("failed: Arrays not initialized");
+        }
+        let unused_count = 0;
+        const size = this.check.array.length;
+        for (let i = 0; i < size; i++) {
+            if (this.check.array[i] < 0) {
+                unused_count++;
+            }
+        }
+        return {
+            all: size,
+            unused: unused_count,
+            efficiency: (size - unused_count) / size
+        };
+    }
+
+    dump() {
+        if (!this.base.array || !this.check.array) {
+            throw new Error("failed: Arrays not initialized");
+        }
+        let dump_base = "";
+        let dump_check = "";
+
+        for (const data of this.base.array) {
+            dump_base += " " + data;
+        }
+        for (const data of this.check.array) {
+            dump_check += " " + data;
+        }
+
+        console.log("base:" + dump_base);
+        console.log("check:" + dump_check);
+
+        return "base:" + dump_base + " check:" + dump_check;
+    }
+}
 
 /**
  * Factory method of double array
  */
 class DoubleArrayBuilder {
-    bc: ReturnType<typeof newBC>;
+    bufferController: BufferController;
     keys: { k: string, v: number }[]
     constructor(initial_size: number = 1024) {
-        this.bc = newBC(initial_size);  // BASE and CHECK
+        this.bufferController = new BufferController(initial_size);  // BASE and CHECK
         this.keys = [];
     }
 
@@ -316,7 +289,7 @@ class DoubleArrayBuilder {
     */
     build(keys: { k: string, v: number }[] = this.keys, sorted: boolean = false) {
         if (keys == null) {
-            return new DoubleArray(this.bc);
+            return new DoubleArray(this.bufferController);
         }
         // Convert key string to ArrayBuffer
         let buff_keys: { k: any; v: number; }[] | null = keys.map((k) => {
@@ -347,7 +320,7 @@ class DoubleArrayBuilder {
         buff_keys = null;  // explicit GC
 
         this._build(ROOT_ID, 0, 0, this.keys.length);
-        return new DoubleArray(this.bc);
+        return new DoubleArray(this.bufferController);
     };
 
     /**
@@ -399,7 +372,7 @@ class DoubleArrayBuilder {
     };
 
     setBC(parent_id: number, children_info: Int32Array, _base: number) {
-        const bc = this.bc;
+        const bc = this.bufferController;
         bc.setBase(parent_id, _base);  // Update BASE of parent node
         let i;
         for (i = 0; i < children_info.length; i = i + 3) {
@@ -455,7 +428,7 @@ class DoubleArrayBuilder {
     * Find BASE value that all children are allocatable in double array's region
     */
     findAllocatableBase(children_info: Int32Array) {
-        const bc = this.bc;
+        const bc = this.bufferController;
 
         // Assertion: keys are sorted by byte order
         // var c = -1;
@@ -487,7 +460,7 @@ class DoubleArrayBuilder {
             }
 
             let empty_area_found = true;
-            for (var i = 0; i < children_info.length; i = i + 3) {
+            for (let i = 0; i < children_info.length; i = i + 3) {
                 const code = children_info[i];
                 const candidate_id = _base + code;
 
@@ -514,7 +487,7 @@ class DoubleArrayBuilder {
     * Check this double array index is unused or not
     */
     isUnusedNode(index: number) {
-        const bc = this.bc;
+        const bc = this.bufferController;
         const check = bc.getCheck(index);
 
         // if (index < 0) {
@@ -539,10 +512,10 @@ class DoubleArrayBuilder {
 * Factory method of double array
 */
 class DoubleArray {
-    bc: ReturnType<typeof newBC>;
-    constructor(bc: ReturnType<typeof newBC>) {
-        this.bc = bc;  // BASE and CHECK
-        this.bc.shrink();
+    bufferController: BufferController;
+    constructor(bc: BufferController) {
+        this.bufferController = bc;  // BASE and CHECK
+        this.bufferController.shrink();
     }
 
     /**
@@ -552,7 +525,7 @@ class DoubleArray {
      * @return {Boolean} True if this trie contains a given key
      */
     contain(key: string) {
-        const bc = this.bc;
+        const bc = this.bufferController;
         key += TERM_CHAR;
         const buffer = encoder.encode(key);
         let parent = ROOT_ID;
@@ -596,7 +569,7 @@ class DoubleArray {
             }
             parent = child;
         }
-        const base = this.bc.getBase(child);
+        const base = this.bufferController.getBase(child);
         if (base <= 0) {
             // leaf node
             return - base - 1;
@@ -614,9 +587,9 @@ class DoubleArray {
     * @return {Array} Each result object has 'k' and 'v' (key and record,
     * respectively) properties assigned to matched string
     */
-    commonPrefixSearch(key: string) {
+    commonPrefixSearch(key: string): { k: string, v: number }[] {
         const buffer = encoder.encode(key);
-        const result = [];
+        const result: { k: string, v: number }[] = [];
         let parent = ROOT_ID;
         let child = NOT_FOUND;
         for (let i = 0; i < buffer.length; i++) {
@@ -627,7 +600,7 @@ class DoubleArray {
                 // look forward by terminal character code to check this node is a leaf or not
                 const grand_child = this.traverse(child, TERM_CODE);
                 if (grand_child !== NOT_FOUND) {
-                    const base = this.bc.getBase(grand_child);
+                    const base = this.bufferController.getBase(grand_child);
                     const r: { k: string, v: number } = {
                         k: "",
                         v: 0
@@ -650,8 +623,8 @@ class DoubleArray {
     };
 
     traverse(parent: number, code: number) {
-        const child = this.bc.getBase(parent) + code;
-        if (this.bc.getCheck(child) === parent) {
+        const child = this.bufferController.getBase(parent) + code;
+        if (this.bufferController.getCheck(child) === parent) {
             return child;
         } else {
             return NOT_FOUND;
@@ -659,15 +632,15 @@ class DoubleArray {
     };
 
     size() {
-        return this.bc.size();
+        return this.bufferController.size();
     };
 
     calc() {
-        return this.bc.calc();
+        return this.bufferController.calc();
     };
 
     dump() {
-        return this.bc.dump();
+        return this.bufferController.dump();
     };
 }
 
@@ -675,11 +648,11 @@ const doublearray = {
     builder: (initial_size: number = 1024) => {
         return new DoubleArrayBuilder(initial_size);
     },
-    load: (base_buffer: Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array, check_buffer: Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array) => {
-        const bc = newBC(0);
-        bc.loadBaseBuffer(base_buffer);
-        bc.loadCheckBuffer(check_buffer);
-        return new DoubleArray(bc);
+    load: (base_buffer: ArrayBuffer, check_buffer: ArrayBuffer) => {
+        const bufferController = new BufferController(0);
+        bufferController.loadBaseBuffer(base_buffer);
+        bufferController.loadCheckBuffer(check_buffer);
+        return new DoubleArray(bufferController);
     }
 };
 
