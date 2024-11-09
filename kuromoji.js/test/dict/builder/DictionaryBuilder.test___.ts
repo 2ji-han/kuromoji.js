@@ -29,7 +29,7 @@ const unk_def_file = DIC_DIR + "unk.def";
 const tid_dic_file = DIC_DIR + "minimum.csv";
 
 describe("DictionaryBuilder", () => {
-    let kuromoji_dic: DynamicDictionaries | null = null;  // target object of DynamicDictionaries to build
+    let kuromoji_dic: DynamicDictionaries | null = null; // target object of DynamicDictionaries to build
     beforeEach((done) => {
         // Build token info dictionary
         const builder = kuromoji.dictionaryBuilder();
@@ -64,43 +64,43 @@ describe("DictionaryBuilder", () => {
 
     it("Dictionary not to be null", () => {
         if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null")
+            throw new Error("kuromoji_dic is null");
         }
         expect(kuromoji_dic).not.toBeNull();
     });
     it("TokenInfoDictionary not to be null", () => {
         if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null")
+            throw new Error("kuromoji_dic is null");
         }
         expect(kuromoji_dic.token_info_dictionary).not.toBeNull();
     });
     it("TokenInfoDictionary", () => {
         if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null")
+            throw new Error("kuromoji_dic is null");
         }
         // expect(kuromoji_dic.token_info_dictionary.getFeatures("1467000")).to.have.length.above(1);
         expect(kuromoji_dic.token_info_dictionary.dictionary.buffer.length).toBeGreaterThanOrEqual(1);
     });
     it("DoubleArray not to be null", () => {
         if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null")
+            throw new Error("kuromoji_dic is null");
         }
         expect(kuromoji_dic.trie).not.toBeNull();
     });
     it("ConnectionCosts not to be null", () => {
         if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null")
+            throw new Error("kuromoji_dic is null");
         }
         expect(kuromoji_dic.connection_costs).not.toBeNull();
     });
     it("Tokenize simple test", () => {
         if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null")
+            throw new Error("kuromoji_dic is null");
         }
         const tokenizer = new Tokenizer(kuromoji_dic);
         const path = tokenizer.tokenize("すもももももももものうち");
 
-        const expected_tokens: { [key: string]: any; }[] = [
+        const expected_tokens: { [key: string]: any }[] = [
             {
                 word_type: "KNOWN",
                 word_position: 1,
@@ -113,7 +113,7 @@ describe("DictionaryBuilder", () => {
                 conjugated_form: "*",
                 basic_form: "すもも",
                 reading: "スモモ",
-                pronunciation: "スモモ"
+                pronunciation: "スモモ",
             },
             {
                 word_type: "KNOWN",
@@ -127,7 +127,7 @@ describe("DictionaryBuilder", () => {
                 conjugated_form: "*",
                 basic_form: "も",
                 reading: "モ",
-                pronunciation: "モ"
+                pronunciation: "モ",
             },
             {
                 word_type: "KNOWN",
@@ -141,7 +141,7 @@ describe("DictionaryBuilder", () => {
                 conjugated_form: "*",
                 basic_form: "もも",
                 reading: "モモ",
-                pronunciation: "モモ"
+                pronunciation: "モモ",
             },
             {
                 word_type: "KNOWN",
@@ -155,7 +155,7 @@ describe("DictionaryBuilder", () => {
                 conjugated_form: "*",
                 basic_form: "も",
                 reading: "モ",
-                pronunciation: "モ"
+                pronunciation: "モ",
             },
             {
                 word_type: "KNOWN",
@@ -169,7 +169,7 @@ describe("DictionaryBuilder", () => {
                 conjugated_form: "*",
                 basic_form: "もも",
                 reading: "モモ",
-                pronunciation: "モモ"
+                pronunciation: "モモ",
             },
             {
                 word_type: "KNOWN",
@@ -183,7 +183,7 @@ describe("DictionaryBuilder", () => {
                 conjugated_form: "*",
                 basic_form: "の",
                 reading: "ノ",
-                pronunciation: "ノ"
+                pronunciation: "ノ",
             },
             {
                 word_type: "KNOWN",
@@ -197,8 +197,8 @@ describe("DictionaryBuilder", () => {
                 conjugated_form: "*",
                 basic_form: "うち",
                 reading: "ウチ",
-                pronunciation: "ウチ"
-            }
+                pronunciation: "ウチ",
+            },
         ];
 
         expect(path).toHaveLength(7);

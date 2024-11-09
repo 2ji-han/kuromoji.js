@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -36,7 +36,7 @@ class SurrogateAwareString {
     constructor(str: string) {
         this.str = str;
         this.index_mapping = [];
-        const str_length = str.length
+        const str_length = str.length;
         for (let pos = 0; pos < str_length; pos++) {
             const ch = str.charAt(pos);
             this.index_mapping.push(pos);
@@ -54,7 +54,7 @@ class SurrogateAwareString {
         }
         const surrogate_aware_index = this.index_mapping[index];
         return this.str.slice(surrogate_aware_index);
-    };
+    }
 
     charAt(index: number) {
         if (this.str.length <= index) {
@@ -66,7 +66,7 @@ class SurrogateAwareString {
             return this.str.slice(surrogate_aware_start_index);
         }
         return this.str.slice(surrogate_aware_start_index, surrogate_aware_end_index);
-    };
+    }
 
     charCodeAt(index: number) {
         if (this.index_mapping.length <= index) {
@@ -75,18 +75,18 @@ class SurrogateAwareString {
         const surrogate_aware_index = this.index_mapping[index];
         const upper = this.str.charCodeAt(surrogate_aware_index);
         let lower;
-        if (upper >= 0xD800 && upper <= 0xDBFF && surrogate_aware_index < this.str.length) {
+        if (upper >= 0xd800 && upper <= 0xdbff && surrogate_aware_index < this.str.length) {
             lower = this.str.charCodeAt(surrogate_aware_index + 1);
-            if (lower >= 0xDC00 && lower <= 0xDFFF) {
-                return (upper - 0xD800) * 0x400 + lower - 0xDC00 + 0x10000;
+            if (lower >= 0xdc00 && lower <= 0xdfff) {
+                return (upper - 0xd800) * 0x400 + lower - 0xdc00 + 0x10000;
             }
         }
         return upper;
-    };
+    }
 
     toString() {
         return this.str;
-    };
+    }
 
     add(other: SurrogateAwareString): SurrogateAwareString {
         return new SurrogateAwareString(this.str + other.str);
@@ -98,13 +98,13 @@ class SurrogateAwareString {
 
     static isSurrogatePair(ch: string) {
         const utf16_code = ch.charCodeAt(0);
-        if (utf16_code >= 0xD800 && utf16_code <= 0xDBFF) {
+        if (utf16_code >= 0xd800 && utf16_code <= 0xdbff) {
             // surrogate pair
             return true;
         } else {
             return false;
         }
-    };
+    }
 }
 
 export default SurrogateAwareString;

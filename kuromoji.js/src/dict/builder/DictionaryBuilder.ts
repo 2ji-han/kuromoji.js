@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -37,17 +37,17 @@ class DictionaryBuilder {
     cc_builder: ConnectionCostsBuilder;
     cd_builder: CharacterDefinitionBuilder;
     /**
-    * Build dictionaries (token info, connection costs)
-    *
-    * Generates from matrix.def
-    * cc.dat: Connection costs
-    *
-    * Generates from *.csv
-    * dat.dat: Double array
-    * tid.dat: Token info dictionary
-    * tid_map.dat: targetMap
-    * tid_pos.dat: posList (part of speech)
-    */
+     * Build dictionaries (token info, connection costs)
+     *
+     * Generates from matrix.def
+     * cc.dat: Connection costs
+     *
+     * Generates from *.csv
+     * dat.dat: Double array
+     * tid.dat: Token info dictionary
+     * tid_map.dat: targetMap
+     * tid_pos.dat: posList (part of speech)
+     */
     constructor() {
         // Array of entries, each entry in Mecab form
         // (0: surface form, 1: left id, 2: right id, 3: word cost, 4: part of speech id, 5-: other features)
@@ -61,43 +61,48 @@ class DictionaryBuilder {
         const new_entry = line.split(",");
         this.tid_entries.push(new_entry);
         return this;
-    };
+    }
 
     /**
-    * Put one line of "matrix.def" file for building ConnectionCosts object
-    * @param {string} line is a line of "matrix.def"
-    */
+     * Put one line of "matrix.def" file for building ConnectionCosts object
+     * @param {string} line is a line of "matrix.def"
+     */
     putCostMatrixLine(line: string) {
         this.cc_builder.putLine(line);
         return this;
-    };
+    }
 
     putCharDefLine(line: string) {
         this.cd_builder.putLine(line);
         return this;
-    };
+    }
 
     /**
-    * Put one line of "unk.def" file for building UnknownDictionary object
-    * @param {string} line is a line of "unk.def"
-    */
+     * Put one line of "unk.def" file for building UnknownDictionary object
+     * @param {string} line is a line of "unk.def"
+     */
     putUnkDefLine(line: string) {
         this.unk_entries.push(line.split(","));
         return this;
-    };
+    }
 
     build() {
         const dictionaries = this.buildTokenInfoDictionary();
         const unknown_dictionary = this.buildUnknownDictionary();
 
-        return new DynamicDictionaries(dictionaries.trie, dictionaries.token_info_dictionary, this.cc_builder.build(), unknown_dictionary);
-    };
+        return new DynamicDictionaries(
+            dictionaries.trie,
+            dictionaries.token_info_dictionary,
+            this.cc_builder.build(),
+            unknown_dictionary
+        );
+    }
 
     /**
-    * Build TokenInfoDictionary
-    *
-    * @returns {{trie: *, token_info_dictionary: *}}
-    */
+     * Build TokenInfoDictionary
+     *
+     * @returns {{trie: *, token_info_dictionary: *}}
+     */
     buildTokenInfoDictionary() {
         const token_info_dictionary = new TokenInfoDictionary();
         // using as hashmap, string -> string (word_id -> surface_form) to build dictionary
@@ -114,9 +119,9 @@ class DictionaryBuilder {
         }
         return {
             trie: trie,
-            token_info_dictionary: token_info_dictionary
+            token_info_dictionary: token_info_dictionary,
         };
-    };
+    }
 
     buildUnknownDictionary() {
         const unk_dictionary = new UnknownDictionary();
@@ -140,7 +145,7 @@ class DictionaryBuilder {
             unk_dictionary.addMapping(class_id, parseInt(token_info_id));
         }
         return unk_dictionary;
-    };
+    }
 
     /**
      * Build double array trie
@@ -156,7 +161,7 @@ class DictionaryBuilder {
 
         const builder = doublearray.builder(1024 * 1024);
         return builder.build(words);
-    };
+    }
 }
 
 export default DictionaryBuilder;

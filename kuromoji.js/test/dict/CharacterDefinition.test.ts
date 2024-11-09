@@ -25,13 +25,15 @@ import fs from "fs";
 const DIC_DIR = "test/_resource/minimum-dic/";
 
 describe("CharacterDefinition from char.def", () => {
-    let char_def: CharacterDefinition | null = null;  // target object
+    let char_def: CharacterDefinition | null = null; // target object
 
     beforeEach((done) => {
         const cd_builder = new CharacterDefinitionBuilder();
-        fs.readFileSync(DIC_DIR + "char.def", "utf-8").split("\n").map((line) => {
-            cd_builder.putLine(line);
-        });
+        fs.readFileSync(DIC_DIR + "char.def", "utf-8")
+            .split("\n")
+            .map((line) => {
+                cd_builder.putLine(line);
+            });
         char_def = cd_builder.build();
         done();
     });
@@ -179,14 +181,14 @@ describe("CharacterDefinition from char.def", () => {
             class_name: "DEFAULT",
             is_always_invoke: false,
             is_grouping: true,
-            max_length: 0
+            max_length: 0,
         });
         expect(invoke_def.getCharacterClass(10)).toEqual({
             class_id: 10,
-            class_name: 'CYRILLIC',
+            class_name: "CYRILLIC",
             is_always_invoke: true,
             is_grouping: true,
-            max_length: 0
+            max_length: 0,
         });
     });
 });

@@ -20,27 +20,27 @@ import SurrogateAwareString from "../../src/util/SurrogateAwareString";
 
 describe("SurrogateAwareString", () => {
     it("length 1", () => {
-        const str = new SurrogateAwareString("𠮷");  // target object
+        const str = new SurrogateAwareString("𠮷"); // target object
         expect(str.length).toEqual(1);
     });
     it("length 3", () => {
-        const str = new SurrogateAwareString("𠮷野屋");  // target object
+        const str = new SurrogateAwareString("𠮷野屋"); // target object
         expect(str.length).toEqual(3);
     });
     it("slice", () => {
-        const str = new SurrogateAwareString("𠮷野屋");  // target object
+        const str = new SurrogateAwareString("𠮷野屋"); // target object
         expect(str.slice(0)).toEqual("𠮷野屋");
         expect(str.slice(1)).toEqual("野屋");
         expect(str.slice(2)).toEqual("屋");
     });
     it("charAt", () => {
-        const str = new SurrogateAwareString("𠮷野屋");  // target object
+        const str = new SurrogateAwareString("𠮷野屋"); // target object
         expect(str.charAt(0)).toEqual("𠮷");
         expect(str.charAt(1)).toEqual("野");
         expect(str.charAt(2)).toEqual("屋");
     });
     it("charCodeAt", () => {
-        const str = new SurrogateAwareString("𠮷野屋");  // target object
+        const str = new SurrogateAwareString("𠮷野屋"); // target object
         expect(str.charCodeAt(0)).toEqual(0x20bb7);
         expect(str.charCodeAt(1)).toEqual("野".charCodeAt(0));
         expect(str.charCodeAt(2)).toEqual("屋".charCodeAt(0));

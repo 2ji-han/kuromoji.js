@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -45,7 +45,7 @@ class Tokenizer {
         this.unknown_dictionary = dic.unknown_dictionary;
         this.viterbi_builder = new ViterbiBuilder(dic);
         this.viterbi_searcher = new ViterbiSearcher(dic.connection_costs);
-        this.formatter = new IpadicFormatter();  // TODO Other dictionaries
+        this.formatter = new IpadicFormatter(); // TODO Other dictionaries
     }
 
     static splitByPunctuation(input: string): string[] {
@@ -61,7 +61,7 @@ class Tokenizer {
             sentences.push(input.slice(lastIndex));
         }
         return sentences;
-    };
+    }
 
     tokenize(text: string) {
         const sentences = Tokenizer.splitByPunctuation(text);
@@ -70,12 +70,12 @@ class Tokenizer {
             this.tokenizeForSentence(sentence, tokens);
         }
         return tokens;
-    };
+    }
 
     tokenizeForSentence(sentence: string, tokens: TOKEN[] = []) {
         const lattice = this.getLattice(sentence);
         const best_path = this.viterbi_searcher.search(lattice);
-        const last_pos = (tokens.length > 0) ? tokens[tokens.length - 1].word_position : 0;
+        const last_pos = tokens.length > 0 ? tokens[tokens.length - 1].word_position : 0;
 
         const best_path_length = best_path.length;
         for (let i = 0; i < best_path_length; i++) {
@@ -85,7 +85,7 @@ class Tokenizer {
         }
 
         return tokens;
-    };
+    }
 
     getTokenFromNode(node: ViterbiNode, last_pos: number): TOKEN {
         if (node.type === "KNOWN") {
@@ -96,7 +96,13 @@ class Tokenizer {
             // Unknown word
             const features_line = this.unknown_dictionary.getFeatures(node.name);
             const features = features_line == null ? [] : features_line.split(",");
-            return this.formatter.formatUnknownEntry(node.name, last_pos + node.start_pos, node.type, features, node.surface_form);
+            return this.formatter.formatUnknownEntry(
+                node.name,
+                last_pos + node.start_pos,
+                node.type,
+                features,
+                node.surface_form
+            );
         } else {
             // TODO User dictionary
             return this.formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, []);
@@ -105,7 +111,7 @@ class Tokenizer {
 
     getLattice(text: string) {
         return this.viterbi_builder.build(text);
-    };
+    }
 }
 
 export default Tokenizer;

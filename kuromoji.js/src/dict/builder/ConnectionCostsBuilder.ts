@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -30,9 +30,9 @@ class ConnectionCostsBuilder {
     lines: number;
     connection_cost: null | ConnectionCosts;
     /**
-    * Builder class for constructing ConnectionCosts object
-    * @constructor
-    */
+     * Builder class for constructing ConnectionCosts object
+     * @constructor
+     */
     constructor() {
         this.lines = 0;
         this.connection_cost = null;
@@ -80,14 +80,14 @@ class ConnectionCostsBuilder {
         this.connection_cost.put(forward_id, backward_id, cost);
         this.lines++;
         return this;
-    };
+    }
 
     build() {
         if (!this.connection_cost) {
             throw "ConnectionCostsBuilder.connection_cost is null";
         }
         return this.connection_cost;
-    };
+    }
 }
 
 export default ConnectionCostsBuilder;

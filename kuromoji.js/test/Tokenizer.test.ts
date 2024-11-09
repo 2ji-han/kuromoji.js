@@ -32,7 +32,14 @@ describe("Tokenizer static method test", () => {
         expect(Tokenizer.splitByPunctuation("。")).toStrictEqual(["。"]);
     });
     it("splitByPunctuation", () => {
-        expect(Tokenizer.splitByPunctuation("すもも、も、もも。もも、も、もも。")).toStrictEqual(["すもも、", "も、", "もも。", "もも、", "も、", "もも。"]);
+        expect(Tokenizer.splitByPunctuation("すもも、も、もも。もも、も、もも。")).toStrictEqual([
+            "すもも、",
+            "も、",
+            "もも。",
+            "もも、",
+            "も、",
+            "もも。",
+        ]);
     });
     it("splitByPunctuation", () => {
         expect(Tokenizer.splitByPunctuation("、𠮷野屋。漢字。")).toStrictEqual(["、", "𠮷野屋。", "漢字。"]);
@@ -55,7 +62,7 @@ describe("Tokenizer for IPADic", () => {
             throw new Error("tokenizer is null");
         }
         const path = tokenizer.tokenize("すもももももももものうち");
-        const expected_tokens: { [key: string]: any; }[] = [
+        const expected_tokens: { [key: string]: any }[] = [
             {
                 word_type: "KNOWN",
                 word_position: 1,
@@ -68,7 +75,7 @@ describe("Tokenizer for IPADic", () => {
                 conjugated_form: "*",
                 basic_form: "すもも",
                 reading: "スモモ",
-                pronunciation: "スモモ"
+                pronunciation: "スモモ",
             },
             {
                 word_type: "KNOWN",
@@ -82,7 +89,7 @@ describe("Tokenizer for IPADic", () => {
                 conjugated_form: "*",
                 basic_form: "も",
                 reading: "モ",
-                pronunciation: "モ"
+                pronunciation: "モ",
             },
             {
                 word_type: "KNOWN",
@@ -96,7 +103,7 @@ describe("Tokenizer for IPADic", () => {
                 conjugated_form: "*",
                 basic_form: "もも",
                 reading: "モモ",
-                pronunciation: "モモ"
+                pronunciation: "モモ",
             },
             {
                 word_type: "KNOWN",
@@ -110,7 +117,7 @@ describe("Tokenizer for IPADic", () => {
                 conjugated_form: "*",
                 basic_form: "も",
                 reading: "モ",
-                pronunciation: "モ"
+                pronunciation: "モ",
             },
             {
                 word_type: "KNOWN",
@@ -124,7 +131,7 @@ describe("Tokenizer for IPADic", () => {
                 conjugated_form: "*",
                 basic_form: "もも",
                 reading: "モモ",
-                pronunciation: "モモ"
+                pronunciation: "モモ",
             },
             {
                 word_type: "KNOWN",
@@ -138,7 +145,7 @@ describe("Tokenizer for IPADic", () => {
                 conjugated_form: "*",
                 basic_form: "の",
                 reading: "ノ",
-                pronunciation: "ノ"
+                pronunciation: "ノ",
             },
             {
                 word_type: "KNOWN",
@@ -152,8 +159,8 @@ describe("Tokenizer for IPADic", () => {
                 conjugated_form: "*",
                 basic_form: "うち",
                 reading: "ウチ",
-                pronunciation: "ウチ"
-            }
+                pronunciation: "ウチ",
+            },
         ];
 
         expect(path).toHaveLength(7);

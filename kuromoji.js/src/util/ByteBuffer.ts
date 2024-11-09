@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -42,7 +42,7 @@ class ByteBuffer {
             this.position = 0;
         } else if (arg instanceof Uint8Array) {
             this.buffer = arg;
-            this.position = 0;  // Overwrite
+            this.position = 0; // Overwrite
         } else {
             // typeof arg -> String
             throw typeof arg + " is invalid parameter type for ByteBuffer constructor";
@@ -51,18 +51,18 @@ class ByteBuffer {
 
     size() {
         return this.buffer.length;
-    };
+    }
 
     reallocate() {
         var new_array = new Uint8Array(this.buffer.length * 2);
         new_array.set(this.buffer);
         this.buffer = new_array;
-    };
+    }
 
     shrink() {
         this.buffer = this.buffer.subarray(0, this.position);
         return this.buffer;
-    };
+    }
 
     put(b: number | boolean) {
         if (this.buffer.length < this.position + 1) {
@@ -73,7 +73,7 @@ class ByteBuffer {
         } else {
             this.buffer[this.position++] = b;
         }
-    };
+    }
 
     get(index: number | null = null) {
         if (index == null) {
@@ -84,18 +84,18 @@ class ByteBuffer {
             return 0;
         }
         return this.buffer[index];
-    };
+    }
 
     // Write short to buffer by little endian
     putShort(num: number) {
-        if (0xFFFF < num) {
+        if (0xffff < num) {
             throw num + " is over short value";
         }
-        const lower = (0x00FF & num);
-        const upper = (0xFF00 & num) >> 8;
+        const lower = 0x00ff & num;
+        const upper = (0xff00 & num) >> 8;
         this.put(lower);
         this.put(upper);
-    };
+    }
 
     // Read short from buffer by little endian
     getShort(index: number | null) {
@@ -110,25 +110,25 @@ class ByteBuffer {
         const upper = this.buffer[index + 1];
         let value = (upper << 8) + lower;
         if (value & 0x8000) {
-            value = -((value - 1) ^ 0xFFFF);
+            value = -((value - 1) ^ 0xffff);
         }
         return value;
-    };
+    }
 
     // Write integer to buffer by little endian
     putInt(num: number) {
-        if (0xFFFFFFFF < num) {
+        if (0xffffffff < num) {
             throw num + " is over integer value";
         }
-        const b0 = (0x000000FF & num);
-        const b1 = (0x0000FF00 & num) >> 8;
-        const b2 = (0x00FF0000 & num) >> 16;
-        const b3 = (0xFF000000 & num) >> 24;
+        const b0 = 0x000000ff & num;
+        const b1 = (0x0000ff00 & num) >> 8;
+        const b2 = (0x00ff0000 & num) >> 16;
+        const b3 = (0xff000000 & num) >> 24;
         this.put(b0);
         this.put(b1);
         this.put(b2);
         this.put(b3);
-    };
+    }
 
     // Read integer from buffer by little endian
     getInt(index: number | null = null) {
@@ -145,13 +145,13 @@ class ByteBuffer {
         const b3 = this.buffer[index + 3];
 
         return (b3 << 24) + (b2 << 16) + (b1 << 8) + b0;
-    };
+    }
 
     readInt() {
         const pos = this.position;
         this.position += 4;
         return this.getInt(pos);
-    };
+    }
 
     putString(str: string) {
         const bytes = encoder.encode(str);
@@ -161,7 +161,7 @@ class ByteBuffer {
         }
         // put null character as terminal character
         this.put(0);
-    };
+    }
 
     getString(index: number = this.position) {
         const buf = [];
@@ -175,7 +175,7 @@ class ByteBuffer {
 
         this.position = index;
         return decoder.decode(new Uint8Array(buf));
-    };
+    }
 
     getUtf32(index: number | null = null): number {
         if (index == null) {

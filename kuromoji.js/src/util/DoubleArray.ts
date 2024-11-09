@@ -5,15 +5,15 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
 
 const TERM_CHAR = "\u0000"; // terminal character
-const TERM_CODE = 0;        // terminal character code
-const ROOT_ID = 0;          // index of root node
-const NOT_FOUND = -1;       // traverse() returns if no nodes found
+const TERM_CODE = 0; // terminal character code
+const ROOT_ID = 0; // index of root node
+const NOT_FOUND = -1; // traverse() returns if no nodes found
 const BASE_SIGNED = true;
 const CHECK_SIGNED = true;
 const BASE_BYTES = 4;
@@ -57,9 +57,9 @@ const arrayCopy = (src: Uint8Array, src_offset: number, length: number) => {
 type ArrayBuffer = Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array;
 
 type BaseCheck = {
-    signed: boolean,
-    bytes: number,
-    array: ArrayBuffer | null
+    signed: boolean;
+    bytes: number;
+    array: ArrayBuffer | null;
 };
 
 class BufferController {
@@ -73,13 +73,13 @@ class BufferController {
         this.base = {
             signed: BASE_SIGNED,
             bytes: BASE_BYTES,
-            array: newArrayBuffer(BASE_SIGNED, BASE_BYTES, initial_size)
+            array: newArrayBuffer(BASE_SIGNED, BASE_BYTES, initial_size),
         };
 
         this.check = {
             signed: CHECK_SIGNED,
             bytes: CHECK_BYTES,
-            array: newArrayBuffer(CHECK_SIGNED, CHECK_BYTES, initial_size)
+            array: newArrayBuffer(CHECK_SIGNED, CHECK_BYTES, initial_size),
         };
 
         if (!this.base.array || !this.check.array) {
@@ -232,7 +232,7 @@ class BufferController {
         return {
             all: size,
             unused: unused_count,
-            efficiency: (size - unused_count) / size
+            efficiency: (size - unused_count) / size,
         };
     }
 
@@ -262,40 +262,40 @@ class BufferController {
  */
 class DoubleArrayBuilder {
     bufferController: BufferController;
-    keys: { k: string, v: number }[]
+    keys: { k: string; v: number }[];
     constructor(initial_size: number = 1024) {
-        this.bufferController = new BufferController(initial_size);  // BASE and CHECK
+        this.bufferController = new BufferController(initial_size); // BASE and CHECK
         this.keys = [];
     }
 
     /**
-    * Append a key to initialize set
-    * (This method should be called by dictionary ordered key)
-    *
-    * @param {String} key
-    * @param {Number} value Integer value from 0 to max signed integer number - 1
-    */
+     * Append a key to initialize set
+     * (This method should be called by dictionary ordered key)
+     *
+     * @param {String} key
+     * @param {Number} value Integer value from 0 to max signed integer number - 1
+     */
     append(key: string, record: number) {
         this.keys.push({ k: key, v: record });
         return this;
-    };
+    }
 
     /**
-    * Build double array for given keys
-    *
-    * @param {Array} keys Array of keys. A key is a Object which has properties 'k', 'v'.
-    * 'k' is a key string, 'v' is a record assigned to that key.
-    * @return {DoubleArray} Compiled double array
-    */
-    build(keys: { k: string, v: number }[] = this.keys, sorted: boolean = false) {
+     * Build double array for given keys
+     *
+     * @param {Array} keys Array of keys. A key is a Object which has properties 'k', 'v'.
+     * 'k' is a key string, 'v' is a record assigned to that key.
+     * @return {DoubleArray} Compiled double array
+     */
+    build(keys: { k: string; v: number }[] = this.keys, sorted: boolean = false) {
         if (keys == null) {
             return new DoubleArray(this.bufferController);
         }
         // Convert key string to ArrayBuffer
-        let buff_keys: { k: any; v: number; }[] | null = keys.map((k) => {
+        let buff_keys: { k: any; v: number }[] | null = keys.map((k) => {
             return {
                 k: encoder.encode(k.k + TERM_CHAR),
-                v: k.v
+                v: k.v,
             };
         });
 
@@ -317,15 +317,15 @@ class DoubleArrayBuilder {
             });
         }
 
-        buff_keys = null;  // explicit GC
+        buff_keys = null; // explicit GC
 
         this._build(ROOT_ID, 0, 0, this.keys.length);
         return new DoubleArray(this.bufferController);
-    };
+    }
 
     /**
-    * Append nodes to BASE and CHECK array recursively
-    */
+     * Append nodes to BASE and CHECK array recursively
+     */
     _build(parent_index: number, position: number, start: number, length: number) {
         const children_info = this.getChildrenInfo(position, start, length);
         const _base = this.findAllocatableBase(children_info);
@@ -342,25 +342,25 @@ class DoubleArrayBuilder {
             const child_index = _base + child_code;
             this._build(child_index, position + 1, child_start, child_len);
         }
-    };
+    }
 
     getChildrenInfo(position: number, start: number, length: number) {
         let current_char = this.keys[start].k[position];
         let children_info = new Int32Array(length * 3);
         let i = 0;
 
-        children_info[i++] = parseInt(current_char);  // char (current)
-        children_info[i++] = start;         // start index (current)
+        children_info[i++] = parseInt(current_char); // char (current)
+        children_info[i++] = start; // start index (current)
 
         let next_pos = start;
         let start_pos = start;
         for (; next_pos < start + length; next_pos++) {
             const next_char = this.keys[next_pos].k[position];
             if (current_char !== next_char) {
-                children_info[i++] = next_pos - start_pos;  // length (current)
+                children_info[i++] = next_pos - start_pos; // length (current)
 
-                children_info[i++] = parseInt(next_char);             // char (next)
-                children_info[i++] = next_pos;              // start index (next)
+                children_info[i++] = parseInt(next_char); // char (next)
+                children_info[i++] = next_pos; // start index (next)
                 current_char = next_char;
                 start_pos = next_pos;
             }
@@ -369,11 +369,11 @@ class DoubleArrayBuilder {
         children_info = children_info.subarray(0, i);
 
         return children_info;
-    };
+    }
 
     setBC(parent_id: number, children_info: Int32Array, _base: number) {
         const bc = this.bufferController;
-        bc.setBase(parent_id, _base);  // Update BASE of parent node
+        bc.setBase(parent_id, _base); // Update BASE of parent node
         let i;
         for (i = 0; i < children_info.length; i = i + 3) {
             const code = children_info[i];
@@ -386,8 +386,8 @@ class DoubleArrayBuilder {
             //     throw 'assertion error: child_id is negative'
             // }
 
-            const prev_unused_id = - bc.getBase(child_id);
-            const next_unused_id = - bc.getCheck(child_id);
+            const prev_unused_id = -bc.getBase(child_id);
+            const next_unused_id = -bc.getCheck(child_id);
             // if (prev_unused_id < 0) {
             //     throw 'assertion error: setBC'
             // }
@@ -395,15 +395,15 @@ class DoubleArrayBuilder {
             //     throw 'assertion error: setBC'
             // }
             if (child_id !== bc.getFirstUnusedNode()) {
-                bc.setCheck(prev_unused_id, - next_unused_id);
+                bc.setCheck(prev_unused_id, -next_unused_id);
             } else {
                 // Update first_unused_node
                 bc.setFirstUnusedNode(next_unused_id);
             }
-            bc.setBase(next_unused_id, - prev_unused_id);
+            bc.setBase(next_unused_id, -prev_unused_id);
 
-            const check = parent_id;         // CHECK is parent node index
-            bc.setCheck(child_id, check);  // Update CHECK of child node
+            const check = parent_id; // CHECK is parent node index
+            bc.setCheck(child_id, check); // Update CHECK of child node
 
             // Update record
             if (code === TERM_CODE) {
@@ -418,15 +418,15 @@ class DoubleArrayBuilder {
                     value = 0;
                 }
 
-                const base = - value - 1;       // BASE is inverted record value
-                bc.setBase(child_id, base);  // Update BASE of child(leaf) node
+                const base = -value - 1; // BASE is inverted record value
+                bc.setBase(child_id, base); // Update BASE of child(leaf) node
             }
         }
-    };
+    }
 
     /**
-    * Find BASE value that all children are allocatable in double array's region
-    */
+     * Find BASE value that all children are allocatable in double array's region
+     */
     findAllocatableBase(children_info: Int32Array) {
         const bc = this.bufferController;
 
@@ -441,7 +441,7 @@ class DoubleArrayBuilder {
 
         // iterate linked list of unused nodes
         let _base: number;
-        let curr = bc.getFirstUnusedNode();  // current index
+        let curr = bc.getFirstUnusedNode(); // current index
         // if (curr < 0) {
         //     throw 'assertion error: getFirstUnusedNode returns negative value'
         // }
@@ -450,7 +450,7 @@ class DoubleArrayBuilder {
             _base = curr - children_info[0];
 
             if (_base < 0) {
-                curr = - bc.getCheck(curr);  // next
+                curr = -bc.getCheck(curr); // next
 
                 // if (curr < 0) {
                 //     throw 'assertion error: getCheck returns negative value'
@@ -467,7 +467,7 @@ class DoubleArrayBuilder {
                 if (!this.isUnusedNode(candidate_id)) {
                     // candidate_id is used node
                     // next
-                    curr = - bc.getCheck(curr);
+                    curr = -bc.getCheck(curr);
                     // if (curr < 0) {
                     //     throw 'assertion error: getCheck returns negative value'
                     // }
@@ -484,8 +484,8 @@ class DoubleArrayBuilder {
     }
 
     /**
-    * Check this double array index is unused or not
-    */
+     * Check this double array index is unused or not
+     */
     isUnusedNode(index: number) {
         const bc = this.bufferController;
         const check = bc.getCheck(index);
@@ -505,16 +505,16 @@ class DoubleArrayBuilder {
 
         // used node (incl. leaf)
         return false;
-    };
+    }
 }
 
 /**
-* Factory method of double array
-*/
+ * Factory method of double array
+ */
 class DoubleArray {
     bufferController: BufferController;
     constructor(bc: BufferController) {
-        this.bufferController = bc;  // BASE and CHECK
+        this.bufferController = bc; // BASE and CHECK
         this.bufferController.shrink();
     }
 
@@ -548,14 +548,14 @@ class DoubleArray {
             }
         }
         return false;
-    };
+    }
 
     /**
-    * Look up a given key in this trie
-    *
-    * @param {String} key
-    * @return {Number} Record value assgned to this key, -1 if this key does not contain
-    */
+     * Look up a given key in this trie
+     *
+     * @param {String} key
+     * @return {Number} Record value assgned to this key, -1 if this key does not contain
+     */
     lookup(key: string) {
         key += TERM_CHAR;
         const buffer = encoder.encode(key);
@@ -572,24 +572,23 @@ class DoubleArray {
         const base = this.bufferController.getBase(child);
         if (base <= 0) {
             // leaf node
-            return - base - 1;
+            return -base - 1;
         } else {
             // not leaf
             return NOT_FOUND;
         }
-    };
-
+    }
 
     /**
-    * Common prefix search
-    *
-    * @param {String} key
-    * @return {Array} Each result object has 'k' and 'v' (key and record,
-    * respectively) properties assigned to matched string
-    */
-    commonPrefixSearch(key: string): { k: string, v: number }[] {
+     * Common prefix search
+     *
+     * @param {String} key
+     * @return {Array} Each result object has 'k' and 'v' (key and record,
+     * respectively) properties assigned to matched string
+     */
+    commonPrefixSearch(key: string): { k: string; v: number }[] {
         const buffer = encoder.encode(key);
-        const result: { k: string, v: number }[] = [];
+        const result: { k: string; v: number }[] = [];
         let parent = ROOT_ID;
         let child = NOT_FOUND;
         for (let i = 0; i < buffer.length; i++) {
@@ -601,14 +600,14 @@ class DoubleArray {
                 const grand_child = this.traverse(child, TERM_CODE);
                 if (grand_child !== NOT_FOUND) {
                     const base = this.bufferController.getBase(grand_child);
-                    const r: { k: string, v: number } = {
+                    const r: { k: string; v: number } = {
                         k: "",
-                        v: 0
+                        v: 0,
                     };
 
                     if (base <= 0) {
                         // If child is a leaf node, add record to result
-                        r.v = - base - 1;
+                        r.v = -base - 1;
                     }
                     // If child is a leaf node, add word to result
                     r.k = decoder.decode(arrayCopy(buffer, 0, i + 1));
@@ -620,7 +619,7 @@ class DoubleArray {
             }
         }
         return result;
-    };
+    }
 
     traverse(parent: number, code: number) {
         const child = this.bufferController.getBase(parent) + code;
@@ -629,19 +628,19 @@ class DoubleArray {
         } else {
             return NOT_FOUND;
         }
-    };
+    }
 
     size() {
         return this.bufferController.size();
-    };
+    }
 
     calc() {
         return this.bufferController.calc();
-    };
+    }
 
     dump() {
         return this.bufferController.dump();
-    };
+    }
 }
 
 const doublearray = {
@@ -653,7 +652,7 @@ const doublearray = {
         bufferController.loadBaseBuffer(base_buffer);
         bufferController.loadCheckBuffer(check_buffer);
         return new DoubleArray(bufferController);
-    }
+    },
 };
 
 export { DoubleArrayBuilder, DoubleArray };

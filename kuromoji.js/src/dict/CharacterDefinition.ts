@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -40,25 +40,25 @@ class CharacterDefinition {
      * @constructor
      */
     constructor() {
-        this.character_category_map = new Uint8Array(65536);  // for all UCS2 code points
-        this.compatible_category_map = new Uint32Array(65536);  // for all UCS2 code points
+        this.character_category_map = new Uint8Array(65536); // for all UCS2 code points
+        this.compatible_category_map = new Uint32Array(65536); // for all UCS2 code points
         this.invoke_definition_map = null;
     }
 
     /**
-    * Load CharacterDefinition
-    * @param {Uint8Array} cat_map_buffer
-    * @param {Uint32Array} compat_cat_map_buffer
-    * @param {Uint8Array} invoke_def_buffer
-    * @returns {CharacterDefinition}
-    */
+     * Load CharacterDefinition
+     * @param {Uint8Array} cat_map_buffer
+     * @param {Uint32Array} compat_cat_map_buffer
+     * @param {Uint8Array} invoke_def_buffer
+     * @returns {CharacterDefinition}
+     */
     load(cat_map_buffer: Uint8Array, compat_cat_map_buffer: Uint32Array, invoke_def_buffer: Uint8Array) {
         const char_def = new CharacterDefinition();
         char_def.character_category_map = cat_map_buffer;
         char_def.compatible_category_map = compat_cat_map_buffer;
         char_def.invoke_definition_map = InvokeDefinitionMap.load(invoke_def_buffer);
         return char_def;
-    };
+    }
 
     static parseCharCategory(class_id: number, parsed_category_def: RegExpExecArray) {
         const category = parsed_category_def[1];
@@ -77,40 +77,40 @@ class CharacterDefinition {
             console.log("char.def parse error. LENGTH is 1 to n:" + max_length);
             return null;
         }
-        const is_invoke = (invoke === 1);
-        const is_grouping = (grouping === 1);
+        const is_invoke = invoke === 1;
+        const is_grouping = grouping === 1;
         return new CharacterClass(class_id, category, is_invoke, is_grouping, max_length);
-    };
+    }
 
     static parseCategoryMapping(parsed_category_mapping: RegExpExecArray) {
         const start = parseInt(parsed_category_mapping[1]);
         const default_category = parsed_category_mapping[2];
-        const compatible_category = (3 < parsed_category_mapping.length) ? parsed_category_mapping.slice(3) : [];
-        if (!isFinite(start) || start < 0 || start > 0xFFFF) {
+        const compatible_category = 3 < parsed_category_mapping.length ? parsed_category_mapping.slice(3) : [];
+        if (!isFinite(start) || start < 0 || start > 0xffff) {
             console.log("char.def parse error. CODE is invalid:" + start);
         }
         return { start: start, default: default_category, compatible: compatible_category };
-    };
+    }
 
     static parseRangeCategoryMapping(parsed_category_mapping: RegExpExecArray) {
         const start = parseInt(parsed_category_mapping[1]);
         const end = parseInt(parsed_category_mapping[2]);
         const default_category = parsed_category_mapping[3];
-        const compatible_category = (4 < parsed_category_mapping.length) ? parsed_category_mapping.slice(4) : [];
-        if (!isFinite(start) || start < 0 || start > 0xFFFF) {
+        const compatible_category = 4 < parsed_category_mapping.length ? parsed_category_mapping.slice(4) : [];
+        if (!isFinite(start) || start < 0 || start > 0xffff) {
             console.log("char.def parse error. CODE is invalid:" + start);
         }
-        if (!isFinite(end) || end < 0 || end > 0xFFFF) {
+        if (!isFinite(end) || end < 0 || end > 0xffff) {
             console.log("char.def parse error. CODE is invalid:" + end);
         }
         return { start: start, end: end, default: default_category, compatible: compatible_category };
-    };
+    }
 
     /**
-    * Initializing method
-    * @param {Array} category_mapping Array of category mapping
-    */
-    initCategoryMappings(category_mapping: { start: number, end?: number, default: string, compatible: string[] }[]) {
+     * Initializing method
+     * @param {Array} category_mapping Array of category mapping
+     */
+    initCategoryMappings(category_mapping: { start: number; end?: number; default: string; compatible: string[] }[]) {
         if (!this.invoke_definition_map) {
             throw new Error("CharacterDefinition.initCategoryMappings: invoke_definition_map is null");
         }
@@ -122,11 +122,12 @@ class CharacterDefinition {
                 const mapping = category_mapping[i];
                 const end = mapping.end || mapping.start;
                 for (code_point = mapping.start; code_point <= end; code_point++) {
-
                     // Default Category class ID
                     const id = this.invoke_definition_map.lookup(mapping.default);
                     if (id == null) {
-                        throw new Error("CharacterDefinition.initCategoryMappings: invoke_definition_map.lookup() returns null");
+                        throw new Error(
+                            "CharacterDefinition.initCategoryMappings: invoke_definition_map.lookup() returns null"
+                        );
                     }
                     this.character_category_map[code_point] = id;
 
@@ -136,12 +137,12 @@ class CharacterDefinition {
                         if (compatible_category == null) {
                             continue;
                         }
-                        const class_id = this.invoke_definition_map.lookup(compatible_category);  // Default Category
+                        const class_id = this.invoke_definition_map.lookup(compatible_category); // Default Category
                         if (class_id == null) {
                             continue;
                         }
                         const class_id_bit = 1 << class_id;
-                        bitset = bitset | class_id_bit;  // Set a bit of class ID 例えば、class_idが3のとき、3ビット目に1を立てる
+                        bitset = bitset | class_id_bit; // Set a bit of class ID 例えば、class_idが3のとき、3ビット目に1を立てる
                         this.compatible_category_map[code_point] = bitset;
                     }
                 }
@@ -159,13 +160,13 @@ class CharacterDefinition {
                 this.character_category_map[code_point] = 1 << default_id;
             }
         }
-    };
+    }
 
     /**
-    * Lookup compatible categories for a character (not included 1st category)
-    * @param {string} ch UCS2 character (just 1st character is effective)
-    * @returns {Array.<CharacterClass>} character classes
-    */
+     * Lookup compatible categories for a character (not included 1st category)
+     * @param {string} ch UCS2 character (just 1st character is effective)
+     * @returns {Array.<CharacterClass>} character classes
+     */
     lookupCompatibleCategory(ch: string) {
         const classes: CharacterClass[] = [];
         if (!this.invoke_definition_map) {
@@ -180,13 +181,14 @@ class CharacterDefinition {
         const code = ch.charCodeAt(0);
         let integer: number | null = null;
         if (code < this.compatible_category_map.length) {
-            integer = this.compatible_category_map[code];  // Bitset
+            integer = this.compatible_category_map[code]; // Bitset
         }
         if (integer == null || integer === 0) {
             return classes;
         }
-        for (let bit = 0; bit < 32; bit++) {  // Treat "bit" as a class ID
-            if (((integer << (31 - bit)) >>> 31) === 1) {
+        for (let bit = 0; bit < 32; bit++) {
+            // Treat "bit" as a class ID
+            if ((integer << (31 - bit)) >>> 31 === 1) {
                 const character_class = this.invoke_definition_map.getCharacterClass(bit);
                 if (character_class == null) {
                     continue;
@@ -195,13 +197,13 @@ class CharacterDefinition {
             }
         }
         return classes;
-    };
+    }
 
     /**
-    * Lookup category for a character
-    * @param {string} ch UCS2 character (just 1st character is effective)
-    * @returns {CharacterClass} character class
-    */
+     * Lookup category for a character
+     * @param {string} ch UCS2 character (just 1st character is effective)
+     * @returns {CharacterClass} character class
+     */
     lookup(ch: string) {
         if (!this.invoke_definition_map) {
             throw new Error("CharacterDefinition.lookup: invoke_definition_map is null");
@@ -212,7 +214,7 @@ class CharacterDefinition {
             // Surrogate pair character codes can not be defined by char.def, so set DEFAULT category
             class_id = this.invoke_definition_map.lookup(DEFAULT_CATEGORY);
         } else if (code < this.character_category_map.length) {
-            class_id = this.character_category_map[code];  // Read as integer value
+            class_id = this.character_category_map[code]; // Read as integer value
         }
 
         if (class_id == null) {
@@ -220,7 +222,7 @@ class CharacterDefinition {
         }
 
         return this.invoke_definition_map.getCharacterClass(class_id as number);
-    };
+    }
 }
 
 export default CharacterDefinition;

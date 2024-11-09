@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -31,23 +31,23 @@ import type ViterbiNode from "./ViterbiNode";
 class ViterbiSearcher {
     connection_costs: ConnectionCosts;
     /**
-    * ViterbiSearcher is for searching best Viterbi path
-    * @param {ConnectionCosts} connection_costs Connection costs matrix
-    * @constructor
-    */
+     * ViterbiSearcher is for searching best Viterbi path
+     * @param {ConnectionCosts} connection_costs Connection costs matrix
+     * @constructor
+     */
     constructor(connection_costs: ConnectionCosts) {
         this.connection_costs = connection_costs;
     }
 
     /**
-    * Search best path by forward-backward algorithm
-    * @param {ViterbiLattice} lattice Viterbi lattice to search
-    * @returns {Array} Shortest path
-    */
+     * Search best path by forward-backward algorithm
+     * @param {ViterbiLattice} lattice Viterbi lattice to search
+     * @returns {Array} Shortest path
+     */
     search(lattice: ViterbiLattice) {
         lattice = this.forward(lattice);
         return this.backward(lattice);
-    };
+    }
 
     forward(lattice: ViterbiLattice) {
         let i: number = 1;
@@ -83,7 +83,7 @@ class ViterbiSearcher {
             }
         }
         return lattice;
-    };
+    }
 
     backward(lattice: ViterbiLattice) {
         const shortest_path: ViterbiNode[] = [];
@@ -102,7 +102,7 @@ class ViterbiSearcher {
         }
 
         return shortest_path.reverse();
-    };
+    }
 }
 
 export default ViterbiSearcher;

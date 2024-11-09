@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -37,10 +37,10 @@ class ViterbiBuilder {
     token_info_dictionary: TokenInfoDictionary;
     unknown_dictionary: UnknownDictionary;
     /**
-    * ViterbiBuilder builds word lattice (ViterbiLattice)
-    * @param {DynamicDictionaries} dic dictionary
-    * @constructor
-    */
+     * ViterbiBuilder builds word lattice (ViterbiLattice)
+     * @param {DynamicDictionaries} dic dictionary
+     * @constructor
+     */
     constructor(dic: DynamicDictionaries) {
         this.trie = dic.trie;
         this.token_info_dictionary = dic.token_info_dictionary;
@@ -48,10 +48,10 @@ class ViterbiBuilder {
     }
 
     /**
-    * Build word lattice
-    * @param {string} sentence_str Input text
-    * @returns {ViterbiLattice} Word lattice
-    */
+     * Build word lattice
+     * @param {string} sentence_str Input text
+     * @returns {ViterbiLattice} Word lattice
+     */
     build(sentence_str: string) {
         const lattice = new ViterbiLattice();
         const sentence = new SurrogateAwareString(sentence_str);
@@ -60,7 +60,8 @@ class ViterbiBuilder {
             const tail = sentence.slice(pos);
             const vocabulary = this.trie.commonPrefixSearch(tail);
             const vocabulary_length = vocabulary.length;
-            for (let n = 0; n < vocabulary_length; n++) {  // Words in dictionary do not have surrogate pair (only UCS2 set)
+            for (let n = 0; n < vocabulary_length; n++) {
+                // Words in dictionary do not have surrogate pair (only UCS2 set)
                 const trie_id = vocabulary[n].v;
                 const key = vocabulary[n].k;
                 const token_info_ids = this.token_info_dictionary.target_map[trie_id];
@@ -71,7 +72,9 @@ class ViterbiBuilder {
                     const right_id = this.token_info_dictionary.dictionary.getShort(token_info_id + 2);
                     const word_cost = this.token_info_dictionary.dictionary.getShort(token_info_id + 4);
                     // node_name, cost, start_index, length, type, left_id, right_id, surface_form
-                    lattice.append(new ViterbiNode(token_info_id, word_cost, pos + 1, key.length, "KNOWN", left_id, right_id, key));
+                    lattice.append(
+                        new ViterbiNode(token_info_id, word_cost, pos + 1, key.length, "KNOWN", left_id, right_id, key)
+                    );
                 }
             }
 
@@ -96,7 +99,18 @@ class ViterbiBuilder {
                 const unknown_dict = this.unknown_dictionary.dictionary;
                 for (let j = 0; j < unk_length; j++) {
                     const unk_id = unk_ids[j];
-                    lattice.append(new ViterbiNode(unk_id, unknown_dict.getShort(unk_id + 4), pos + 1, key.length, "UNKNOWN", unknown_dict.getShort(unk_id), unknown_dict.getShort(unk_id + 2), key));
+                    lattice.append(
+                        new ViterbiNode(
+                            unk_id,
+                            unknown_dict.getShort(unk_id + 4),
+                            pos + 1,
+                            key.length,
+                            "UNKNOWN",
+                            unknown_dict.getShort(unk_id),
+                            unknown_dict.getShort(unk_id + 2),
+                            key
+                        )
+                    );
                 }
             }
         }
@@ -104,7 +118,7 @@ class ViterbiBuilder {
         lattice.appendEos();
 
         return lattice;
-    };
+    }
 }
 
 export default ViterbiBuilder;

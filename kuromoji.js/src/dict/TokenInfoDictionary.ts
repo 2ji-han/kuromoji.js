@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -28,11 +28,11 @@ import ByteBuffer from "../util/ByteBuffer";
 
 class TokenInfoDictionary {
     dictionary: ByteBuffer;
-    target_map: { [key: number]: number[] };;
+    target_map: { [key: number]: number[] };
     pos_buffer: ByteBuffer;
     constructor() {
         this.dictionary = new ByteBuffer(10 * 1024 * 1024);
-        this.target_map = {};  // trie_id (of surface form) -> token_info_id (of token)
+        this.target_map = {}; // trie_id (of surface form) -> token_info_id (of token)
         this.pos_buffer = new ByteBuffer(10 * 1024 * 1024);
     }
 
@@ -49,7 +49,7 @@ class TokenInfoDictionary {
             const left_id = parseInt(entry[1]);
             const right_id = parseInt(entry[2]);
             const word_cost = parseInt(entry[3]);
-            const feature = entry.slice(4).join(",");  // TODO Optimize
+            const feature = entry.slice(4).join(","); // TODO Optimize
             // Assertion
             if (!isFinite(left_id) || !isFinite(right_id) || !isFinite(word_cost)) {
                 console.log(entry);
@@ -63,7 +63,7 @@ class TokenInfoDictionary {
         this.pos_buffer.shrink();
 
         return dictionary_entries;
-    };
+    }
 
     put(left_id: number, right_id: number, word_cost: number, surface_form: string, feature: string): number {
         const token_info_id = this.dictionary.position;
@@ -76,7 +76,7 @@ class TokenInfoDictionary {
         this.pos_buffer.putString(surface_form + "," + feature);
 
         return token_info_id;
-    };
+    }
 
     addMapping(source: number, target: number): void {
         let mapping = this.target_map[source];
@@ -86,14 +86,14 @@ class TokenInfoDictionary {
         mapping.push(target);
 
         this.target_map[source] = mapping;
-    };
+    }
 
     targetMapToBuffer(): Uint8Array {
         const buffer = new ByteBuffer();
         const map_keys_size = Object.keys(this.target_map).length;
         buffer.putInt(map_keys_size);
         for (const key in this.target_map) {
-            const values = this.target_map[key];  // Array
+            const values = this.target_map[key]; // Array
             const map_values_size = values.length;
             buffer.putInt(parseInt(key));
             buffer.putInt(map_values_size);
@@ -101,27 +101,27 @@ class TokenInfoDictionary {
                 buffer.putInt(value);
             }
         }
-        return buffer.shrink();  // Shrink-ed Typed Array
-    };
+        return buffer.shrink(); // Shrink-ed Typed Array
+    }
 
     // from tid.dat
     loadDictionary(array_buffer: Uint8Array) {
         this.dictionary = new ByteBuffer(array_buffer);
         return this;
-    };
+    }
 
     // from tid_pos.dat
     loadPosVector(array_buffer: Uint8Array) {
         this.pos_buffer = new ByteBuffer(array_buffer);
         return this;
-    };
+    }
 
     // from tid_map.dat
     loadTargetMap(array_buffer: Uint8Array) {
         const buffer = new ByteBuffer(array_buffer);
         buffer.position = 0;
         this.target_map = {};
-        buffer.readInt();  // map_keys_size
+        buffer.readInt(); // map_keys_size
         while (true) {
             if (buffer.buffer.length < buffer.position + 1) {
                 break;
@@ -134,7 +134,7 @@ class TokenInfoDictionary {
             }
         }
         return this;
-    };
+    }
 
     getFeatures(token_info_id: number): string | null {
         if (isNaN(token_info_id)) {
@@ -142,7 +142,7 @@ class TokenInfoDictionary {
         }
         const pos_id = this.dictionary.getInt(token_info_id + 6);
         return this.pos_buffer.getString(pos_id);
-    };
+    }
 }
 
 export default TokenInfoDictionary;

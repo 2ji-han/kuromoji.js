@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -40,7 +40,7 @@ export type TOKEN = {
     basic_form: string;
     reading?: string;
     pronunciation?: string;
-}
+};
 
 /**
  * Mappings between IPADIC dictionary features and tokenized results
@@ -64,9 +64,15 @@ class IpadicFormatter {
             pronunciation: features[9],
         };
         return token;
-    };
+    }
 
-    formatUnknownEntry(word_id: number, position: number, type: WORD_TYPE, features: string[], surface_form: string | Uint8Array) {
+    formatUnknownEntry(
+        word_id: number,
+        position: number,
+        type: WORD_TYPE,
+        features: string[],
+        surface_form: string | Uint8Array
+    ) {
         const token: TOKEN = {
             word_id: word_id,
             word_type: type,
@@ -84,7 +90,7 @@ class IpadicFormatter {
         // token.pronunciation = features[9];
 
         return token;
-    };
+    }
 }
 
 export default IpadicFormatter;

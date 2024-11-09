@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -44,7 +44,7 @@ class ConnectionCosts {
             throw "ConnectionCosts buffer overflow";
         }
         this.buffer[index] = cost;
-    };
+    }
 
     get(forward_id: number, backward_id: number) {
         const index = forward_id * this.backward_dimension + backward_id + 2;
@@ -52,13 +52,13 @@ class ConnectionCosts {
             throw "ConnectionCosts buffer overflow";
         }
         return this.buffer[index];
-    };
+    }
 
     loadConnectionCosts(connection_costs_buffer: Int16Array) {
         this.forward_dimension = connection_costs_buffer[0];
         this.backward_dimension = connection_costs_buffer[1];
         this.buffer = connection_costs_buffer;
-    };
+    }
 }
 
 export default ConnectionCosts;

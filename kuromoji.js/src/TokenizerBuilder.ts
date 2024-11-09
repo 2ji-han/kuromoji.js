@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -29,7 +29,7 @@ import DictionaryLoader from "./loader/NodeDictionaryLoader";
 
 export type TokenizerBuilderOption = {
     dicPath?: string | undefined;
-}
+};
 
 class TokenizerBuilder {
     dic_path: string;

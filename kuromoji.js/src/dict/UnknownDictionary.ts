@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -32,14 +32,14 @@ class UnknownDictionary {
     target_map: { [key: number]: number[] };
     pos_buffer: ByteBuffer;
     character_definition: CharacterDefinition | null = null;
-    
+
     /**
      * UnknownDictionary
      * @constructor
      */
     constructor() {
         this.dictionary = new ByteBuffer(10 * 1024 * 1024);
-        this.target_map = {};  // trie_id (of surface form) -> token_info_id (of token)
+        this.target_map = {}; // trie_id (of surface form) -> token_info_id (of token)
         this.pos_buffer = new ByteBuffer(10 * 1024 * 1024);
     }
 
@@ -57,7 +57,7 @@ class UnknownDictionary {
             const left_id = parseInt(entry[1]);
             const right_id = parseInt(entry[2]);
             const word_cost = parseInt(entry[3]);
-            const feature = entry.slice(4).join(",");  // TODO Optimize
+            const feature = entry.slice(4).join(","); // TODO Optimize
             // Assertion
             if (!isFinite(left_id) || !isFinite(right_id) || !isFinite(word_cost)) {
                 console.log(entry);
@@ -71,7 +71,7 @@ class UnknownDictionary {
         this.pos_buffer.shrink();
 
         return dictionary_entries;
-    };
+    }
 
     put(left_id: number, right_id: number, word_cost: number, surface_form: string, feature: string): number {
         const token_info_id = this.dictionary.position;
@@ -84,7 +84,7 @@ class UnknownDictionary {
         this.pos_buffer.putString(surface_form + "," + feature);
 
         return token_info_id;
-    };
+    }
 
     addMapping(source: number, target: number): void {
         let mapping = this.target_map[source];
@@ -94,14 +94,14 @@ class UnknownDictionary {
         mapping.push(target);
 
         this.target_map[source] = mapping;
-    };
+    }
 
     targetMapToBuffer(): Uint8Array {
         const buffer = new ByteBuffer();
         const map_keys_size = Object.keys(this.target_map).length;
         buffer.putInt(map_keys_size);
         for (const key in this.target_map) {
-            const values = this.target_map[key];  // Array
+            const values = this.target_map[key]; // Array
             const map_values_size = values.length;
             buffer.putInt(parseInt(key));
             buffer.putInt(map_values_size);
@@ -109,27 +109,27 @@ class UnknownDictionary {
                 buffer.putInt(value);
             }
         }
-        return buffer.shrink();  // Shrink-ed Typed Array
-    };
+        return buffer.shrink(); // Shrink-ed Typed Array
+    }
 
     // from tid.dat
     loadDictionary(array_buffer: Uint8Array) {
         this.dictionary = new ByteBuffer(array_buffer);
         return this;
-    };
+    }
 
     // from tid_pos.dat
     loadPosVector(array_buffer: Uint8Array) {
         this.pos_buffer = new ByteBuffer(array_buffer);
         return this;
-    };
+    }
 
     // from tid_map.dat
     loadTargetMap(array_buffer: Uint8Array) {
         const buffer = new ByteBuffer(array_buffer);
         buffer.position = 0;
         this.target_map = {};
-        buffer.readInt();  // map_keys_size
+        buffer.readInt(); // map_keys_size
         while (true) {
             if (buffer.buffer.length < buffer.position + 1) {
                 break;
@@ -142,7 +142,7 @@ class UnknownDictionary {
             }
         }
         return this;
-    };
+    }
 
     getFeatures(token_info_id: number): string | null {
         if (isNaN(token_info_id)) {
@@ -150,33 +150,44 @@ class UnknownDictionary {
         }
         const pos_id = this.dictionary.getInt(token_info_id + 6);
         return this.pos_buffer.getString(pos_id);
-    };
+    }
 
     characterDefinition(character_definition: CharacterDefinition) {
         this.character_definition = character_definition;
         return this;
-    };
+    }
 
     lookup(ch: string) {
         if (this.character_definition == null) {
             throw new Error("CharacterDefinition is not set");
         }
         return this.character_definition.lookup(ch);
-    };
+    }
 
     lookupCompatibleCategory(ch: string) {
         if (this.character_definition == null) {
             throw new Error("CharacterDefinition is not set");
         }
         return this.character_definition.lookupCompatibleCategory(ch);
-    };
+    }
 
-    loadUnknownDictionaries(unk_buffer: Uint8Array, unk_pos_buffer: Uint8Array, unk_map_buffer: Uint8Array, cat_map_buffer: Uint8Array, compat_cat_map_buffer: Uint32Array, invoke_def_buffer: Uint8Array) {
+    loadUnknownDictionaries(
+        unk_buffer: Uint8Array,
+        unk_pos_buffer: Uint8Array,
+        unk_map_buffer: Uint8Array,
+        cat_map_buffer: Uint8Array,
+        compat_cat_map_buffer: Uint32Array,
+        invoke_def_buffer: Uint8Array
+    ) {
         this.loadDictionary(unk_buffer);
         this.loadPosVector(unk_pos_buffer);
         this.loadTargetMap(unk_map_buffer);
-        this.character_definition = new CharacterDefinition().load(cat_map_buffer, compat_cat_map_buffer, invoke_def_buffer);
-    };
+        this.character_definition = new CharacterDefinition().load(
+            cat_map_buffer,
+            compat_cat_map_buffer,
+            invoke_def_buffer
+        );
+    }
 }
 
 export default UnknownDictionary;

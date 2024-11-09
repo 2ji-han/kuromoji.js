@@ -22,7 +22,7 @@ import ViterbiBuilder from "../../src/viterbi/ViterbiBuilder";
 const DIC_DIR = "dict/";
 
 describe("ViterbiBuilder", () => {
-    let viterbi_builder: ViterbiBuilder | null = null;  // target object
+    let viterbi_builder: ViterbiBuilder | null = null; // target object
 
     beforeEach((done) => {
         const loader = new DictionaryLoader(DIC_DIR);
@@ -34,7 +34,7 @@ describe("ViterbiBuilder", () => {
 
     it("Unknown word", () => {
         if (!viterbi_builder) {
-            throw new Error("ViterbiBuilder is null")
+            throw new Error("ViterbiBuilder is null");
         }
         // lattice to have "ト", "トト", "トトロ"
         const lattice = viterbi_builder.build("トトロ");
@@ -43,11 +43,32 @@ describe("ViterbiBuilder", () => {
             if (nodes == null) {
                 continue;
             }
-            expect(nodes.map(function (node) {
-                return node.surface_form;
-            })).toStrictEqual([
-                "トトロ", "トトロ", "トトロ", "トトロ", "トトロ", "トトロ", "トロ", "トロ", "トロ",
-                "トロ", "トロ", "トロ", "トロ", "ロ", "ロ", "ロ", "ロ", "ロ", "ロ", "ロ", "ロ"
+            expect(
+                nodes.map(function (node) {
+                    return node.surface_form;
+                })
+            ).toStrictEqual([
+                "トトロ",
+                "トトロ",
+                "トトロ",
+                "トトロ",
+                "トトロ",
+                "トトロ",
+                "トロ",
+                "トロ",
+                "トロ",
+                "トロ",
+                "トロ",
+                "トロ",
+                "トロ",
+                "ロ",
+                "ロ",
+                "ロ",
+                "ロ",
+                "ロ",
+                "ロ",
+                "ロ",
+                "ロ",
             ]);
         }
     });

@@ -34,19 +34,19 @@ describe("DictionaryLoader", () => {
 
     it("Unknown dictionaries are loaded properly", () => {
         if (!dictionaries) {
-            throw new Error("dictionaries is null")
+            throw new Error("dictionaries is null");
         }
         expect(dictionaries.unknown_dictionary.lookup(" ")).toEqual({
             class_id: 1,
             class_name: "SPACE",
             is_always_invoke: false,
             is_grouping: true,
-            max_length: 0
+            max_length: 0,
         });
     });
     it("TokenInfoDictionary is loaded properly", () => {
         if (!dictionaries) {
-            throw new Error("dictionaries is null")
+            throw new Error("dictionaries is null");
         }
         expect(dictionaries.token_info_dictionary.getFeatures(0)?.length).toBeGreaterThanOrEqual(1);
     });

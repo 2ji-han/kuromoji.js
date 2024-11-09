@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -42,9 +42,9 @@ class CharacterDefinitionBuilder {
         end?: number;
     }[];
     /**
-    * CharacterDefinitionBuilder
-    * @constructor
-    */
+     * CharacterDefinitionBuilder
+     * @constructor
+     */
     constructor() {
         this.char_def = new CharacterDefinition();
         this.char_def.invoke_definition_map = new InvokeDefinitionMap();
@@ -73,7 +73,7 @@ class CharacterDefinitionBuilder {
             const range_mapping = CharacterDefinition.parseRangeCategoryMapping(parsed_range_category_mapping);
             this.category_mapping.push(range_mapping);
         }
-    };
+    }
 
     build() {
         // TODO If DEFAULT category does not exist, throw error
@@ -83,7 +83,7 @@ class CharacterDefinitionBuilder {
         this.char_def.invoke_definition_map.init(this.character_category_definition);
         this.char_def.initCategoryMappings(this.category_mapping);
         return this.char_def;
-    };
+    }
 }
 
 export default CharacterDefinitionBuilder;

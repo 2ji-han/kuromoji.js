@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -35,13 +35,16 @@ class DynamicDictionaries {
     token_info_dictionary: TokenInfoDictionary;
     connection_costs: ConnectionCosts;
     unknown_dictionary: UnknownDictionary;
-    constructor(trie?: DoubleArray, token_info_dictionary?: TokenInfoDictionary, connection_costs?: ConnectionCosts, unknown_dictionary?: UnknownDictionary) {
+    constructor(
+        trie?: DoubleArray,
+        token_info_dictionary?: TokenInfoDictionary,
+        connection_costs?: ConnectionCosts,
+        unknown_dictionary?: UnknownDictionary
+    ) {
         if (trie != null) {
             this.trie = trie;
         } else {
-            this.trie = doublearray.builder(0).build([
-                { k: "", v: 1 }
-            ]);
+            this.trie = doublearray.builder(0).build([{ k: "", v: 1 }]);
         }
         if (token_info_dictionary != null) {
             this.token_info_dictionary = token_info_dictionary;
@@ -64,24 +67,38 @@ class DynamicDictionaries {
     loadTrie(base_buffer: Int32Array, check_buffer: Int32Array) {
         this.trie = doublearray.load(base_buffer, check_buffer);
         return this;
-    };
+    }
 
     loadTokenInfoDictionaries(token_info_buffer: Uint8Array, pos_buffer: Uint8Array, target_map_buffer: Uint8Array) {
         this.token_info_dictionary.loadDictionary(token_info_buffer);
         this.token_info_dictionary.loadPosVector(pos_buffer);
         this.token_info_dictionary.loadTargetMap(target_map_buffer);
         return this;
-    };
+    }
 
     loadConnectionCosts(cc_buffer: Int16Array) {
         this.connection_costs.loadConnectionCosts(cc_buffer);
         return this;
-    };
+    }
 
-    loadUnknownDictionaries(unk_buffer: Uint8Array, unk_pos_buffer: Uint8Array, unk_map_buffer: Uint8Array, cat_map_buffer: Uint8Array, compat_cat_map_buffer: Uint32Array, invoke_def_buffer: Uint8Array) {
-        this.unknown_dictionary.loadUnknownDictionaries(unk_buffer, unk_pos_buffer, unk_map_buffer, cat_map_buffer, compat_cat_map_buffer, invoke_def_buffer);
+    loadUnknownDictionaries(
+        unk_buffer: Uint8Array,
+        unk_pos_buffer: Uint8Array,
+        unk_map_buffer: Uint8Array,
+        cat_map_buffer: Uint8Array,
+        compat_cat_map_buffer: Uint32Array,
+        invoke_def_buffer: Uint8Array
+    ) {
+        this.unknown_dictionary.loadUnknownDictionaries(
+            unk_buffer,
+            unk_pos_buffer,
+            unk_map_buffer,
+            cat_map_buffer,
+            compat_cat_map_buffer,
+            invoke_def_buffer
+        );
         return this;
-    };
+    }
 }
 
-export default DynamicDictionaries
+export default DynamicDictionaries;

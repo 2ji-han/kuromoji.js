@@ -1,7 +1,12 @@
 {
     "name": "@kuromoji/kuromoji",
     "private": true,
-    "workspaces": [
-        "kuromoji.js"
-    ]
+    "workspaces": ["kuromoji.js"],
+    "devDependencies": {
+        "@biomejs/biome": "^1.9.4"
+    },
+    "trustedDependencies": ["@biomejs/biome"],
+    "scripts": {
+        "lint": "biome"
+    }
 }

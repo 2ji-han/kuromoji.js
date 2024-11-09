@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -27,11 +27,7 @@
 import TokenizerBuilder, { type TokenizerBuilderOption } from "./TokenizerBuilder";
 import DictionaryBuilder from "./dict/builder/DictionaryBuilder";
 
-export {
-    TokenizerBuilder,
-    type TokenizerBuilderOption,
-    DictionaryBuilder
-}
+export { TokenizerBuilder, type TokenizerBuilderOption, DictionaryBuilder };
 
 // Public methods
 export default {
@@ -40,5 +36,5 @@ export default {
     },
     dictionaryBuilder: () => {
         return new DictionaryBuilder();
-    }
+    },
 };

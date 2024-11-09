@@ -19,7 +19,7 @@
  * rewrite by f1w3_ | 2024
  * All rights reserved by Takuya Asano.
  * See above for more information.
- *  
+ *
  */
 
 "use strict";
@@ -36,14 +36,14 @@ class InvokeDefinitionMap {
     lookup_table: { [key: string]: number };
     constructor() {
         this.map = [];
-        this.lookup_table = {};  // Just for building dictionary
+        this.lookup_table = {}; // Just for building dictionary
     }
 
     /**
-    * Load InvokeDefinitionMap from buffer
-    * @param {Uint8Array} invoke_def_buffer
-    * @returns {InvokeDefinitionMap}
-    */
+     * Load InvokeDefinitionMap from buffer
+     * @param {Uint8Array} invoke_def_buffer
+     * @returns {InvokeDefinitionMap}
+     */
     static load(invoke_def_buffer: Uint8Array): InvokeDefinitionMap {
         const invoke_def = new InvokeDefinitionMap();
         const character_category_definition: CharacterClass[] = [];
@@ -55,18 +55,20 @@ class InvokeDefinitionMap {
             const is_grouping = Boolean(buffer.get());
             const max_length = buffer.getInt();
             const class_name = buffer.getString();
-            character_category_definition.push(new CharacterClass(class_id, class_name, is_always_invoke, is_grouping, max_length));
+            character_category_definition.push(
+                new CharacterClass(class_id, class_name, is_always_invoke, is_grouping, max_length)
+            );
         }
 
         invoke_def.init(character_category_definition);
 
         return invoke_def;
-    };
+    }
 
     /**
-    * Initializing method
-    * @param {Array.<CharacterClass>} character_category_definition Array of CharacterClass
-    */
+     * Initializing method
+     * @param {Array.<CharacterClass>} character_category_definition Array of CharacterClass
+     */
     init(character_category_definition: CharacterClass[]) {
         if (character_category_definition == null) {
             return;
@@ -77,34 +79,34 @@ class InvokeDefinitionMap {
             this.map[i] = character_class;
             this.lookup_table[character_class.class_name] = i;
         }
-    };
+    }
 
     /**
-    * Get class information by class ID
-    * @param {number} class_id
-    * @returns {CharacterClass}
-    */
+     * Get class information by class ID
+     * @param {number} class_id
+     * @returns {CharacterClass}
+     */
     getCharacterClass(class_id: number) {
         return this.map[class_id];
-    };
+    }
 
     /**
-    * For building character definition dictionary
-    * @param {string} class_name character
-    * @returns {number} class_id
-    */
+     * For building character definition dictionary
+     * @param {string} class_name character
+     * @returns {number} class_id
+     */
     lookup(class_name: string): number | null {
         const class_id = this.lookup_table[class_name];
         if (class_id == null) {
             return null;
         }
         return class_id;
-    };
+    }
 
     /**
-    * Transform from map to binary buffer
-    * @returns {Uint8Array}
-    */
+     * Transform from map to binary buffer
+     * @returns {Uint8Array}
+     */
     toBuffer() {
         const buffer = new ByteBuffer();
         for (let i = 0; i < this.map.length; i++) {
@@ -116,7 +118,7 @@ class InvokeDefinitionMap {
         }
         buffer.shrink();
         return buffer.buffer;
-    };
+    }
 }
 
 export default InvokeDefinitionMap;
