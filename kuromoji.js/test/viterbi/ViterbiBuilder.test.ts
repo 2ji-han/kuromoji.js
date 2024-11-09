@@ -44,9 +44,7 @@ describe("ViterbiBuilder", () => {
                 continue;
             }
             expect(
-                nodes.map(function (node) {
-                    return node.surface_form;
-                })
+                nodes.map((node) => node.surface_form)
             ).toStrictEqual([
                 "トトロ",
                 "トトロ",

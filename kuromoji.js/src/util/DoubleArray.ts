@@ -1,14 +1,4 @@
-// DoubleArray.ts MIT License
-// Copyright (c) 2014 Takuya Asano All Rights Reserved.
-/*
- *
- * rewrite by f1w3_ | 2024
- * All rights reserved by Takuya Asano.
- * See above for more information.
- *
- */
 
-"use strict";
 
 const TERM_CHAR = "\u0000"; // terminal character
 const TERM_CODE = 0; // terminal character code
@@ -67,7 +57,7 @@ class BufferController {
     private base: BaseCheck;
     private check: BaseCheck;
 
-    constructor(initial_size: number = 1024) {
+    constructor(initial_size = 1024) {
         this.first_unused_node = ROOT_ID + 1;
 
         this.base = {
@@ -263,7 +253,7 @@ class BufferController {
 class DoubleArrayBuilder {
     bufferController: BufferController;
     keys: { k: string; v: number }[];
-    constructor(initial_size: number = 1024) {
+    constructor(initial_size = 1024) {
         this.bufferController = new BufferController(initial_size); // BASE and CHECK
         this.keys = [];
     }
@@ -287,7 +277,7 @@ class DoubleArrayBuilder {
      * 'k' is a key string, 'v' is a record assigned to that key.
      * @return {DoubleArray} Compiled double array
      */
-    build(keys: { k: string; v: number }[] = this.keys, sorted: boolean = false) {
+    build(keys: { k: string; v: number }[] = this.keys, sorted = false) {
         if (keys == null) {
             return new DoubleArray(this.bufferController);
         }
@@ -349,7 +339,7 @@ class DoubleArrayBuilder {
         let children_info = new Int32Array(length * 3);
         let i = 0;
 
-        children_info[i++] = parseInt(current_char); // char (current)
+        children_info[i++] = Number.parseInt(current_char); // char (current)
         children_info[i++] = start; // start index (current)
 
         let next_pos = start;
@@ -359,7 +349,7 @@ class DoubleArrayBuilder {
             if (current_char !== next_char) {
                 children_info[i++] = next_pos - start_pos; // length (current)
 
-                children_info[i++] = parseInt(next_char); // char (next)
+                children_info[i++] = Number.parseInt(next_char); // char (next)
                 children_info[i++] = next_pos; // start index (next)
                 current_char = next_char;
                 start_pos = next_pos;
@@ -644,7 +634,7 @@ class DoubleArray {
 }
 
 const doublearray = {
-    builder: (initial_size: number = 1024) => {
+    builder: (initial_size = 1024) => {
         return new DoubleArrayBuilder(initial_size);
     },
     load: (base_buffer: ArrayBuffer, check_buffer: ArrayBuffer) => {

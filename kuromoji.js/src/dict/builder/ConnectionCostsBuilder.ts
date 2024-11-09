@@ -1,28 +1,4 @@
-/*
- * Copyright 2014 Takuya Asano
- * Copyright 2010-2014 Atilika Inc. and contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-/*
- *
- * rewrite by f1w3_ | 2024
- * All rights reserved by Takuya Asano.
- * See above for more information.
- *
- */
 
-"use strict";
 
 import ConnectionCosts from "../ConnectionCosts";
 
@@ -41,8 +17,8 @@ class ConnectionCostsBuilder {
     putLine(line: string) {
         if (this.lines === 0 || !this.connection_cost) {
             const dimensions = line.split(" ");
-            const forward_dimension = parseInt(dimensions[0]);
-            const backward_dimension = parseInt(dimensions[1]);
+            const forward_dimension = Number.parseInt(dimensions[0]);
+            const backward_dimension = Number.parseInt(dimensions[1]);
 
             if (forward_dimension < 0 || backward_dimension < 0) {
                 throw "Parse error of matrix.def";
@@ -62,9 +38,9 @@ class ConnectionCostsBuilder {
             return this;
         }
 
-        const forward_id = parseInt(costs[0]);
-        const backward_id = parseInt(costs[1]);
-        const cost = parseInt(costs[2]);
+        const forward_id = Number.parseInt(costs[0]);
+        const backward_id = Number.parseInt(costs[1]);
+        const cost = Number.parseInt(costs[2]);
 
         if (
             forward_id < 0 ||

@@ -18,7 +18,7 @@
 import { expect, describe, beforeEach, it } from "bun:test";
 import ByteBuffer from "../../src/util/ByteBuffer";
 
-describe("ByteBuffer static methods", function () {
+describe("ByteBuffer static methods", () => {
     let byteBuffer: ByteBuffer | null = null;
 
     beforeEach((done) => {

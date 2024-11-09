@@ -1,28 +1,4 @@
-/*
- * Copyright 2014 Takuya Asano
- * Copyright 2010-2014 Atilika Inc. and contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-/*
- *
- * rewrite by f1w3_ | 2024
- * All rights reserved by Takuya Asano.
- * See above for more information.
- *
- */
 
-"use strict";
 
 import InvokeDefinitionMap from "./InvokeDefinitionMap";
 import CharacterClass from "./CharacterClass";
@@ -62,9 +38,9 @@ class CharacterDefinition {
 
     static parseCharCategory(class_id: number, parsed_category_def: RegExpExecArray) {
         const category = parsed_category_def[1];
-        const invoke = parseInt(parsed_category_def[2]);
-        const grouping = parseInt(parsed_category_def[3]);
-        const max_length = parseInt(parsed_category_def[4]);
+        const invoke = Number.parseInt(parsed_category_def[2]);
+        const grouping = Number.parseInt(parsed_category_def[3]);
+        const max_length = Number.parseInt(parsed_category_def[4]);
         if (!isFinite(invoke) || (invoke !== 0 && invoke !== 1)) {
             console.log("char.def parse error. INVOKE is 0 or 1 in:" + invoke);
             return null;
@@ -83,7 +59,7 @@ class CharacterDefinition {
     }
 
     static parseCategoryMapping(parsed_category_mapping: RegExpExecArray) {
-        const start = parseInt(parsed_category_mapping[1]);
+        const start = Number.parseInt(parsed_category_mapping[1]);
         const default_category = parsed_category_mapping[2];
         const compatible_category = 3 < parsed_category_mapping.length ? parsed_category_mapping.slice(3) : [];
         if (!isFinite(start) || start < 0 || start > 0xffff) {
@@ -93,8 +69,8 @@ class CharacterDefinition {
     }
 
     static parseRangeCategoryMapping(parsed_category_mapping: RegExpExecArray) {
-        const start = parseInt(parsed_category_mapping[1]);
-        const end = parseInt(parsed_category_mapping[2]);
+        const start = Number.parseInt(parsed_category_mapping[1]);
+        const end = Number.parseInt(parsed_category_mapping[2]);
         const default_category = parsed_category_mapping[3];
         const compatible_category = 4 < parsed_category_mapping.length ? parsed_category_mapping.slice(4) : [];
         if (!isFinite(start) || start < 0 || start > 0xffff) {
@@ -115,7 +91,7 @@ class CharacterDefinition {
             throw new Error("CharacterDefinition.initCategoryMappings: invoke_definition_map is null");
         }
         // Initialize map by DEFAULT class
-        let code_point: number = 0;
+        let code_point = 0;
         if (category_mapping != null) {
             const category_mapping_length = category_mapping.length;
             for (let i = 0; i < category_mapping_length; i++) {

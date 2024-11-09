@@ -1,28 +1,4 @@
-/*
- * Copyright 2014 Takuya Asano
- * Copyright 2010-2014 Atilika Inc. and contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-/*
- *
- * rewrite by f1w3_ | 2024
- * All rights reserved by Takuya Asano.
- * See above for more information.
- *
- */
 
-"use strict";
 
 import CharacterDefinition from "./CharacterDefinition";
 import ByteBuffer from "../util/ByteBuffer";
@@ -54,9 +30,9 @@ class UnknownDictionary {
                 continue;
             }
             const surface_form = entry[0];
-            const left_id = parseInt(entry[1]);
-            const right_id = parseInt(entry[2]);
-            const word_cost = parseInt(entry[3]);
+            const left_id = Number.parseInt(entry[1]);
+            const right_id = Number.parseInt(entry[2]);
+            const word_cost = Number.parseInt(entry[3]);
             const feature = entry.slice(4).join(","); // TODO Optimize
             // Assertion
             if (!isFinite(left_id) || !isFinite(right_id) || !isFinite(word_cost)) {
@@ -103,7 +79,7 @@ class UnknownDictionary {
         for (const key in this.target_map) {
             const values = this.target_map[key]; // Array
             const map_values_size = values.length;
-            buffer.putInt(parseInt(key));
+            buffer.putInt(Number.parseInt(key));
             buffer.putInt(map_values_size);
             for (const value of values) {
                 buffer.putInt(value);

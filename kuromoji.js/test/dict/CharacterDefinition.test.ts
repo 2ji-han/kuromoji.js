@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import CharacterDefinition from "../../src/dict/CharacterDefinition";
+import type CharacterDefinition from "../../src/dict/CharacterDefinition";
 import InvokeDefinitionMap from "../../src/dict/InvokeDefinitionMap";
 import CharacterDefinitionBuilder from "../../src/dict/builder/CharacterDefinitionBuilder";
 
@@ -99,7 +99,7 @@ describe("CharacterDefinition from char.def", () => {
         }
         expect(char_def.lookupCompatibleCategory("一")[0].class_name).toEqual("KANJI");
     });
-    it("lookup by 0x4E00, return KANJINUMERIC class as compatible category", function () {
+    it("lookup by 0x4E00, return KANJINUMERIC class as compatible category", () => {
         if (!char_def) {
             throw new Error("char_def is null");
         }
