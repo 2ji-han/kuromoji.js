@@ -1,5 +1,3 @@
-
-
 import ViterbiBuilder from "./viterbi/ViterbiBuilder";
 import ViterbiSearcher from "./viterbi/ViterbiSearcher";
 import IpadicFormatter, { type TOKEN } from "./util/IpadicFormatter";
@@ -29,7 +27,7 @@ class Tokenizer {
         const sentences = [];
         let lastIndex = 0;
         for (const match of matches) {
-            const index = match.index!;
+            const index = match.index;
             sentences.push(input.slice(lastIndex, index + 1));
             lastIndex = index + 1;
         }
@@ -68,7 +66,8 @@ class Tokenizer {
             const features_line = this.token_info_dictionary.getFeatures(node.name);
             const features = features_line == null ? [] : features_line.split(",");
             return this.formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, features);
-        } else if (node.type === "UNKNOWN") {
+        }
+        if (node.type === "UNKNOWN") {
             // Unknown word
             const features_line = this.unknown_dictionary.getFeatures(node.name);
             const features = features_line == null ? [] : features_line.split(",");
@@ -79,10 +78,9 @@ class Tokenizer {
                 features,
                 node.surface_form
             );
-        } else {
-            // TODO User dictionary
-            return this.formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, []);
         }
+        // TODO User dictionary
+        return this.formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, []);
     }
 
     getLattice(text: string) {

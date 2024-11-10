@@ -1,5 +1,3 @@
-
-
 import { existsSync } from "fs";
 import { readFile } from "fs/promises";
 import path from "path";

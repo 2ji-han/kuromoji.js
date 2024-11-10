@@ -1,5 +1,3 @@
-
-
 import TokenizerBuilder, { type TokenizerBuilderOption } from "./TokenizerBuilder";
 import DictionaryBuilder from "./dict/builder/DictionaryBuilder";
 

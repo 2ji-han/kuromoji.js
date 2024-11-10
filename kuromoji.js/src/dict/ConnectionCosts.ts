@@ -1,5 +1,3 @@
-
-
 class ConnectionCosts {
     forward_dimension: number;
     backward_dimension: number;

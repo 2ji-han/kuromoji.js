@@ -1,5 +1,3 @@
-
-
 class SurrogateAwareString {
     str: string;
     index_mapping: number[];
@@ -50,7 +48,7 @@ class SurrogateAwareString {
         }
         const surrogate_aware_index = this.index_mapping[index];
         const upper = this.str.charCodeAt(surrogate_aware_index);
-        let lower;
+        let lower: number;
         if (upper >= 0xd800 && upper <= 0xdbff && surrogate_aware_index < this.str.length) {
             lower = this.str.charCodeAt(surrogate_aware_index + 1);
             if (lower >= 0xdc00 && lower <= 0xdfff) {
@@ -77,9 +75,8 @@ class SurrogateAwareString {
         if (utf16_code >= 0xd800 && utf16_code <= 0xdbff) {
             // surrogate pair
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 }
 

@@ -1,5 +1,3 @@
-
-
 import InvokeDefinitionMap from "./InvokeDefinitionMap";
 import CharacterClass from "./CharacterClass";
 import SurrogateAwareString from "../util/SurrogateAwareString";

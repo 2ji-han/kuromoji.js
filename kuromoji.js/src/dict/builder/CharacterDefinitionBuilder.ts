@@ -1,5 +1,3 @@
-
-
 import type CharacterClass from "../CharacterClass";
 import CharacterDefinition from "../CharacterDefinition";
 import InvokeDefinitionMap from "../InvokeDefinitionMap";

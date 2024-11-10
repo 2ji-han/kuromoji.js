@@ -1,5 +1,3 @@
-
-
 import Tokenizer from "./Tokenizer";
 import DictionaryLoader from "./loader/NodeDictionaryLoader";
 
@@ -11,7 +9,7 @@ class TokenizerBuilder {
     dic_path: string;
 
     constructor(option: TokenizerBuilderOption = {}) {
-        if (option.dicPath == undefined) {
+        if (option.dicPath === undefined) {
             this.dic_path = "dict/";
         } else {
             this.dic_path = option.dicPath;

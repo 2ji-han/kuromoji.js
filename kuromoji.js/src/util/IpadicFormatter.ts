@@ -1,5 +1,3 @@
-
-
 import type { WORD_TYPE } from "../viterbi/ViterbiNode";
 
 export type TOKEN = {

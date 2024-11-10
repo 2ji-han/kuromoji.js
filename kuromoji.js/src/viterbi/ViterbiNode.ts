@@ -1,5 +1,3 @@
-
-
 export type WORD_TYPE = "KNOWN" | "UNKNOWN" | "BOS" | "EOS";
 
 class ViterbiNode {

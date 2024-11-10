@@ -1,5 +1,3 @@
-
-
 const TERM_CHAR = "\u0000"; // terminal character
 const TERM_CODE = 0; // terminal character code
 const ROOT_ID = 0; // index of root node

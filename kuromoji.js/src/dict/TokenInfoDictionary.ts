@@ -1,5 +1,3 @@
-
-
 import ByteBuffer from "../util/ByteBuffer";
 
 class TokenInfoDictionary {

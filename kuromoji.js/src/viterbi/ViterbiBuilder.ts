@@ -1,5 +1,3 @@
-
-
 import ViterbiNode from "./ViterbiNode";
 import ViterbiLattice from "./ViterbiLattice";
 import SurrogateAwareString from "../util/SurrogateAwareString";

@@ -1,5 +1,3 @@
-
-
 import ViterbiNode from "./ViterbiNode";
 
 class ViterbiLattice {

@@ -1,5 +1,3 @@
-
-
 import type ConnectionCosts from "../dict/ConnectionCosts";
 import type ViterbiLattice from "./ViterbiLattice";
 import type ViterbiNode from "./ViterbiNode";
@@ -20,7 +18,8 @@ class ViterbiSearcher {
      * @param {ViterbiLattice} lattice Viterbi lattice to search
      * @returns {Array} Shortest path
      */
-    search(lattice: ViterbiLattice) {
+    search(_lattice: ViterbiLattice) {
+        let lattice = _lattice;
         lattice = this.forward(lattice);
         return this.backward(lattice);
     }

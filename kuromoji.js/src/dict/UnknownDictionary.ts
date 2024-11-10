@@ -1,5 +1,3 @@
-
-
 import CharacterDefinition from "./CharacterDefinition";
 import ByteBuffer from "../util/ByteBuffer";
 

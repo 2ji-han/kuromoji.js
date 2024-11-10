@@ -1,5 +1,3 @@
-
-
 import ConnectionCosts from "../ConnectionCosts";
 
 class ConnectionCostsBuilder {
