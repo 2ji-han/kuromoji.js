@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-import fs from "fs";
-import { expect, describe, beforeEach, it } from "bun:test";
+import { beforeEach, describe, expect, it } from "bun:test";
+import fs from "node:fs";
 
-import kuromoji from "../../../src/kuromoji";
 import Tokenizer from "../../../src/Tokenizer";
 import type DynamicDictionaries from "../../../src/dict/DynamicDictionaries";
+import kuromoji from "../../../src/kuromoji";
 
 const DIC_DIR = "test/_resource/minimum-dic/";
-const connection_costs_file = DIC_DIR + "matrix.def";
-const char_def_file = DIC_DIR + "char.def";
-const unk_def_file = DIC_DIR + "unk.def";
-const tid_dic_file = DIC_DIR + "minimum.csv";
+const connection_costs_file = `${DIC_DIR}matrix.def`;
+const char_def_file = `${DIC_DIR}char.def`;
+const unk_def_file = `${DIC_DIR}unk.def`;
+const tid_dic_file = `${DIC_DIR}minimum.csv`;
 
 describe("DictionaryBuilder", () => {
     let kuromoji_dic: DynamicDictionaries | null = null; // target object of DynamicDictionaries to build
@@ -100,7 +100,7 @@ describe("DictionaryBuilder", () => {
         const tokenizer = new Tokenizer(kuromoji_dic);
         const path = tokenizer.tokenize("すもももももももものうち");
 
-        const expected_tokens: { [key: string]: any }[] = [
+        const expected_tokens: { [key: string]: string | number }[] = [
             {
                 word_type: "KNOWN",
                 word_position: 1,
@@ -199,7 +199,7 @@ describe("DictionaryBuilder", () => {
                 reading: "ウチ",
                 pronunciation: "ウチ",
             },
-        ];
+        ] as const;
 
         expect(path).toHaveLength(7);
         for (let i = 0; i < expected_tokens.length; i++) {

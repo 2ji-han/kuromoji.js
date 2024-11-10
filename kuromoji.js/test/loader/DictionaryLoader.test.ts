@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { expect, describe, beforeEach, it } from "bun:test";
-import DictionaryLoader from "../../src/loader/NodeDictionaryLoader";
+import { beforeEach, describe, expect, it } from "bun:test";
 import type DynamicDictionaries from "../../src/dict/DynamicDictionaries";
+import DictionaryLoader from "../../src/loader/NodeDictionaryLoader";
 
 const DIC_DIR = "dict/";
 

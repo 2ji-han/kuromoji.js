@@ -19,8 +19,8 @@ import type CharacterDefinition from "../../src/dict/CharacterDefinition";
 import InvokeDefinitionMap from "../../src/dict/InvokeDefinitionMap";
 import CharacterDefinitionBuilder from "../../src/dict/builder/CharacterDefinitionBuilder";
 
-import { expect, describe, beforeEach, it } from "bun:test";
-import fs from "fs";
+import { beforeEach, describe, expect, it } from "bun:test";
+import fs from "node:fs";
 
 const DIC_DIR = "test/_resource/minimum-dic/";
 
@@ -29,7 +29,7 @@ describe("CharacterDefinition from char.def", () => {
 
     beforeEach((done) => {
         const cd_builder = new CharacterDefinitionBuilder();
-        fs.readFileSync(DIC_DIR + "char.def", "utf-8")
+        fs.readFileSync(`${DIC_DIR}char.def`, "utf-8")
             .split("\n")
             .map((line) => {
                 cd_builder.putLine(line);

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { expect, describe, beforeEach, it } from "bun:test";
+import { beforeEach, describe, expect, it } from "bun:test";
 import ByteBuffer from "../../src/util/ByteBuffer";
 
 describe("ByteBuffer static methods", () => {

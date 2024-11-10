@@ -1,6 +1,6 @@
-import InvokeDefinitionMap from "./InvokeDefinitionMap";
-import CharacterClass from "./CharacterClass";
 import SurrogateAwareString from "../util/SurrogateAwareString";
+import CharacterClass from "./CharacterClass";
+import InvokeDefinitionMap from "./InvokeDefinitionMap";
 
 const DEFAULT_CATEGORY = "DEFAULT";
 

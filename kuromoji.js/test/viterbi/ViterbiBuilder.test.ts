@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { expect, describe, beforeEach, it } from "bun:test";
+import { beforeEach, describe, expect, it } from "bun:test";
 
 import DictionaryLoader from "../../src/loader/NodeDictionaryLoader";
 import ViterbiBuilder from "../../src/viterbi/ViterbiBuilder";

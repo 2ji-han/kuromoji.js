@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { expect, describe, beforeEach, it } from "bun:test";
-import kuromoji from "../src/kuromoji";
+import { beforeEach, describe, expect, it } from "bun:test";
 import Tokenizer from "../src/Tokenizer";
+import kuromoji from "../src/kuromoji";
 
 const DIC_DIR = "dict/";
 
@@ -62,7 +62,7 @@ describe("Tokenizer for IPADic", () => {
             throw new Error("tokenizer is null");
         }
         const path = tokenizer.tokenize("すもももももももものうち");
-        const expected_tokens: { [key: string]: any }[] = [
+        const expected_tokens: { [key: string]: string | number }[] = [
             {
                 word_type: "KNOWN",
                 word_position: 1,
@@ -161,7 +161,7 @@ describe("Tokenizer for IPADic", () => {
                 reading: "ウチ",
                 pronunciation: "ウチ",
             },
-        ];
+        ] as const;
 
         expect(path).toHaveLength(7);
 

@@ -1,9 +1,9 @@
 import doublearray from "../../util/DoubleArray";
 import DynamicDictionaries from "../DynamicDictionaries";
 import TokenInfoDictionary from "../TokenInfoDictionary";
-import ConnectionCostsBuilder from "./ConnectionCostsBuilder";
-import CharacterDefinitionBuilder from "./CharacterDefinitionBuilder";
 import UnknownDictionary from "../UnknownDictionary";
+import CharacterDefinitionBuilder from "./CharacterDefinitionBuilder";
+import ConnectionCostsBuilder from "./ConnectionCostsBuilder";
 
 class DictionaryBuilder {
     tid_entries: string[][];

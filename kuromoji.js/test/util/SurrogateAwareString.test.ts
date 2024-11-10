@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { expect, describe, it } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import SurrogateAwareString from "../../src/util/SurrogateAwareString";
 
 describe("SurrogateAwareString", () => {

@@ -1,10 +1,10 @@
-import ViterbiNode from "./ViterbiNode";
-import ViterbiLattice from "./ViterbiLattice";
-import SurrogateAwareString from "../util/SurrogateAwareString";
 import type DynamicDictionaries from "../dict/DynamicDictionaries";
-import type { DoubleArray } from "../util/DoubleArray";
 import type TokenInfoDictionary from "../dict/TokenInfoDictionary";
 import type UnknownDictionary from "../dict/UnknownDictionary";
+import type { DoubleArray } from "../util/DoubleArray";
+import SurrogateAwareString from "../util/SurrogateAwareString";
+import ViterbiLattice from "./ViterbiLattice";
+import ViterbiNode from "./ViterbiNode";
 
 class ViterbiBuilder {
     trie: DoubleArray;

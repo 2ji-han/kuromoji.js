@@ -1,5 +1,5 @@
-import CharacterDefinition from "./CharacterDefinition";
 import ByteBuffer from "../util/ByteBuffer";
+import CharacterDefinition from "./CharacterDefinition";
 
 class UnknownDictionary {
     dictionary: ByteBuffer;
