@@ -43,8 +43,8 @@ class ConnectionCostsBuilder {
         if (
             forward_id < 0 ||
             backward_id < 0 ||
-            !isFinite(forward_id) ||
-            !isFinite(backward_id) ||
+            !Number.isFinite(forward_id) ||
+            !Number.isFinite(backward_id) ||
             this.connection_cost.forward_dimension <= forward_id ||
             this.connection_cost.backward_dimension <= backward_id
         ) {

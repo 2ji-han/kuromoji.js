@@ -1,7 +1,7 @@
-import { existsSync } from "fs";
-import { readFile } from "fs/promises";
-import path from "path";
-import zlib from "zlib";
+import { existsSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import zlib from "node:zlib";
 import DynamicDictionaries from "../dict/DynamicDictionaries";
 class NodeDictionaryLoader {
     dic: DynamicDictionaries;
@@ -12,9 +12,9 @@ class NodeDictionaryLoader {
     }
 
     loadArrayBuffer = (file: string) =>
-        new Promise<ArrayBufferLike>(async (resolve, reject) => {
+        new Promise<ArrayBufferLike>((resolve, reject) => {
             if (!existsSync(file)) return reject(new Error(`${file} does not exist`));
-            const buffer = await readFile(file);
+            const buffer = readFileSync(file);
             zlib.gunzip(new Uint8Array(buffer), (err, binary) => {
                 if (err) return reject(err);
                 const typed_array = new Uint8Array(binary);

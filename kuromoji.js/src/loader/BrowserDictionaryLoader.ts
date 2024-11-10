@@ -1,5 +1,5 @@
-import path from "path";
-import zlib from "zlib";
+import path from "node:path";
+import zlib from "node:zlib";
 import DynamicDictionaries from "../dict/DynamicDictionaries";
 
 class BrowserDictionaryLoader {

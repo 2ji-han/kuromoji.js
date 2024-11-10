@@ -6,7 +6,7 @@ class ByteBuffer {
     position = 0;
 
     constructor(arg?: number | Uint8Array) {
-        if (arg == undefined) {
+        if (arg === undefined) {
             const initial_size = 1024 * 1024;
             this.buffer = new Uint8Array(initial_size);
             this.position = 0;
@@ -19,7 +19,7 @@ class ByteBuffer {
             this.position = 0; // Overwrite
         } else {
             // typeof arg -> String
-            throw typeof arg + " is invalid parameter type for ByteBuffer constructor";
+            throw `${typeof arg} is invalid parameter type for ByteBuffer constructor`;
         }
     }
 
@@ -28,7 +28,7 @@ class ByteBuffer {
     }
 
     reallocate() {
-        var new_array = new Uint8Array(this.buffer.length * 2);
+        const new_array = new Uint8Array(this.buffer.length * 2);
         new_array.set(this.buffer);
         this.buffer = new_array;
     }
@@ -49,7 +49,8 @@ class ByteBuffer {
         }
     }
 
-    get(index: number | null = null) {
+    get(_index: number | null = null) {
+        let index = _index;
         if (index == null) {
             index = this.position;
             this.position += 1;
@@ -63,7 +64,7 @@ class ByteBuffer {
     // Write short to buffer by little endian
     putShort(num: number) {
         if (0xffff < num) {
-            throw num + " is over short value";
+            throw `${num} is over short value`;
         }
         const lower = 0x00ff & num;
         const upper = (0xff00 & num) >> 8;
@@ -72,7 +73,8 @@ class ByteBuffer {
     }
 
     // Read short from buffer by little endian
-    getShort(index: number | null) {
+    getShort(_index: number | null) {
+        let index = _index;
         if (index == null) {
             index = this.position;
             this.position += 2;
@@ -92,7 +94,7 @@ class ByteBuffer {
     // Write integer to buffer by little endian
     putInt(num: number) {
         if (0xffffffff < num) {
-            throw num + " is over integer value";
+            throw `${num} is over integer value`;
         }
         const b0 = 0x000000ff & num;
         const b1 = (0x0000ff00 & num) >> 8;
@@ -105,7 +107,8 @@ class ByteBuffer {
     }
 
     // Read integer from buffer by little endian
-    getInt(index: number | null = null) {
+    getInt(_index: number | null = null) {
+        let index = _index;
         if (index == null) {
             index = this.position;
             this.position += 4;
@@ -137,7 +140,8 @@ class ByteBuffer {
         this.put(0);
     }
 
-    getString(index: number = this.position) {
+    getString(_index: number = this.position) {
+        let index = _index;
         const buf = [];
         let ch: number;
 
@@ -151,7 +155,8 @@ class ByteBuffer {
         return decoder.decode(new Uint8Array(buf));
     }
 
-    getUtf32(index: number | null = null): number {
+    getUtf32(_index: number | null = null): number {
+        let index = _index;
         if (index == null) {
             index = this.position;
             this.position += 4;

@@ -22,19 +22,18 @@ const newArrayBuffer = (signed: boolean, bytes: number, size: number) => {
             case 4:
                 return new Int32Array(size);
             default:
-                throw new RangeError("Invalid newArray parameter element_bytes:" + bytes);
+                throw new RangeError(`Invalid newArray parameter element_bytes:${bytes}`);
         }
-    } else {
-        switch (bytes) {
-            case 1:
-                return new Uint8Array(size);
-            case 2:
-                return new Uint16Array(size);
-            case 4:
-                return new Uint32Array(size);
-            default:
-                throw new RangeError("Invalid newArray parameter element_bytes:" + bytes);
-        }
+    }
+    switch (bytes) {
+        case 1:
+            return new Uint8Array(size);
+        case 2:
+            return new Uint16Array(size);
+        case 4:
+            return new Uint32Array(size);
+        default:
+            throw new RangeError(`Invalid newArray parameter element_bytes:${bytes}`);
     }
 };
 
@@ -232,16 +231,16 @@ class BufferController {
         let dump_check = "";
 
         for (const data of this.base.array) {
-            dump_base += " " + data;
+            dump_base += ` ${data}`;
         }
         for (const data of this.check.array) {
-            dump_check += " " + data;
+            dump_check += ` ${data}`;
         }
 
-        console.log("base:" + dump_base);
-        console.log("check:" + dump_check);
+        console.log(`base:${dump_base}`);
+        console.log(`check:${dump_check}`);
 
-        return "base:" + dump_base + " check:" + dump_check;
+        return `base:${dump_base} check:${dump_check}`;
     }
 }
 
@@ -250,7 +249,7 @@ class BufferController {
  */
 class DoubleArrayBuilder {
     bufferController: BufferController;
-    keys: { k: string; v: number }[];
+    keys: { k: string | Uint8Array; v: number }[];
     constructor(initial_size = 1024) {
         this.bufferController = new BufferController(initial_size); // BASE and CHECK
         this.keys = [];
@@ -275,12 +274,12 @@ class DoubleArrayBuilder {
      * 'k' is a key string, 'v' is a record assigned to that key.
      * @return {DoubleArray} Compiled double array
      */
-    build(keys: { k: string; v: number }[] = this.keys, sorted = false) {
+    build(keys: { k: string | Uint8Array; v: number }[] = this.keys, sorted = false) {
         if (keys == null) {
             return new DoubleArray(this.bufferController);
         }
         // Convert key string to ArrayBuffer
-        let buff_keys: { k: any; v: number }[] | null = keys.map((k) => {
+        const buff_keys: { k: Uint8Array; v: number }[] | null = keys.map((k) => {
             return {
                 k: encoder.encode(k.k + TERM_CHAR),
                 v: k.v,
@@ -304,8 +303,6 @@ class DoubleArrayBuilder {
                 return b1.length - b2.length;
             });
         }
-
-        buff_keys = null; // explicit GC
 
         this._build(ROOT_ID, 0, 0, this.keys.length);
         return new DoubleArray(this.bufferController);
@@ -336,8 +333,7 @@ class DoubleArrayBuilder {
         let current_char = this.keys[start].k[position];
         let children_info = new Int32Array(length * 3);
         let i = 0;
-
-        children_info[i++] = Number.parseInt(current_char); // char (current)
+        children_info[i++] = Number.parseInt(`${current_char}`); // char (current)
         children_info[i++] = start; // start index (current)
 
         let next_pos = start;
@@ -347,7 +343,7 @@ class DoubleArrayBuilder {
             if (current_char !== next_char) {
                 children_info[i++] = next_pos - start_pos; // length (current)
 
-                children_info[i++] = Number.parseInt(next_char); // char (next)
+                children_info[i++] = Number.parseInt(`${next_char}`); // char (next)
                 children_info[i++] = next_pos; // start index (next)
                 current_char = next_char;
                 start_pos = next_pos;
@@ -362,8 +358,7 @@ class DoubleArrayBuilder {
     setBC(parent_id: number, children_info: Int32Array, _base: number) {
         const bc = this.bufferController;
         bc.setBase(parent_id, _base); // Update BASE of parent node
-        let i;
-        for (i = 0; i < children_info.length; i = i + 3) {
+        for (let i = 0; i < children_info.length; i = i + 3) {
             const code = children_info[i];
             const child_id = _base + code;
 
@@ -512,7 +507,8 @@ class DoubleArray {
      * @param {String} key
      * @return {Boolean} True if this trie contains a given key
      */
-    contain(key: string) {
+    contain(_key: string) {
+        let key = _key;
         const bc = this.bufferController;
         key += TERM_CHAR;
         const buffer = encoder.encode(key);
@@ -529,11 +525,9 @@ class DoubleArray {
             if (bc.getBase(child) <= 0) {
                 // leaf node
                 return true;
-            } else {
-                // not leaf
-                parent = child;
-                continue;
             }
+            // not leaf
+            parent = child;
         }
         return false;
     }
@@ -544,7 +538,8 @@ class DoubleArray {
      * @param {String} key
      * @return {Number} Record value assgned to this key, -1 if this key does not contain
      */
-    lookup(key: string) {
+    lookup(_key: string) {
+        let key = _key;
         key += TERM_CHAR;
         const buffer = encoder.encode(key);
         let parent = ROOT_ID;
@@ -561,10 +556,9 @@ class DoubleArray {
         if (base <= 0) {
             // leaf node
             return -base - 1;
-        } else {
-            // not leaf
-            return NOT_FOUND;
         }
+        // not leaf
+        return NOT_FOUND;
     }
 
     /**
@@ -602,9 +596,8 @@ class DoubleArray {
                     result.push(r);
                 }
                 continue;
-            } else {
-                break;
             }
+            break;
         }
         return result;
     }
@@ -613,9 +606,8 @@ class DoubleArray {
         const child = this.bufferController.getBase(parent) + code;
         if (this.bufferController.getCheck(child) === parent) {
             return child;
-        } else {
-            return NOT_FOUND;
         }
+        return NOT_FOUND;
     }
 
     size() {

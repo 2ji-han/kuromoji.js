@@ -25,7 +25,7 @@ class TokenInfoDictionary {
             const word_cost = Number.parseInt(entry[3]);
             const feature = entry.slice(4).join(","); // TODO Optimize
             // Assertion
-            if (!isFinite(left_id) || !isFinite(right_id) || !isFinite(word_cost)) {
+            if (!Number.isFinite(left_id) || !Number.isFinite(right_id) || !Number.isFinite(word_cost)) {
                 console.log(entry);
             }
             const token_info_id = this.put(left_id, right_id, word_cost, surface_form, feature);
@@ -47,7 +47,7 @@ class TokenInfoDictionary {
         this.dictionary.putShort(right_id);
         this.dictionary.putShort(word_cost);
         this.dictionary.putInt(pos_id);
-        this.pos_buffer.putString(surface_form + "," + feature);
+        this.pos_buffer.putString(`${surface_form},${feature}`);
 
         return token_info_id;
     }
@@ -111,7 +111,7 @@ class TokenInfoDictionary {
     }
 
     getFeatures(token_info_id: number): string | null {
-        if (isNaN(token_info_id)) {
+        if (Number.isNaN(token_info_id)) {
             return null;
         }
         const pos_id = this.dictionary.getInt(token_info_id + 6);

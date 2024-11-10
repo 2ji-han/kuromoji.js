@@ -110,7 +110,7 @@ class DictionaryBuilder {
             const class_name = dictionary_entries[token_info_id];
             const class_id = char_def.invoke_definition_map.lookup(class_name);
             if (!class_id) {
-                throw new Error("Class name not found: " + class_name);
+                throw new Error(`Class name not found: ${class_name}`);
             }
             // Assertion
             // if (trie_id < 0) {

@@ -39,16 +39,16 @@ class CharacterDefinition {
         const invoke = Number.parseInt(parsed_category_def[2]);
         const grouping = Number.parseInt(parsed_category_def[3]);
         const max_length = Number.parseInt(parsed_category_def[4]);
-        if (!isFinite(invoke) || (invoke !== 0 && invoke !== 1)) {
-            console.log("char.def parse error. INVOKE is 0 or 1 in:" + invoke);
+        if (!Number.isFinite(invoke) || (invoke !== 0 && invoke !== 1)) {
+            console.log(`char.def parse error. INVOKE is 0 or 1 in:${invoke}`);
             return null;
         }
-        if (!isFinite(grouping) || (grouping !== 0 && grouping !== 1)) {
-            console.log("char.def parse error. GROUP is 0 or 1 in:" + grouping);
+        if (!Number.isFinite(grouping) || (grouping !== 0 && grouping !== 1)) {
+            console.log(`char.def parse error. GROUP is 0 or 1 in:${grouping}`);
             return null;
         }
-        if (!isFinite(max_length) || max_length < 0) {
-            console.log("char.def parse error. LENGTH is 1 to n:" + max_length);
+        if (!Number.isFinite(max_length) || max_length < 0) {
+            console.log(`char.def parse error. LENGTH is 1 to n:${max_length}`);
             return null;
         }
         const is_invoke = invoke === 1;
@@ -60,8 +60,8 @@ class CharacterDefinition {
         const start = Number.parseInt(parsed_category_mapping[1]);
         const default_category = parsed_category_mapping[2];
         const compatible_category = 3 < parsed_category_mapping.length ? parsed_category_mapping.slice(3) : [];
-        if (!isFinite(start) || start < 0 || start > 0xffff) {
-            console.log("char.def parse error. CODE is invalid:" + start);
+        if (!Number.isFinite(start) || start < 0 || start > 0xffff) {
+            console.log(`char.def parse error. CODE is invalid:${start}`);
         }
         return { start: start, default: default_category, compatible: compatible_category };
     }
@@ -71,11 +71,11 @@ class CharacterDefinition {
         const end = Number.parseInt(parsed_category_mapping[2]);
         const default_category = parsed_category_mapping[3];
         const compatible_category = 4 < parsed_category_mapping.length ? parsed_category_mapping.slice(4) : [];
-        if (!isFinite(start) || start < 0 || start > 0xffff) {
-            console.log("char.def parse error. CODE is invalid:" + start);
+        if (!Number.isFinite(start) || start < 0 || start > 0xffff) {
+            console.log(`char.def parse error. CODE is invalid:${start}`);
         }
-        if (!isFinite(end) || end < 0 || end > 0xffff) {
-            console.log("char.def parse error. CODE is invalid:" + end);
+        if (!Number.isFinite(end) || end < 0 || end > 0xffff) {
+            console.log(`char.def parse error. CODE is invalid:${end}`);
         }
         return { start: start, end: end, default: default_category, compatible: compatible_category };
     }
