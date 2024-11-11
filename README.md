@@ -7,10 +7,7 @@
   - kuromoji.js core library
   - this library is fork of [@takuyaa/kuromoji.js](https://github.com/takuyaa/kuromoji.js)
 
-- **[@kuromoji.js/kuromoji-promise](./kuromoji-promise)**
-
-  - @kuromoji/promise library
-  - support asynchronous
+- archive ~~**[@kuromoji.js/kuromoji-promise](./kuromoji-promise)**~~
 
 ## Getting started
 
