@@ -38,6 +38,10 @@ class Tokenizer {
     }
 
     tokenize(text: string) {
+        //console.log("token_info_dictionary: ", this.token_info_dictionary.target_map.size);
+        //console.log("unknown_dictionary: ", this.unknown_dictionary.target_map.size);
+        //console.log("viterbi_builder: ", this.viterbi_builder.trie.size());
+
         const sentences = Tokenizer.splitByPunctuation(text);
         const tokens: TOKEN[] = [];
         for (const sentence of sentences) {

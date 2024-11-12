@@ -2,11 +2,11 @@ import ByteBuffer from "../util/ByteBuffer";
 
 class TokenInfoDictionary {
     dictionary: ByteBuffer;
-    target_map: { [key: number]: number[] };
+    target_map: Map<number, Set<number>>;
     pos_buffer: ByteBuffer;
     constructor() {
         this.dictionary = new ByteBuffer(10 * 1024 * 1024);
-        this.target_map = {}; // trie_id (of surface form) -> token_info_id (of token)
+        this.target_map = new Map<number, Set<number>>(); // trie_id (of surface form) -> token_info_id (of token)
         this.pos_buffer = new ByteBuffer(10 * 1024 * 1024);
     }
 
@@ -53,23 +53,27 @@ class TokenInfoDictionary {
     }
 
     addMapping(source: number, target: number): void {
-        let mapping = this.target_map[source];
+        let mapping = this.target_map.get(source);
         if (mapping == null) {
-            mapping = [];
+            mapping = new Set<number>();
         }
-        mapping.push(target);
+        mapping.add(target);
 
-        this.target_map[source] = mapping;
+        this.target_map.set(source, mapping);
     }
 
     targetMapToBuffer(): Uint8Array {
         const buffer = new ByteBuffer();
         const map_keys_size = Object.keys(this.target_map).length;
         buffer.putInt(map_keys_size);
-        for (const key in this.target_map) {
-            const values = this.target_map[key]; // Array
-            const map_values_size = values.length;
-            buffer.putInt(Number.parseInt(key));
+        for (const _key in this.target_map) {
+            const key = Number.parseInt(_key);
+
+            const values = this.target_map.get(key); // Array
+            if (!values) continue;
+
+            const map_values_size = values.size;
+            buffer.putInt(key);
             buffer.putInt(map_values_size);
             for (const value of values) {
                 buffer.putInt(value);
@@ -94,7 +98,7 @@ class TokenInfoDictionary {
     loadTargetMap(array_buffer: Uint8Array) {
         const buffer = new ByteBuffer(array_buffer);
         buffer.position = 0;
-        this.target_map = {};
+        this.target_map = new Map<number, Set<number>>();
         buffer.readInt(); // map_keys_size
         while (true) {
             if (buffer.buffer.length < buffer.position + 1) {

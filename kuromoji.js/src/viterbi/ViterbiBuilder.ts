@@ -38,10 +38,9 @@ class ViterbiBuilder {
                 // Words in dictionary do not have surrogate pair (only UCS2 set)
                 const trie_id = vocabulary[n].v;
                 const key = vocabulary[n].k;
-                const token_info_ids = this.token_info_dictionary.target_map[trie_id];
-                const tokenInfoIds_length = token_info_ids.length;
-                for (let j = 0; j < tokenInfoIds_length; j++) {
-                    const token_info_id = token_info_ids[j];
+                const token_info_ids = this.token_info_dictionary.target_map.get(trie_id);
+                if (!token_info_ids) throw new Error("TokenInfo dictionary is broken");
+                for (const token_info_id of token_info_ids) {
                     const left_id = this.token_info_dictionary.dictionary.getShort(token_info_id);
                     const right_id = this.token_info_dictionary.dictionary.getShort(token_info_id + 2);
                     const word_cost = this.token_info_dictionary.dictionary.getShort(token_info_id + 4);
@@ -67,7 +66,7 @@ class ViterbiBuilder {
                         key += next_char;
                     }
                 }
-                const unk_ids = this.unknown_dictionary.target_map[head_char_class.class_id];
+                const unk_ids = this.unknown_dictionary.target_map.get(head_char_class.class_id);
                 if (!unk_ids) throw new Error("Unknown dictionary is broken");
                 const unk_length = unk_ids.length;
                 const unknown_dict = this.unknown_dictionary.dictionary;

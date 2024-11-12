@@ -7,10 +7,10 @@ import CharacterClass from "./CharacterClass";
  */
 class InvokeDefinitionMap {
     map: CharacterClass[];
-    lookup_table: { [key: string]: number };
+    lookup_table: Map<string, number>;
     constructor() {
         this.map = [];
-        this.lookup_table = {}; // Just for building dictionary
+        this.lookup_table = new Map<string, number>(); // Just for building dictionary
     }
 
     /**
@@ -51,7 +51,7 @@ class InvokeDefinitionMap {
         for (let i = 0; i < ccd_length; i++) {
             const character_class = character_category_definition[i];
             this.map[i] = character_class;
-            this.lookup_table[character_class.class_name] = i;
+            this.lookup_table.set(character_class.class_name, i);
         }
     }
 
@@ -70,7 +70,7 @@ class InvokeDefinitionMap {
      * @returns {number} class_id
      */
     lookup(class_name: string): number | null {
-        const class_id = this.lookup_table[class_name];
+        const class_id = this.lookup_table.get(class_name);
         if (class_id == null) {
             return null;
         }

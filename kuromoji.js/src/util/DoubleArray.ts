@@ -315,7 +315,7 @@ class DoubleArrayBuilder {
         const children_info = this.getChildrenInfo(position, start, length);
         const _base = this.findAllocatableBase(children_info);
 
-        this.setBC(parent_index, children_info, _base);
+        this.setBufferController(parent_index, children_info, _base);
 
         for (let i = 0; i < children_info.length; i = i + 3) {
             const child_code = children_info[i];
@@ -355,9 +355,9 @@ class DoubleArrayBuilder {
         return children_info;
     }
 
-    setBC(parent_id: number, children_info: Int32Array, _base: number) {
-        const bc = this.bufferController;
-        bc.setBase(parent_id, _base); // Update BASE of parent node
+    setBufferController(parent_id: number, children_info: Int32Array, _base: number) {
+        const bufferController = this.bufferController;
+        bufferController.setBase(parent_id, _base); // Update BASE of parent node
         for (let i = 0; i < children_info.length; i = i + 3) {
             const code = children_info[i];
             const child_id = _base + code;
@@ -369,24 +369,24 @@ class DoubleArrayBuilder {
             //     throw 'assertion error: child_id is negative'
             // }
 
-            const prev_unused_id = -bc.getBase(child_id);
-            const next_unused_id = -bc.getCheck(child_id);
+            const prev_unused_id = -bufferController.getBase(child_id);
+            const next_unused_id = -bufferController.getCheck(child_id);
             // if (prev_unused_id < 0) {
             //     throw 'assertion error: setBC'
             // }
             // if (next_unused_id < 0) {
             //     throw 'assertion error: setBC'
             // }
-            if (child_id !== bc.getFirstUnusedNode()) {
-                bc.setCheck(prev_unused_id, -next_unused_id);
+            if (child_id !== bufferController.getFirstUnusedNode()) {
+                bufferController.setCheck(prev_unused_id, -next_unused_id);
             } else {
                 // Update first_unused_node
-                bc.setFirstUnusedNode(next_unused_id);
+                bufferController.setFirstUnusedNode(next_unused_id);
             }
-            bc.setBase(next_unused_id, -prev_unused_id);
+            bufferController.setBase(next_unused_id, -prev_unused_id);
 
             const check = parent_id; // CHECK is parent node index
-            bc.setCheck(child_id, check); // Update CHECK of child node
+            bufferController.setCheck(child_id, check); // Update CHECK of child node
 
             // Update record
             if (code === TERM_CODE) {
@@ -402,7 +402,7 @@ class DoubleArrayBuilder {
                 }
 
                 const base = -value - 1; // BASE is inverted record value
-                bc.setBase(child_id, base); // Update BASE of child(leaf) node
+                bufferController.setBase(child_id, base); // Update BASE of child(leaf) node
             }
         }
     }
@@ -411,7 +411,7 @@ class DoubleArrayBuilder {
      * Find BASE value that all children are allocatable in double array's region
      */
     findAllocatableBase(children_info: Int32Array) {
-        const bc = this.bufferController;
+        const bufferController = this.bufferController;
 
         // Assertion: keys are sorted by byte order
         // var c = -1;
@@ -424,7 +424,7 @@ class DoubleArrayBuilder {
 
         // iterate linked list of unused nodes
         let _base: number;
-        let curr = bc.getFirstUnusedNode(); // current index
+        let curr = bufferController.getFirstUnusedNode(); // current index
         // if (curr < 0) {
         //     throw 'assertion error: getFirstUnusedNode returns negative value'
         // }
@@ -433,7 +433,7 @@ class DoubleArrayBuilder {
             _base = curr - children_info[0];
 
             if (_base < 0) {
-                curr = -bc.getCheck(curr); // next
+                curr = -bufferController.getCheck(curr); // next
 
                 // if (curr < 0) {
                 //     throw 'assertion error: getCheck returns negative value'
@@ -450,7 +450,7 @@ class DoubleArrayBuilder {
                 if (!this.isUnusedNode(candidate_id)) {
                     // candidate_id is used node
                     // next
-                    curr = -bc.getCheck(curr);
+                    curr = -bufferController.getCheck(curr);
                     // if (curr < 0) {
                     //     throw 'assertion error: getCheck returns negative value'
                     // }
@@ -470,8 +470,8 @@ class DoubleArrayBuilder {
      * Check this double array index is unused or not
      */
     isUnusedNode(index: number) {
-        const bc = this.bufferController;
-        const check = bc.getCheck(index);
+        const bufferController = this.bufferController;
+        const check = bufferController.getCheck(index);
 
         // if (index < 0) {
         //     throw 'assertion error: isUnusedNode index:' + index;
@@ -496,8 +496,8 @@ class DoubleArrayBuilder {
  */
 class DoubleArray {
     bufferController: BufferController;
-    constructor(bc: BufferController) {
-        this.bufferController = bc; // BASE and CHECK
+    constructor(bufferController: BufferController) {
+        this.bufferController = bufferController; // BASE and CHECK
         this.bufferController.shrink();
     }
 
@@ -509,7 +509,7 @@ class DoubleArray {
      */
     contain(_key: string) {
         let key = _key;
-        const bc = this.bufferController;
+        const bufferController = this.bufferController;
         key += TERM_CHAR;
         const buffer = encoder.encode(key);
         let parent = ROOT_ID;
@@ -522,7 +522,7 @@ class DoubleArray {
                 return false;
             }
 
-            if (bc.getBase(child) <= 0) {
+            if (bufferController.getBase(child) <= 0) {
                 // leaf node
                 return true;
             }
