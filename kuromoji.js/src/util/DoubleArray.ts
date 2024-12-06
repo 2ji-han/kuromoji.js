@@ -50,48 +50,48 @@ type BaseCheck = {
 };
 
 class BufferController {
-    private first_unused_node: number;
-    private base: BaseCheck;
-    private check: BaseCheck;
+    #first_unused_node: number;
+    #base: BaseCheck;
+    #check: BaseCheck;
 
     constructor(initial_size = 1024) {
-        this.first_unused_node = ROOT_ID + 1;
+        this.#first_unused_node = ROOT_ID + 1;
 
-        this.base = {
+        this.#base = {
             signed: BASE_SIGNED,
             bytes: BASE_BYTES,
             array: newArrayBuffer(BASE_SIGNED, BASE_BYTES, initial_size),
         };
 
-        this.check = {
+        this.#check = {
             signed: CHECK_SIGNED,
             bytes: CHECK_BYTES,
             array: newArrayBuffer(CHECK_SIGNED, CHECK_BYTES, initial_size),
         };
 
-        if (!this.base.array || !this.check.array) {
+        if (!this.#base.array || !this.#check.array) {
             throw new Error("Initialization failed: Arrays are null");
         }
 
         // Initialize root node
-        this.base.array[ROOT_ID] = 1;
-        this.check.array[ROOT_ID] = ROOT_ID;
+        this.#base.array[ROOT_ID] = 1;
+        this.#check.array[ROOT_ID] = ROOT_ID;
 
         // Initialize BASE and CHECK arrays
-        this.initBase(this.base.array, ROOT_ID + 1, this.base.array.length);
-        this.initCheck(this.check.array, ROOT_ID + 1, this.check.array.length);
+        this.initBase(this.#base.array, ROOT_ID + 1, this.#base.array.length);
+        this.initCheck(this.#check.array, ROOT_ID + 1, this.#check.array.length);
     }
 
     private initBase(_base: ArrayBuffer, start: number, end: number) {
-        if (!this.base.array || !this.check.array) {
+        if (!this.#base.array || !this.#check.array) {
             throw new Error("initBase() failed: Arrays not initialized");
         }
         for (let i = start; i < end; i++) {
             _base[i] = -i + 1;
         }
-        if (0 < this.check.array[this.check.array.length - 1]) {
-            let last_used_id = this.check.array.length - 2;
-            while (0 < this.check.array[last_used_id]) {
+        if (0 < this.#check.array[this.#check.array.length - 1]) {
+            let last_used_id = this.#check.array.length - 2;
+            while (0 < this.#check.array[last_used_id]) {
                 last_used_id--;
             }
             _base[start] = -last_used_id;
@@ -105,114 +105,114 @@ class BufferController {
     }
 
     private realloc(min_size: number) {
-        if (!this.base.array || !this.check.array) {
+        if (!this.#base.array || !this.#check.array) {
             throw new Error("initBase() failed: Arrays not initialized");
         }
         const new_size = min_size * MEMORY_EXPAND_RATIO;
-        const base_new_array = newArrayBuffer(this.base.signed, this.base.bytes, new_size);
-        this.initBase(base_new_array, this.base.array.length, new_size);
-        base_new_array.set(this.base.array);
-        this.base.array = base_new_array;
+        const base_new_array = newArrayBuffer(this.#base.signed, this.#base.bytes, new_size);
+        this.initBase(base_new_array, this.#base.array.length, new_size);
+        base_new_array.set(this.#base.array);
+        this.#base.array = base_new_array;
 
-        const check_new_array = newArrayBuffer(this.check.signed, this.check.bytes, new_size);
-        this.initCheck(check_new_array, this.check.array.length, new_size);
-        check_new_array.set(this.check.array);
-        this.check.array = check_new_array;
+        const check_new_array = newArrayBuffer(this.#check.signed, this.#check.bytes, new_size);
+        this.initCheck(check_new_array, this.#check.array.length, new_size);
+        check_new_array.set(this.#check.array);
+        this.#check.array = check_new_array;
     }
 
     getBaseBuffer() {
-        return this.base.array;
+        return this.#base.array;
     }
 
     getCheckBuffer() {
-        return this.check.array;
+        return this.#check.array;
     }
 
     loadBaseBuffer(base_buffer: ArrayBuffer) {
-        this.base.array = base_buffer;
+        this.#base.array = base_buffer;
         return this;
     }
 
     loadCheckBuffer(check_buffer: ArrayBuffer) {
-        this.check.array = check_buffer;
+        this.#check.array = check_buffer;
         return this;
     }
 
     size() {
-        if (!this.base.array || !this.check.array) {
+        if (!this.#base.array || !this.#check.array) {
             throw new Error("failed: Arrays not initialized");
         }
-        return Math.max(this.base.array.length, this.check.array.length);
+        return Math.max(this.#base.array.length, this.#check.array.length);
     }
 
     getBase(index: number) {
-        if (!this.base.array) {
+        if (!this.#base.array) {
             throw new Error("failed: Arrays not initialized");
         }
-        if (this.base.array.length - 1 < index) {
+        if (this.#base.array.length - 1 < index) {
             return -index + 1;
         }
-        return this.base.array[index];
+        return this.#base.array[index];
     }
 
     getCheck(index: number) {
-        if (!this.check.array) {
+        if (!this.#check.array) {
             throw new Error("failed: Arrays not initialized");
         }
-        if (this.check.array.length - 1 < index) {
+        if (this.#check.array.length - 1 < index) {
             return -index - 1;
         }
-        return this.check.array[index];
+        return this.#check.array[index];
     }
 
     setBase(index: number, base_value: number) {
-        if (!this.base.array) {
+        if (!this.#base.array) {
             throw new Error("failed: Arrays not initialized");
         }
-        if (this.base.array.length - 1 < index) {
+        if (this.#base.array.length - 1 < index) {
             this.realloc(index);
         }
-        this.base.array[index] = base_value;
+        this.#base.array[index] = base_value;
     }
 
     setCheck(index: number, check_value: number) {
-        if (!this.check.array) {
+        if (!this.#check.array) {
             throw new Error("failed: Arrays not initialized");
         }
-        if (this.check.array.length - 1 < index) {
+        if (this.#check.array.length - 1 < index) {
             this.realloc(index);
         }
-        this.check.array[index] = check_value;
+        this.#check.array[index] = check_value;
     }
 
     setFirstUnusedNode(index: number) {
-        this.first_unused_node = index;
+        this.#first_unused_node = index;
     }
 
     getFirstUnusedNode() {
-        return this.first_unused_node;
+        return this.#first_unused_node;
     }
 
     shrink() {
-        if (!this.base.array || !this.check.array) {
+        if (!this.#base.array || !this.#check.array) {
             throw new Error("failed: Arrays not initialized");
         }
-        let last_index = Math.max(this.base.array.length, this.check.array.length) - 1;
-        while (0 <= this.check.array[last_index]) {
+        let last_index = Math.max(this.#base.array.length, this.#check.array.length) - 1;
+        while (0 <= this.#check.array[last_index]) {
             last_index--;
         }
-        this.base.array = this.base.array.subarray(0, last_index + 2);
-        this.check.array = this.check.array.subarray(0, last_index + 2);
+        this.#base.array = this.#base.array.subarray(0, last_index + 2);
+        this.#check.array = this.#check.array.subarray(0, last_index + 2);
     }
 
     calc() {
-        if (!this.base.array || !this.check.array) {
+        if (!this.#base.array || !this.#check.array) {
             throw new Error("failed: Arrays not initialized");
         }
         let unused_count = 0;
-        const size = this.check.array.length;
+        const size = this.#check.array.length;
         for (let i = 0; i < size; i++) {
-            if (this.check.array[i] < 0) {
+            if (this.#check.array[i] < 0) {
                 unused_count++;
             }
         }
@@ -224,16 +224,16 @@ class BufferController {
     }
 
     dump() {
-        if (!this.base.array || !this.check.array) {
+        if (!this.#base.array || !this.#check.array) {
             throw new Error("failed: Arrays not initialized");
         }
         let dump_base = "";
         let dump_check = "";
 
-        for (const data of this.base.array) {
+        for (const data of this.#base.array) {
             dump_base += ` ${data}`;
         }
-        for (const data of this.check.array) {
+        for (const data of this.#check.array) {
             dump_check += ` ${data}`;
         }
 
@@ -248,11 +248,11 @@ class BufferController {
  * Factory method of double array
  */
 class DoubleArrayBuilder {
-    bufferController: BufferController;
-    keys: { k: string | Uint8Array; v: number }[];
+    #bufferController: BufferController;
+    #keys: { k: string | Uint8Array; v: number }[];
     constructor(initial_size = 1024) {
-        this.bufferController = new BufferController(initial_size); // BASE and CHECK
-        this.keys = [];
+        this.#bufferController = new BufferController(initial_size); // BASE and CHECK
+        this.#keys = [];
     }
 
     /**
@@ -263,7 +263,7 @@ class DoubleArrayBuilder {
      * @param {Number} value Integer value from 0 to max signed integer number - 1
      */
     append(key: string, record: number) {
-        this.keys.push({ k: key, v: record });
+        this.#keys.push({ k: key, v: record });
         return this;
     }
 
@@ -274,9 +274,9 @@ class DoubleArrayBuilder {
      * 'k' is a key string, 'v' is a record assigned to that key.
      * @return {DoubleArray} Compiled double array
      */
-    build(keys: { k: string | Uint8Array; v: number }[] = this.keys, sorted = false) {
+    build(keys: { k: string | Uint8Array; v: number }[] = this.#keys, sorted = false) {
         if (keys == null) {
-            return new DoubleArray(this.bufferController);
+            return new DoubleArray(this.#bufferController);
         }
         // Convert key string to ArrayBuffer
         const buff_keys: { k: Uint8Array; v: number }[] | null = keys.map((k) => {
@@ -288,9 +288,9 @@ class DoubleArrayBuilder {
 
         // Sort keys by byte order
         if (sorted) {
-            this.keys = buff_keys;
+            this.#keys = buff_keys;
         } else {
-            this.keys = buff_keys.sort((k1, k2) => {
+            this.#keys = buff_keys.sort((k1, k2) => {
                 const b1 = k1.k;
                 const b2 = k2.k;
                 const min_length = Math.min(b1.length, b2.length);
@@ -304,14 +304,14 @@ class DoubleArrayBuilder {
             });
         }
 
-        this._build(ROOT_ID, 0, 0, this.keys.length);
-        return new DoubleArray(this.bufferController);
+        this.#_build(ROOT_ID, 0, 0, this.#keys.length);
+        return new DoubleArray(this.#bufferController);
     }
 
     /**
      * Append nodes to BASE and CHECK array recursively
      */
-    _build(parent_index: number, position: number, start: number, length: number) {
+    #_build(parent_index: number, position: number, start: number, length: number) {
         const children_info = this.getChildrenInfo(position, start, length);
         const _base = this.findAllocatableBase(children_info);
 
@@ -325,12 +325,12 @@ class DoubleArrayBuilder {
             const child_start = children_info[i + 1];
             const child_len = children_info[i + 2];
             const child_index = _base + child_code;
-            this._build(child_index, position + 1, child_start, child_len);
+            this.#_build(child_index, position + 1, child_start, child_len);
         }
     }
 
     getChildrenInfo(position: number, start: number, length: number) {
-        let current_char = this.keys[start].k[position];
+        let current_char = this.#keys[start].k[position];
         let children_info = new Int32Array(length * 3);
         let i = 0;
         children_info[i++] = Number.parseInt(`${current_char}`); // char (current)
@@ -339,7 +339,7 @@ class DoubleArrayBuilder {
         let next_pos = start;
         let start_pos = start;
         for (; next_pos < start + length; next_pos++) {
-            const next_char = this.keys[next_pos].k[position];
+            const next_char = this.#keys[next_pos].k[position];
             if (current_char !== next_char) {
                 children_info[i++] = next_pos - start_pos; // length (current)
 
@@ -356,7 +356,7 @@ class DoubleArrayBuilder {
     }
 
     setBufferController(parent_id: number, children_info: Int32Array, _base: number) {
-        const bufferController = this.bufferController;
+        const bufferController = this.#bufferController;
         bufferController.setBase(parent_id, _base); // Update BASE of parent node
         for (let i = 0; i < children_info.length; i = i + 3) {
             const code = children_info[i];
@@ -395,7 +395,7 @@ class DoubleArrayBuilder {
                 // if (len != 1) {
                 //     throw 'assertion error: there are multiple terminal nodes. len:' + len;
                 // }
-                let value = this.keys[start_pos].v;
+                let value = this.#keys[start_pos].v;
 
                 if (value == null) {
                     value = 0;
@@ -411,7 +411,7 @@ class DoubleArrayBuilder {
      * Find BASE value that all children are allocatable in double array's region
      */
     findAllocatableBase(children_info: Int32Array) {
-        const bufferController = this.bufferController;
+        const bufferController = this.#bufferController;
 
         // Assertion: keys are sorted by byte order
         // var c = -1;
@@ -470,7 +470,7 @@ class DoubleArrayBuilder {
      * Check this double array index is unused or not
      */
     isUnusedNode(index: number) {
-        const bufferController = this.bufferController;
+        const bufferController = this.#bufferController;
         const check = bufferController.getCheck(index);
 
         // if (index < 0) {
@@ -495,10 +495,10 @@ class DoubleArrayBuilder {
  * Factory method of double array
  */
 class DoubleArray {
-    bufferController: BufferController;
+    #bufferController: BufferController;
     constructor(bufferController: BufferController) {
-        this.bufferController = bufferController; // BASE and CHECK
-        this.bufferController.shrink();
+        this.#bufferController = bufferController; // BASE and CHECK
+        this.#bufferController.shrink();
     }
 
     /**
@@ -509,7 +509,7 @@ class DoubleArray {
      */
     contain(_key: string) {
         let key = _key;
-        const bufferController = this.bufferController;
+        const bufferController = this.#bufferController;
         key += TERM_CHAR;
         const buffer = encoder.encode(key);
         let parent = ROOT_ID;
@@ -552,7 +552,7 @@ class DoubleArray {
             }
             parent = child;
         }
-        const base = this.bufferController.getBase(child);
+        const base = this.#bufferController.getBase(child);
         if (base <= 0) {
             // leaf node
             return -base - 1;
@@ -581,7 +581,7 @@ class DoubleArray {
                 // look forward by terminal character code to check this node is a leaf or not
                 const grand_child = this.traverse(child, TERM_CODE);
                 if (grand_child !== NOT_FOUND) {
-                    const base = this.bufferController.getBase(grand_child);
+                    const base = this.#bufferController.getBase(grand_child);
                     const r: { k: string; v: number } = {
                         k: "",
                         v: 0,
@@ -603,23 +603,23 @@ class DoubleArray {
     }
 
     traverse(parent: number, code: number) {
-        const child = this.bufferController.getBase(parent) + code;
-        if (this.bufferController.getCheck(child) === parent) {
+        const child = this.#bufferController.getBase(parent) + code;
+        if (this.#bufferController.getCheck(child) === parent) {
             return child;
         }
         return NOT_FOUND;
     }
 
     size() {
-        return this.bufferController.size();
+        return this.#bufferController.size();
     }
 
     calc() {
-        return this.bufferController.calc();
+        return this.#bufferController.calc();
     }
 
     dump() {
-        return this.bufferController.dump();
+        return this.#bufferController.dump();
     }
 }
 

@@ -3,14 +3,14 @@ import type ViterbiLattice from "./ViterbiLattice";
 import type ViterbiNode from "./ViterbiNode";
 
 class ViterbiSearcher {
-    connection_costs: ConnectionCosts;
+    #connection_costs: ConnectionCosts;
     /**
      * ViterbiSearcher is for searching best Viterbi path
      * @param {ConnectionCosts} connection_costs Connection costs matrix
      * @constructor
      */
     constructor(connection_costs: ConnectionCosts) {
-        this.connection_costs = connection_costs;
+        this.#connection_costs = connection_costs;
     }
 
     /**
@@ -20,11 +20,11 @@ class ViterbiSearcher {
      */
     search(_lattice: ViterbiLattice) {
         let lattice = _lattice;
-        lattice = this.forward(lattice);
-        return this.backward(lattice);
+        lattice = this.#forward(lattice);
+        return this.#backward(lattice);
     }
 
-    forward(lattice: ViterbiLattice) {
+    #forward(lattice: ViterbiLattice) {
         let i = 1;
         for (i = 1; i <= lattice.eos_pos; i++) {
             const nodes = lattice.nodes_end_at[i];
@@ -45,7 +45,7 @@ class ViterbiSearcher {
                         console.log("Left or right is null");
                         edge_cost = 0;
                     } else {
-                        edge_cost = this.connection_costs.get(prev_node.right_id, node.left_id);
+                        edge_cost = this.#connection_costs.get(prev_node.right_id, node.left_id);
                     }
                     const _cost = prev_node.shortest_cost + edge_cost + node.cost;
                     if (_cost < cost) {
@@ -60,7 +60,7 @@ class ViterbiSearcher {
         return lattice;
     }
 
-    backward(lattice: ViterbiLattice) {
+    #backward(lattice: ViterbiLattice) {
         const shortest_path: ViterbiNode[] = [];
         const eos = lattice.nodes_end_at[lattice.nodes_end_at.length - 1][0];
         let node_back = eos.prev;

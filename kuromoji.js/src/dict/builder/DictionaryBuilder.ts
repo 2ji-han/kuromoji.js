@@ -6,10 +6,10 @@ import CharacterDefinitionBuilder from "./CharacterDefinitionBuilder";
 import ConnectionCostsBuilder from "./ConnectionCostsBuilder";
 
 class DictionaryBuilder {
-    tid_entries: string[][];
-    unk_entries: string[][];
-    cc_builder: ConnectionCostsBuilder;
-    cd_builder: CharacterDefinitionBuilder;
+    #tid_entries: string[][];
+    #unk_entries: string[][];
+    #cc_builder: ConnectionCostsBuilder;
+    #cd_builder: CharacterDefinitionBuilder;
     /**
      * Build dictionaries (token info, connection costs)
      *
@@ -25,15 +25,15 @@ class DictionaryBuilder {
     constructor() {
         // Array of entries, each entry in Mecab form
         // (0: surface form, 1: left id, 2: right id, 3: word cost, 4: part of speech id, 5-: other features)
-        this.tid_entries = [];
-        this.unk_entries = [];
-        this.cc_builder = new ConnectionCostsBuilder();
-        this.cd_builder = new CharacterDefinitionBuilder();
+        this.#tid_entries = [];
+        this.#unk_entries = [];
+        this.#cc_builder = new ConnectionCostsBuilder();
+        this.#cd_builder = new CharacterDefinitionBuilder();
     }
 
     addTokenInfoDictionary(line: string) {
         const new_entry = line.split(",");
-        this.tid_entries.push(new_entry);
+        this.#tid_entries.push(new_entry);
         return this;
     }
 
@@ -42,12 +42,12 @@ class DictionaryBuilder {
      * @param {string} line is a line of "matrix.def"
      */
     putCostMatrixLine(line: string) {
-        this.cc_builder.putLine(line);
+        this.#cc_builder.putLine(line);
         return this;
     }
 
     putCharDefLine(line: string) {
-        this.cd_builder.putLine(line);
+        this.#cd_builder.putLine(line);
         return this;
     }
 
@@ -56,7 +56,7 @@ class DictionaryBuilder {
      * @param {string} line is a line of "unk.def"
      */
     putUnkDefLine(line: string) {
-        this.unk_entries.push(line.split(","));
+        this.#unk_entries.push(line.split(","));
         return this;
     }
 
@@ -67,7 +67,7 @@ class DictionaryBuilder {
         return new DynamicDictionaries(
             dictionaries.trie,
             dictionaries.token_info_dictionary,
-            this.cc_builder.build(),
+            this.#cc_builder.build(),
             unknown_dictionary
         );
     }
@@ -80,7 +80,7 @@ class DictionaryBuilder {
     buildTokenInfoDictionary() {
         const token_info_dictionary = new TokenInfoDictionary();
         // using as hashmap, string -> string (word_id -> surface_form) to build dictionary
-        const dictionary_entries = token_info_dictionary.buildDictionary(this.tid_entries);
+        const dictionary_entries = token_info_dictionary.buildDictionary(this.#tid_entries);
         const trie = this.buildDoubleArray();
         for (const token_info_id in dictionary_entries) {
             const surface_form = dictionary_entries[token_info_id];
@@ -100,8 +100,8 @@ class DictionaryBuilder {
     buildUnknownDictionary() {
         const unk_dictionary = new UnknownDictionary();
         // using as hashmap, string -> string (word_id -> surface_form) to build dictionary
-        const dictionary_entries = unk_dictionary.buildDictionary(this.unk_entries);
-        const char_def = this.cd_builder.build(); // Create CharacterDefinition
+        const dictionary_entries = unk_dictionary.buildDictionary(this.#unk_entries);
+        const char_def = this.#cd_builder.build(); // Create CharacterDefinition
         if (!char_def || !char_def.invoke_definition_map) {
             throw new Error("CharacterDefinition is not set");
         }
@@ -128,7 +128,7 @@ class DictionaryBuilder {
      */
     buildDoubleArray() {
         let trie_id = 0;
-        const words = this.tid_entries.map((entry) => {
+        const words = this.#tid_entries.map((entry) => {
             const surface_form = entry[0];
             return { k: surface_form, v: trie_id++ };
         });

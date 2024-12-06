@@ -6,18 +6,18 @@ export type TokenizerBuilderOption = {
 };
 
 class TokenizerBuilder {
-    dic_path: string;
+    #dic_path: string;
 
     constructor(option: TokenizerBuilderOption = {}) {
         if (option.dicPath === undefined) {
-            this.dic_path = "dict/";
+            this.#dic_path = "dict/";
         } else {
-            this.dic_path = option.dicPath;
+            this.#dic_path = option.dicPath;
         }
     }
 
     build(callback: (err: Error[] | null, tokenizer: Tokenizer) => void) {
-        const loader = new DictionaryLoader(this.dic_path);
+        const loader = new DictionaryLoader(this.#dic_path);
         loader.load((err, dic) => {
             callback(err, new Tokenizer(dic));
         });

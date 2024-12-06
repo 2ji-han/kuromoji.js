@@ -1,6 +1,6 @@
 class SurrogateAwareString {
     str: string;
-    index_mapping: number[];
+    #index_mapping: number[];
     length: number;
     /**
      * String wrapper for UTF-16 surrogate pair (4 bytes)
@@ -9,24 +9,24 @@ class SurrogateAwareString {
      */
     constructor(str: string) {
         this.str = str;
-        this.index_mapping = [];
+        this.#index_mapping = [];
         const str_length = str.length;
         for (let pos = 0; pos < str_length; pos++) {
             const ch = str.charAt(pos);
-            this.index_mapping.push(pos);
+            this.#index_mapping.push(pos);
             if (SurrogateAwareString.isSurrogatePair(ch)) {
                 pos++;
             }
         }
         // Surrogate aware length
-        this.length = this.index_mapping.length;
+        this.length = this.#index_mapping.length;
     }
 
     slice(index: number) {
-        if (this.index_mapping.length <= index) {
+        if (this.#index_mapping.length <= index) {
             return "";
         }
-        const surrogate_aware_index = this.index_mapping[index];
+        const surrogate_aware_index = this.#index_mapping[index];
         return this.str.slice(surrogate_aware_index);
     }
 
@@ -34,8 +34,8 @@ class SurrogateAwareString {
         if (this.str.length <= index) {
             return "";
         }
-        const surrogate_aware_start_index = this.index_mapping[index];
-        const surrogate_aware_end_index = this.index_mapping[index + 1];
+        const surrogate_aware_start_index = this.#index_mapping[index];
+        const surrogate_aware_end_index = this.#index_mapping[index + 1];
         if (surrogate_aware_end_index == null) {
             return this.str.slice(surrogate_aware_start_index);
         }
@@ -43,10 +43,10 @@ class SurrogateAwareString {
     }
 
     charCodeAt(index: number) {
-        if (this.index_mapping.length <= index) {
+        if (this.#index_mapping.length <= index) {
             return Number.NaN;
         }
-        const surrogate_aware_index = this.index_mapping[index];
+        const surrogate_aware_index = this.#index_mapping[index];
         const upper = this.str.charCodeAt(surrogate_aware_index);
         let lower: number;
         if (upper >= 0xd800 && upper <= 0xdbff && surrogate_aware_index < this.str.length) {

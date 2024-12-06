@@ -6,11 +6,11 @@ import CharacterClass from "./CharacterClass";
  * @constructor
  */
 class InvokeDefinitionMap {
-    map: CharacterClass[];
-    lookup_table: Map<string, number>;
+    #map: CharacterClass[];
+    #lookup_table: Map<string, number>;
     constructor() {
-        this.map = [];
-        this.lookup_table = new Map<string, number>(); // Just for building dictionary
+        this.#map = [];
+        this.#lookup_table = new Map<string, number>(); // Just for building dictionary
     }
 
     /**
@@ -50,8 +50,8 @@ class InvokeDefinitionMap {
         const ccd_length = character_category_definition.length;
         for (let i = 0; i < ccd_length; i++) {
             const character_class = character_category_definition[i];
-            this.map[i] = character_class;
-            this.lookup_table.set(character_class.class_name, i);
+            this.#map[i] = character_class;
+            this.#lookup_table.set(character_class.class_name, i);
         }
     }
 
@@ -61,7 +61,7 @@ class InvokeDefinitionMap {
      * @returns {CharacterClass}
      */
     getCharacterClass(class_id: number) {
-        return this.map[class_id];
+        return this.#map[class_id];
     }
 
     /**
@@ -70,7 +70,7 @@ class InvokeDefinitionMap {
      * @returns {number} class_id
      */
     lookup(class_name: string): number | null {
-        const class_id = this.lookup_table.get(class_name);
+        const class_id = this.#lookup_table.get(class_name);
         if (class_id == null) {
             return null;
         }
@@ -83,8 +83,8 @@ class InvokeDefinitionMap {
      */
     toBuffer() {
         const buffer = new ByteBuffer();
-        for (let i = 0; i < this.map.length; i++) {
-            const char_class = this.map[i];
+        for (let i = 0; i < this.#map.length; i++) {
+            const char_class = this.#map[i];
             buffer.put(char_class.is_always_invoke);
             buffer.put(char_class.is_grouping);
             buffer.putInt(char_class.max_length);

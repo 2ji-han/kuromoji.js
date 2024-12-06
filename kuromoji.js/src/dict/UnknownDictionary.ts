@@ -4,8 +4,8 @@ import CharacterDefinition from "./CharacterDefinition";
 class UnknownDictionary {
     dictionary: ByteBuffer;
     target_map: Map<number, number[]>;
-    pos_buffer: ByteBuffer;
-    character_definition: CharacterDefinition | null = null;
+    #pos_buffer: ByteBuffer;
+    #character_definition: CharacterDefinition | null = null;
 
     /**
      * UnknownDictionary
@@ -14,7 +14,7 @@ class UnknownDictionary {
     constructor() {
         this.dictionary = new ByteBuffer(10 * 1024 * 1024);
         this.target_map = new Map<number, number[]>(); // trie_id (of surface form) -> token_info_id (of token)
-        this.pos_buffer = new ByteBuffer(10 * 1024 * 1024);
+        this.#pos_buffer = new ByteBuffer(10 * 1024 * 1024);
     }
 
     // left_id right_id word_cost ...
@@ -36,26 +36,26 @@ class UnknownDictionary {
             if (!Number.isFinite(left_id) || !Number.isFinite(right_id) || !Number.isFinite(word_cost)) {
                 console.log(entry);
             }
-            const token_info_id = this.put(left_id, right_id, word_cost, surface_form, feature);
+            const token_info_id = this.#put(left_id, right_id, word_cost, surface_form, feature);
             dictionary_entries[token_info_id] = surface_form;
         }
 
         // Remove last unused area
         this.dictionary.shrink();
-        this.pos_buffer.shrink();
+        this.#pos_buffer.shrink();
 
         return dictionary_entries;
     }
 
-    put(left_id: number, right_id: number, word_cost: number, surface_form: string, feature: string): number {
+    #put(left_id: number, right_id: number, word_cost: number, surface_form: string, feature: string): number {
         const token_info_id = this.dictionary.position;
-        const pos_id = this.pos_buffer.position;
+        const pos_id = this.#pos_buffer.position;
 
         this.dictionary.putShort(left_id);
         this.dictionary.putShort(right_id);
         this.dictionary.putShort(word_cost);
         this.dictionary.putInt(pos_id);
-        this.pos_buffer.putString(`${surface_form},${feature}`);
+        this.#pos_buffer.putString(`${surface_form},${feature}`);
 
         return token_info_id;
     }
@@ -91,19 +91,19 @@ class UnknownDictionary {
     }
 
     // from tid.dat
-    loadDictionary(array_buffer: Uint8Array) {
+    #loadDictionary(array_buffer: Uint8Array) {
         this.dictionary = new ByteBuffer(array_buffer);
         return this;
     }
 
     // from tid_pos.dat
-    loadPosVector(array_buffer: Uint8Array) {
-        this.pos_buffer = new ByteBuffer(array_buffer);
+    #loadPosVector(array_buffer: Uint8Array) {
+        this.#pos_buffer = new ByteBuffer(array_buffer);
         return this;
     }
 
     // from tid_map.dat
-    loadTargetMap(array_buffer: Uint8Array) {
+    #loadTargetMap(array_buffer: Uint8Array) {
         const buffer = new ByteBuffer(array_buffer);
         buffer.position = 0;
         this.target_map = new Map<number, number[]>();
@@ -127,26 +127,26 @@ class UnknownDictionary {
             return null;
         }
         const pos_id = this.dictionary.getInt(token_info_id + 6);
-        return this.pos_buffer.getString(pos_id);
+        return this.#pos_buffer.getString(pos_id);
     }
 
     characterDefinition(character_definition: CharacterDefinition) {
-        this.character_definition = character_definition;
+        this.#character_definition = character_definition;
         return this;
     }
 
     lookup(ch: string) {
-        if (this.character_definition == null) {
+        if (this.#character_definition == null) {
             throw new Error("CharacterDefinition is not set");
         }
-        return this.character_definition.lookup(ch);
+        return this.#character_definition.lookup(ch);
     }
 
     lookupCompatibleCategory(ch: string) {
-        if (this.character_definition == null) {
+        if (this.#character_definition == null) {
             throw new Error("CharacterDefinition is not set");
         }
-        return this.character_definition.lookupCompatibleCategory(ch);
+        return this.#character_definition.lookupCompatibleCategory(ch);
     }
 
     loadUnknownDictionaries(
@@ -157,10 +157,10 @@ class UnknownDictionary {
         compat_cat_map_buffer: Uint32Array,
         invoke_def_buffer: Uint8Array
     ) {
-        this.loadDictionary(unk_buffer);
-        this.loadPosVector(unk_pos_buffer);
-        this.loadTargetMap(unk_map_buffer);
-        this.character_definition = new CharacterDefinition().load(
+        this.#loadDictionary(unk_buffer);
+        this.#loadPosVector(unk_pos_buffer);
+        this.#loadTargetMap(unk_map_buffer);
+        this.#character_definition = new CharacterDefinition().load(
             cat_map_buffer,
             compat_cat_map_buffer,
             invoke_def_buffer

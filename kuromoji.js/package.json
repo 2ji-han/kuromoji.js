@@ -10,5 +10,9 @@
         "typescript": "^5.0.0"
     },
     "description": "JavaScript implementation of Japanese morphological analyzer",
-    "license": "Apache-2.0"
+    "license": "Apache-2.0",
+    "scripts": {
+        "build": "bun build src/kuromoji.ts --outdir ./out --minify",
+        "size": "bun scripts/filesize.ts"
+    }
 }

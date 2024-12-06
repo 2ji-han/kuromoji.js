@@ -4,14 +4,14 @@ import path from "node:path";
 import zlib from "node:zlib";
 import DynamicDictionaries from "../dict/DynamicDictionaries";
 class NodeDictionaryLoader {
-    dic: DynamicDictionaries;
-    dic_path: string;
+    #dic: DynamicDictionaries;
+    #dic_path: string;
     constructor(dic_path: string) {
-        this.dic = new DynamicDictionaries();
-        this.dic_path = dic_path;
+        this.#dic = new DynamicDictionaries();
+        this.#dic_path = dic_path;
     }
 
-    loadArrayBuffer = (file: string) =>
+    #loadArrayBuffer = (file: string) =>
         new Promise<ArrayBufferLike>((resolve, reject) => {
             if (!existsSync(file)) return reject(new Error(`${file} does not exist`));
             const buffer = readFileSync(file);
@@ -23,9 +23,9 @@ class NodeDictionaryLoader {
         });
 
     load(callback: (error: Error[] | null, dic: DynamicDictionaries) => void) {
-        const dic = this.dic;
-        const dic_path = this.dic_path;
-        const loadArrayBuffer = this.loadArrayBuffer;
+        const dic = this.#dic;
+        const dic_path = this.#dic_path;
+        const loadArrayBuffer = this.#loadArrayBuffer;
 
         Promise.allSettled([
             // Trie
