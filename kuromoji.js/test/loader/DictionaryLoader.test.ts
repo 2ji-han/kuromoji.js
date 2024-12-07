@@ -17,7 +17,7 @@
 
 import { beforeEach, describe, expect, it } from "bun:test";
 import type DynamicDictionaries from "../../src/dict/DynamicDictionaries";
-import DictionaryLoader from "../../src/loader/NodeDictionaryLoader";
+import DictionaryLoader from "../../src/loader/DictionaryLoader";
 
 const DIC_DIR = "dict/";
 

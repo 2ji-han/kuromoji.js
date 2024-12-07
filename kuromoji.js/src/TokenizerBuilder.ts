@@ -1,19 +1,15 @@
 import Tokenizer from "./Tokenizer";
-import DictionaryLoader from "./loader/NodeDictionaryLoader";
+import DictionaryLoader from "./loader/DictionaryLoader";
 
 export type TokenizerBuilderOption = {
     dicPath?: string | undefined;
 };
 
 class TokenizerBuilder {
-    #dic_path: string;
+    #dic_path: string | undefined;
 
     constructor(option: TokenizerBuilderOption = {}) {
-        if (option.dicPath === undefined) {
-            this.#dic_path = "dict/";
-        } else {
-            this.#dic_path = option.dicPath;
-        }
+        this.#dic_path = option.dicPath;
     }
 
     build(callback: (err: Error[] | null, tokenizer: Tokenizer) => void) {
