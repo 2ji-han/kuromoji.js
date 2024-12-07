@@ -27,5 +27,5 @@ import kuromoji from "../src/kuromoji";
 kuromoji.builder({ dicPath: "dict" }).build((err, tokenizer) => {
     // tokenizer is ready
     const path = tokenizer.tokenize("すもももももももものうち");
-    console.log(path);
+    console.log(path.length);
 });
