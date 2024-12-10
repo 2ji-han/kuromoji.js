@@ -2,12 +2,12 @@ import ByteBuffer from "../util/ByteBuffer";
 
 class TokenInfoDictionary {
     dictionary: ByteBuffer;
-    target_map: Map<number, Set<number>>;
-    #pos_buffer: ByteBuffer;
+    target_map: Map<number, number[]>;
+    pos_buffer: ByteBuffer;
     constructor() {
         this.dictionary = new ByteBuffer(10 * 1024 * 1024);
-        this.target_map = new Map<number, Set<number>>(); // trie_id (of surface form) -> token_info_id (of token)
-        this.#pos_buffer = new ByteBuffer(10 * 1024 * 1024);
+        this.target_map = new Map<number, number[]>(); // trie_id (of surface form) -> token_info_id (of token)
+        this.pos_buffer = new ByteBuffer(10 * 1024 * 1024);
     }
 
     // left_id right_id word_cost ...
@@ -34,20 +34,20 @@ class TokenInfoDictionary {
 
         // Remove last unused area
         this.dictionary.shrink();
-        this.#pos_buffer.shrink();
+        this.pos_buffer.shrink();
 
         return dictionary_entries;
     }
 
     put(left_id: number, right_id: number, word_cost: number, surface_form: string, feature: string): number {
         const token_info_id = this.dictionary.position;
-        const pos_id = this.#pos_buffer.position;
+        const pos_id = this.pos_buffer.position;
 
         this.dictionary.putShort(left_id);
         this.dictionary.putShort(right_id);
         this.dictionary.putShort(word_cost);
         this.dictionary.putInt(pos_id);
-        this.#pos_buffer.putString(`${surface_form},${feature}`);
+        this.pos_buffer.putString(`${surface_form},${feature}`);
 
         return token_info_id;
     }
@@ -55,24 +55,23 @@ class TokenInfoDictionary {
     addMapping(source: number, target: number): void {
         let mapping = this.target_map.get(source);
         if (mapping == null) {
-            mapping = new Set<number>();
+            mapping = [];
         }
-        mapping.add(target);
+        mapping.push(target);
 
         this.target_map.set(source, mapping);
     }
 
     targetMapToBuffer(): Uint8Array {
         const buffer = new ByteBuffer();
-        const map_keys_size = Object.keys(this.target_map).length;
-        buffer.putInt(map_keys_size);
+        buffer.putInt(Object.keys(this.target_map).length);
         for (const _key in this.target_map) {
             const key = Number.parseInt(_key);
 
             const values = this.target_map.get(key); // Array
             if (!values) continue;
 
-            const map_values_size = values.size;
+            const map_values_size = values.length;
             buffer.putInt(key);
             buffer.putInt(map_values_size);
             for (const value of values) {
@@ -90,7 +89,7 @@ class TokenInfoDictionary {
 
     // from tid_pos.dat
     loadPosVector(array_buffer: Uint8Array) {
-        this.#pos_buffer = new ByteBuffer(array_buffer);
+        this.pos_buffer = new ByteBuffer(array_buffer);
         return this;
     }
 
@@ -98,7 +97,7 @@ class TokenInfoDictionary {
     loadTargetMap(array_buffer: Uint8Array) {
         const buffer = new ByteBuffer(array_buffer);
         buffer.position = 0;
-        this.target_map = new Map<number, Set<number>>();
+        this.target_map = new Map<number, number[]>();
         buffer.readInt(); // map_keys_size
         while (true) {
             if (buffer.buffer.length < buffer.position + 1) {
@@ -119,7 +118,7 @@ class TokenInfoDictionary {
             return null;
         }
         const pos_id = this.dictionary.getInt(token_info_id + 6);
-        return this.#pos_buffer.getString(pos_id);
+        return this.pos_buffer.getString(pos_id);
     }
 }
 

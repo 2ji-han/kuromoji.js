@@ -52,7 +52,7 @@ class CharacterDefinitionBuilder {
     build() {
         // TODO If DEFAULT category does not exist, throw error
         if (!this.char_def || !this.char_def.invoke_definition_map) {
-            throw new Error("CharacterDefinitionBuilder.build() called before CharacterDefinitionBuilder.putLine()");
+            throw new Error("No data to build.");
         }
         this.char_def.invoke_definition_map.init(this.character_category_definition);
         this.char_def.initCategoryMappings(this.category_mapping);

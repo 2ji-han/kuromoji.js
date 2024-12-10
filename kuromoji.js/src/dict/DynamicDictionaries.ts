@@ -15,27 +15,11 @@ class DynamicDictionaries {
         connection_costs?: ConnectionCosts,
         unknown_dictionary?: UnknownDictionary
     ) {
-        if (trie != null) {
-            this.trie = trie;
-        } else {
-            this.trie = doublearray.builder(0).build([{ k: "", v: 1 }]);
-        }
-        if (token_info_dictionary != null) {
-            this.token_info_dictionary = token_info_dictionary;
-        } else {
-            this.token_info_dictionary = new TokenInfoDictionary();
-        }
-        if (connection_costs != null) {
-            this.connection_costs = connection_costs;
-        } else {
-            // backward_size * backward_size
-            this.connection_costs = new ConnectionCosts(0, 0);
-        }
-        if (unknown_dictionary != null) {
-            this.unknown_dictionary = unknown_dictionary;
-        } else {
-            this.unknown_dictionary = new UnknownDictionary();
-        }
+        this.trie = trie ?? doublearray.builder(0).build([{ k: "", v: 1 }]);
+        this.token_info_dictionary = token_info_dictionary ?? new TokenInfoDictionary();
+        // backward_size * backward_size
+        this.connection_costs = connection_costs ?? new ConnectionCosts(0, 0);
+        this.unknown_dictionary = unknown_dictionary ?? new UnknownDictionary();
     }
 
     loadTrie(base_buffer: Int32Array, check_buffer: Int32Array) {

@@ -27,7 +27,7 @@ class ConnectionCostsBuilder {
             return this;
         }
         if (!this.connection_cost) {
-            throw "ConnectionCostsBuilder.connection_cost is null";
+            throw "connection_cost is null";
         }
 
         const costs = line.split(" ");
@@ -58,7 +58,7 @@ class ConnectionCostsBuilder {
 
     build() {
         if (!this.connection_cost) {
-            throw "ConnectionCostsBuilder.connection_cost is null";
+            throw "No data to build.";
         }
         return this.connection_cost;
     }

@@ -42,11 +42,7 @@ class ViterbiNode {
         this.right_id = right_id;
         this.prev = null;
         this.surface_form = surface_form;
-        if (type === "BOS") {
-            this.shortest_cost = 0;
-        } else {
-            this.shortest_cost = Number.MAX_VALUE;
-        }
+        this.shortest_cost = type === "BOS" ? 0 : Number.MAX_VALUE;
         this.type = type;
     }
 }

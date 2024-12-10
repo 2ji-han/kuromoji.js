@@ -62,13 +62,12 @@ class DictionaryBuilder {
 
     build() {
         const dictionaries = this.buildTokenInfoDictionary();
-        const unknown_dictionary = this.buildUnknownDictionary();
 
         return new DynamicDictionaries(
             dictionaries.trie,
             dictionaries.token_info_dictionary,
             this.#cc_builder.build(),
-            unknown_dictionary
+            this.buildUnknownDictionary()
         );
     }
 

@@ -51,33 +51,36 @@ class CharacterDefinition {
             console.log(`char.def parse error. LENGTH is 1 to n:${max_length}`);
             return null;
         }
-        const is_invoke = invoke === 1;
-        const is_grouping = grouping === 1;
-        return new CharacterClass(class_id, category, is_invoke, is_grouping, max_length);
+        return new CharacterClass(class_id, category, invoke === 1, grouping === 1, max_length);
     }
 
     static parseCategoryMapping(parsed_category_mapping: RegExpExecArray) {
         const start = Number.parseInt(parsed_category_mapping[1]);
-        const default_category = parsed_category_mapping[2];
-        const compatible_category = 3 < parsed_category_mapping.length ? parsed_category_mapping.slice(3) : [];
         if (!Number.isFinite(start) || start < 0 || start > 0xffff) {
             console.log(`char.def parse error. CODE is invalid:${start}`);
         }
-        return { start: start, default: default_category, compatible: compatible_category };
+        return {
+            start: start,
+            default: parsed_category_mapping[2],
+            compatible: 3 < parsed_category_mapping.length ? parsed_category_mapping.slice(3) : [],
+        };
     }
 
     static parseRangeCategoryMapping(parsed_category_mapping: RegExpExecArray) {
         const start = Number.parseInt(parsed_category_mapping[1]);
         const end = Number.parseInt(parsed_category_mapping[2]);
-        const default_category = parsed_category_mapping[3];
-        const compatible_category = 4 < parsed_category_mapping.length ? parsed_category_mapping.slice(4) : [];
         if (!Number.isFinite(start) || start < 0 || start > 0xffff) {
             console.log(`char.def parse error. CODE is invalid:${start}`);
         }
         if (!Number.isFinite(end) || end < 0 || end > 0xffff) {
             console.log(`char.def parse error. CODE is invalid:${end}`);
         }
-        return { start: start, end: end, default: default_category, compatible: compatible_category };
+        return {
+            start: start,
+            end: end,
+            default: parsed_category_mapping[3],
+            compatible: 4 < parsed_category_mapping.length ? parsed_category_mapping.slice(4) : [],
+        };
     }
 
     /**
@@ -94,8 +97,7 @@ class CharacterDefinition {
             const category_mapping_length = category_mapping.length;
             for (let i = 0; i < category_mapping_length; i++) {
                 const mapping = category_mapping[i];
-                const end = mapping.end || mapping.start;
-                for (code_point = mapping.start; code_point <= end; code_point++) {
+                for (code_point = mapping.start; code_point <= (mapping.end || mapping.start); code_point++) {
                     // Default Category class ID
                     const id = this.invoke_definition_map.lookup(mapping.default);
                     if (id == null) {

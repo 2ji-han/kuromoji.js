@@ -167,6 +167,18 @@ class ByteBuffer {
         const codePoint = this.buffer.subarray(index, index + 4);
         return new DataView(codePoint.buffer).getUint32(0, false); // little-endian
     }
+
+    getBool(_index: number | null = null) {
+        let index = _index;
+        if (index == null) {
+            index = this.position;
+            this.position += 1;
+        }
+        if (this.buffer.length < index + 1) {
+            return false;
+        }
+        return Boolean(this.buffer[index]);
+    }
 }
 
 export default ByteBuffer;

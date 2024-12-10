@@ -24,13 +24,12 @@ class InvokeDefinitionMap {
 
         const buffer = new ByteBuffer(invoke_def_buffer);
         while (buffer.position + 1 < buffer.size()) {
-            const class_id = character_category_definition.length;
-            const is_always_invoke = Boolean(buffer.get());
-            const is_grouping = Boolean(buffer.get());
+            const is_always_invoke = buffer.getBool();
+            const is_grouping = buffer.getBool();
             const max_length = buffer.getInt();
             const class_name = buffer.getString();
             character_category_definition.push(
-                new CharacterClass(class_id, class_name, is_always_invoke, is_grouping, max_length)
+                new CharacterClass(character_category_definition.length, class_name, is_always_invoke, is_grouping, max_length)
             );
         }
 

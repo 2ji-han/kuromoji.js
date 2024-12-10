@@ -21,8 +21,13 @@ export type TOKEN = {
  * @constructor
  */
 class IpadicFormatter {
-    formatEntry(word_id: number, position: number, type: WORD_TYPE, features: string[]) {
-        const token: TOKEN = {
+    formatEntry(
+        word_id: number,
+        position: number,
+        type: WORD_TYPE,
+        features: string[]
+    ): TOKEN {
+        return {
             word_id: word_id,
             word_type: type,
             word_position: position,
@@ -37,7 +42,6 @@ class IpadicFormatter {
             reading: features[8],
             pronunciation: features[9],
         };
-        return token;
     }
 
     formatUnknownEntry(
@@ -46,8 +50,8 @@ class IpadicFormatter {
         type: WORD_TYPE,
         features: string[],
         surface_form: string | Uint8Array
-    ) {
-        const token: TOKEN = {
+    ): TOKEN {
+        return {
             word_id: word_id,
             word_type: type,
             word_position: position,
@@ -59,11 +63,9 @@ class IpadicFormatter {
             conjugated_type: features[5],
             conjugated_form: features[6],
             basic_form: features[7],
+            // token.reading = features[8];
+            // token.pronunciation = features[9];
         };
-        // token.reading = features[8];
-        // token.pronunciation = features[9];
-
-        return token;
     }
 }
 
