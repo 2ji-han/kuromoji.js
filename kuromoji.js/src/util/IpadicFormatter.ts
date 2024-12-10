@@ -21,12 +21,7 @@ export type TOKEN = {
  * @constructor
  */
 class IpadicFormatter {
-    formatEntry(
-        word_id: number,
-        position: number,
-        type: WORD_TYPE,
-        features: string[]
-    ): TOKEN {
+    formatEntry(word_id: number, position: number, type: WORD_TYPE, features: string[]): TOKEN {
         return {
             word_id: word_id,
             word_type: type,
