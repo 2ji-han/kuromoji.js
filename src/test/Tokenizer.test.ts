@@ -16,90 +16,52 @@
  */
 
 import { beforeEach, describe, expect, it } from "bun:test";
-import fs from "node:fs";
+import Tokenizer from "../kuromoji.js/Tokenizer";
+import kuromoji from "../kuromoji.js/kuromoji";
 
-import Tokenizer from "../../../src/Tokenizer";
-import type DynamicDictionaries from "../../../src/dict/DynamicDictionaries";
-import kuromoji from "../../../src/kuromoji";
+const DIC_DIR = "dict/";
 
-const DIC_DIR = "test/_resource/minimum-dic/";
-const connection_costs_file = `${DIC_DIR}matrix.def`;
-const char_def_file = `${DIC_DIR}char.def`;
-const unk_def_file = `${DIC_DIR}unk.def`;
-const tid_dic_file = `${DIC_DIR}minimum.csv`;
+describe("Tokenizer static method test", () => {
+    it("splitByPunctuation", () => {
+        expect(Tokenizer.splitByPunctuation("すもももももももものうち")).toStrictEqual(["すもももももももものうち"]);
+    });
+    it("splitByPunctuation", () => {
+        expect(Tokenizer.splitByPunctuation("、")).toStrictEqual(["、"]);
+    });
+    it("splitByPunctuation", () => {
+        expect(Tokenizer.splitByPunctuation("。")).toStrictEqual(["。"]);
+    });
+    it("splitByPunctuation", () => {
+        expect(Tokenizer.splitByPunctuation("すもも、も、もも。もも、も、もも。")).toStrictEqual([
+            "すもも、",
+            "も、",
+            "もも。",
+            "もも、",
+            "も、",
+            "もも。",
+        ]);
+    });
+    it("splitByPunctuation", () => {
+        expect(Tokenizer.splitByPunctuation("、𠮷野屋。漢字。")).toStrictEqual(["、", "𠮷野屋。", "漢字。"]);
+    });
+});
 
-describe("DictionaryBuilder", () => {
-    let kuromoji_dic: DynamicDictionaries | null = null; // target object of DynamicDictionaries to build
+describe("Tokenizer for IPADic", () => {
+    let tokenizer: Tokenizer | null = null;
+
     beforeEach((done) => {
-        // Build token info dictionary
-        const builder = kuromoji.dictionaryBuilder();
-        const tokenInfo = fs.readFileSync(tid_dic_file, "utf-8");
-        tokenInfo.split("\n").map((line) => {
-            builder.addTokenInfoDictionary(line);
+        kuromoji.builder({ dicPath: DIC_DIR }).build((err, _tokenizer) => {
+            tokenizer = _tokenizer;
+            expect(_tokenizer).toBeObject();
+            done();
         });
-
-        // Build connection costs matrix
-        const cc_text = fs.readFileSync(connection_costs_file, "ascii");
-        const cc_lines = cc_text.split("\n");
-        cc_lines.map((line) => {
-            builder.putCostMatrixLine(line);
-        });
-
-        // Build unknown dictionary
-        const cd_text = fs.readFileSync(char_def_file, "utf-8");
-        const cd_lines = cd_text.split("\n");
-        cd_lines.map((line) => {
-            builder.putCharDefLine(line);
-        });
-        const unk_text = fs.readFileSync(unk_def_file, "utf-8");
-        const unk_lines = unk_text.split("\n");
-        unk_lines.map((line) => {
-            builder.putUnkDefLine(line);
-        });
-
-        kuromoji_dic = builder.build();
-
-        done();
     });
 
-    it("Dictionary not to be null", () => {
-        if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null");
+    it("Sentence すもももももももものうち is tokenized properly", () => {
+        if (!tokenizer) {
+            throw new Error("tokenizer is null");
         }
-        expect(kuromoji_dic).not.toBeNull();
-    });
-    it("TokenInfoDictionary not to be null", () => {
-        if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null");
-        }
-        expect(kuromoji_dic.token_info_dictionary).not.toBeNull();
-    });
-    it("TokenInfoDictionary", () => {
-        if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null");
-        }
-        // expect(kuromoji_dic.token_info_dictionary.getFeatures("1467000")).to.have.length.above(1);
-        expect(kuromoji_dic.token_info_dictionary.dictionary.buffer.length).toBeGreaterThanOrEqual(1);
-    });
-    it("DoubleArray not to be null", () => {
-        if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null");
-        }
-        expect(kuromoji_dic.trie).not.toBeNull();
-    });
-    it("ConnectionCosts not to be null", () => {
-        if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null");
-        }
-        expect(kuromoji_dic.connection_costs).not.toBeNull();
-    });
-    it("Tokenize simple test", () => {
-        if (!kuromoji_dic) {
-            throw new Error("kuromoji_dic is null");
-        }
-        const tokenizer = new Tokenizer(kuromoji_dic);
         const path = tokenizer.tokenize("すもももももももものうち");
-
         const expected_tokens: { [key: string]: string | number }[] = [
             {
                 word_type: "KNOWN",
@@ -202,6 +164,7 @@ describe("DictionaryBuilder", () => {
         ] as const;
 
         expect(path).toHaveLength(7);
+
         for (let i = 0; i < expected_tokens.length; i++) {
             const expected_token = expected_tokens[i];
             const target_token = path[i];
@@ -209,5 +172,51 @@ describe("DictionaryBuilder", () => {
                 expect(target_token).toHaveProperty(key, expected_token[key]);
             }
         }
+    });
+    it("Sentence include unknown words となりのトトロ are tokenized properly", () => {
+        if (!tokenizer) {
+            throw new Error("tokenizer is null");
+        }
+        const path = tokenizer.tokenize("となりのトトロ");
+        expect(path).toHaveLength(3);
+    });
+    it("研究 is not split", () => {
+        if (!tokenizer) {
+            throw new Error("tokenizer is null");
+        }
+        const path = tokenizer.tokenize("研究");
+        expect(path).toHaveLength(1);
+    });
+    it("Blank input", () => {
+        if (!tokenizer) {
+            throw new Error("tokenizer is null");
+        }
+        const path = tokenizer.tokenize("");
+        expect(path).toHaveLength(0);
+    });
+    it("Sentence include UTF-16 surrogate pair", () => {
+        if (!tokenizer) {
+            throw new Error("tokenizer is null");
+        }
+        const path = tokenizer.tokenize("𠮷野屋");
+        expect(path).toHaveLength(3);
+        expect(path[0].word_position).toEqual(1);
+        expect(path[1].word_position).toEqual(2);
+        expect(path[2].word_position).toEqual(3);
+    });
+    it("Sentence include punctuation あ、あ。あ、あ。 returns correct positions", () => {
+        if (!tokenizer) {
+            throw new Error("tokenizer is null");
+        }
+        const path = tokenizer.tokenize("あ、あ。あ、あ。");
+        expect(path).toHaveLength(8);
+        expect(path[0].word_position).toEqual(1);
+        expect(path[1].word_position).toEqual(2);
+        expect(path[2].word_position).toEqual(3);
+        expect(path[3].word_position).toEqual(4);
+        expect(path[4].word_position).toEqual(5);
+        expect(path[5].word_position).toEqual(6);
+        expect(path[6].word_position).toEqual(7);
+        expect(path[7].word_position).toEqual(8);
     });
 });

@@ -16,8 +16,8 @@
  */
 
 import { beforeEach, describe, expect, it } from "bun:test";
-import type DynamicDictionaries from "../../src/dict/DynamicDictionaries";
-import DictionaryLoader from "../../src/loader/DictionaryLoader";
+import type DynamicDictionaries from "../../kuromoji.js/dict/DynamicDictionaries";
+import DictionaryLoader from "../../kuromoji.js/loader/DictionaryLoader";
 
 const DIC_DIR = "dict/";
 

@@ -1,12 +1,29 @@
 {
-    "name": "@kuromoji/kuromoji",
-    "private": true,
-    "workspaces": ["kuromoji.js"],
+    "name": "@kuromoji/kuromoji.js",
+    "version": "0.1.4",
+    "author": "Takuya Asano <takuya.a@gmail.com>",
+    "main": "dist/cjs/index.min.cjs",
+    "type": "module",
+    "module": "dist/index.min.js",
+    "files": [
+        "dist"
+    ],
     "devDependencies": {
+        "@types/bun": "latest",
         "@biomejs/biome": "^1.9.4"
     },
-    "trustedDependencies": ["@biomejs/biome"],
+    "peerDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "description": "JavaScript implementation of Japanese morphological analyzer",
+    "license": "Apache-2.0",
     "scripts": {
-        "lint": "biome"
-    }
+        "build": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --minify --target bun --entry-naming [dir]/index.min.js --sourcemap=linked && bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --minify --target node --format cjs --entry-naming [dir]/cjs/index.min.cjs --sourcemap=linked",
+        "lint": "biome lint",
+        "format": "biome format",
+        "check": "biome check"
+    },
+    "trustedDependencies": [
+        "@biomejs/biome"
+    ]
 }
