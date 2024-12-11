@@ -1,8 +1,13 @@
 {
     "name": "@kuromoji/kuromoji.js",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "author": "Takuya Asano <takuya.a@gmail.com>",
-    "main": "./src/kuromoji.ts",
+    "main": "dist/cjs/index.min.cjs",
+    "type": "module",
+    "module": "dist/index.min.js",
+    "files": [
+        "dist"
+    ],
     "devDependencies": {
         "@types/bun": "latest"
     },
@@ -12,7 +17,6 @@
     "description": "JavaScript implementation of Japanese morphological analyzer",
     "license": "Apache-2.0",
     "scripts": {
-        "build": "bun build src/kuromoji.ts --outdir ./out --minify",
-        "size": "bun scripts/filesize.ts"
+        "build": "bun build src/kuromoji.ts --outdir ./dist --minify --target bun --entry-naming [dir]/index.min.js --sourcemap=linked && bun build src/kuromoji.ts --outdir ./dist --minify --target node --format cjs --entry-naming [dir]/cjs/index.min.cjs --sourcemap=linked"
     }
 }
