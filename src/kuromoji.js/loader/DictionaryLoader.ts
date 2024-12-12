@@ -3,7 +3,7 @@ import path from "node:path";
 import zlib from "node:zlib";
 import DynamicDictionaries from "../dict/DynamicDictionaries";
 
-class NodeDictionaryLoader {
+class DictionaryLoader {
     #dic: DynamicDictionaries;
     #dic_path: string;
     constructor(dic_path = "dict/") {
@@ -72,4 +72,4 @@ class NodeDictionaryLoader {
     }
 }
 
-export default NodeDictionaryLoader;
+export default DictionaryLoader;
