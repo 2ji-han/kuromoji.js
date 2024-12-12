@@ -26,3 +26,19 @@ jobs:
       - run: bun run lint
       - run: bun run build
       - run: bun test
+  build:
+    name: Push to GitHub
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun run build
+      - name: Push to GitHub
+        uses: EndBug/add-and-commit@v9.1.1
+        with:
+          add: '-f ./dist'
+          author_name: 'GitHub Actions'
+          author_email: 'action@github.com'
+          message: 'build: Build action'
