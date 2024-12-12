@@ -20,6 +20,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check for src changes
+        run: |
+          if ! git diff --quiet HEAD^ HEAD -- src; then
+            echo "Changes detected in 'src'. Proceeding..."
+          else
+            echo "No changes detected in 'src'. Exiting..."
+            exit 0
+          fi
       - uses: oven-sh/setup-bun@v2
       - run: bun install
       - run: bun run format
@@ -34,6 +42,14 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+      - name: Check for src changes
+        run: |
+          if ! git diff --quiet HEAD^ HEAD -- src; then
+            echo "Changes detected in 'src'. Proceeding..."
+          else
+            echo "No changes detected in 'src'. Exiting..."
+            exit 0
+          fi
       - uses: oven-sh/setup-bun@v2
       - run: bun install
       - run: bun run build
