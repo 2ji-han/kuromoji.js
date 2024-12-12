@@ -7,17 +7,14 @@ This software includes a binary and/or source version of data from
 
 which can be obtained from
 
-http://atilika.com/releases/mecab-ipadic/mecab-ipadic-2.7.0-20070801.tar.gz
+<http://atilika.com/releases/mecab-ipadic/mecab-ipadic-2.7.0-20070801.tar.gz>
 
 or
 
-http://jaist.dl.sourceforge.net/project/mecab/mecab-ipadic/2.7.0-20070801/mecab-ipadic-2.7.0-20070801.tar.gz
-
-
+<http://jaist.dl.sourceforge.net/project/mecab/mecab-ipadic/2.7.0-20070801/mecab-ipadic-2.7.0-20070801.tar.gz>
 
 Copyright and license
 =====================
-
 
 mecab-ipadic-2.7.0-20070801
 ---------------------------

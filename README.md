@@ -1,5 +1,7 @@
 # kuromoji.js
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](/LICENSE.txt)
+
 [English](/docs/README-en.md)・[日本語](/docs/README-ja.md)
 
 ## this is fork of [@takuyaa/kuromoji.js](https://github.com/takuyaa/kuromoji.js)
@@ -90,4 +92,4 @@ The function tokenize() returns an JSON array like this:
 } ]
 ```
 
-(This is defined in [src/util/IpadicFormatter.js](./src/util/IpadicFormatter.ts))
+(This is defined in [src/kuromoji.js/util/IpadicFormatter.ts](./src/kuromoji.js/util/IpadicFormatter.ts))
