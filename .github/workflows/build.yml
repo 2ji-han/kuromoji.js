@@ -13,6 +13,8 @@ on:
       - 'example'
       - 'CHANGELOG.md'
       - 'NOTICE.md'
+
+jobs:
   main:
     name: 'Main'
     runs-on: ubuntu-latest
