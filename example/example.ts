@@ -22,7 +22,7 @@
  *
  */
 
-import kuromoji from "../src/kuromoji";
+import kuromoji from "../src/kuromoji.js/kuromoji";
 
 kuromoji.builder({ dicPath: "dict" }).build((err, tokenizer) => {
     // tokenizer is ready

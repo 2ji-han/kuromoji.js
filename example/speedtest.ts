@@ -1,4 +1,4 @@
-import kuromoji from "../src/kuromoji";
+import kuromoji from "../src/kuromoji.js/kuromoji";
 
 console.time("build");
 kuromoji.builder({ dicPath: "dict" }).build((err, tokenizer) => {
