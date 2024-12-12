@@ -8,8 +8,12 @@
     "files": [
         "dist"
     ],
+    "dependencies": {
+        "pako": "^2.1.0"
+    },
     "devDependencies": {
         "@types/bun": "latest",
+        "@types/pako": "^2.0.3",
         "@biomejs/biome": "^1.9.4"
     },
     "peerDependencies": {
@@ -18,7 +22,13 @@
     "description": "JavaScript implementation of Japanese morphological analyzer",
     "license": "Apache-2.0",
     "scripts": {
-        "build": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --minify --target bun --entry-naming [dir]/index.min.js --sourcemap=linked && bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --minify --target node --format cjs --entry-naming [dir]/cjs/index.min.cjs --sourcemap=linked",
+        "build": "bun run build:bun && bun run build:bun-minify && bun run build:node && bun run build:node-minify && bun run build:browser && bun run build:browser-minify",
+        "build:bun": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --minify --target bun --entry-naming [dir]/index.min.js --sourcemap=linked",
+        "build:bun-minify": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --target bun --entry-naming [dir]/index.js --sourcemap=linked",
+        "build:node": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --target node --format cjs --entry-naming [dir]/cjs/index.min.cjs --sourcemap=linked",
+        "build:node-minify": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --minify --target node --format cjs --entry-naming [dir]/cjs/index.min.cjs --sourcemap=linked",
+        "build:browser": "bun build src/browser/kuromoji.ts --outdir ./dist/browser --target browser --entry-naming [dir]/index.min.js --sourcemap=linked",
+        "build:browser-minify": "bun build src/browser/kuromoji.ts --outdir ./dist/browser --minify --target browser --entry-naming [dir]/index.min.js --sourcemap=linked",
         "lint": "biome lint ./src",
         "format": "biome format ./src",
         "check": "biome check ./src",
