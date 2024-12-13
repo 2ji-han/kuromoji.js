@@ -1,4 +1,4 @@
-name: build
+name: test
 on:
   push:
     paths:
@@ -6,6 +6,8 @@ on:
       - 'src/**/*'
     branches:
       - 'master'
+      - 'dev'
+      - 'dev/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,7 +15,7 @@ concurrency:
 
 jobs:
   main:
-    name: 'Test & Build'
+    name: 'Test'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -33,11 +35,3 @@ jobs:
 
       - name: Build project
         run: bun run build
-
-      - name: Push to GitHub
-        uses: EndBug/add-and-commit@v9.1.1
-        with:
-          add: '-f ./dist'
-          author_name: 'GitHub Actions'
-          author_email: 'action@github.com'
-          message: 'build: Build action'
