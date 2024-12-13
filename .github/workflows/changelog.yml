@@ -7,16 +7,22 @@ on:
 
 jobs:
   main:
-    name: 'build & push changelog'
+    name: 'Build & Push Changelog'
     runs-on: ubuntu-latest
     steps:
-      uses: actions/checkout@v4
-      uses: oven-sh/setup-bun@v2
-      run: bun run changelog
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Generate Changelog
+        run: bun run changelog
+
       - name: Push to GitHub
         uses: EndBug/add-and-commit@v9.1.1
         with:
           add: '-f ./docs/CHANGELOG.md'
           author_name: 'GitHub Actions'
           author_email: 'action@github.com'
-          message: 'build: Build action'
+          message: 'build: Update changelog'
