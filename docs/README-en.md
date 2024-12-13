@@ -1,5 +1,8 @@
 # kuromoji.js
 
+[![test](https://github.com/f1w3/kuromoji.js/actions/workflows/test.yml/badge.svg)](https://github.com/f1w3/kuromoji.js/actions/workflows/test.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](/LICENSE.txt)
+
 [English](/docs/README-en.md)・[日本語](/docs/README-ja.md)
 
 ## this is fork of [@takuyaa/kuromoji.js](https://github.com/takuyaa/kuromoji.js)
