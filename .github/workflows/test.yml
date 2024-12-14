@@ -2,7 +2,7 @@ name: test
 on:
   push:
     paths:
-      - '.github/workflows/build.yml'
+      - '.github/workflows/test.yml'
       - 'src/**/*'
     branches:
       - 'master'
