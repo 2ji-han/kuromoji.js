@@ -109,7 +109,7 @@
 
             let tokenizer = null;
 
-            kuromoji.builder({ dicPath: "/dict" }).build((err, _tokenizer) => {
+            kuromoji.builder({ dicPath: "/kuromoji.js/dict" }).build((err, _tokenizer) => {
                 tokenizer = _tokenizer;
                 document.querySelector(".loading").classList.remove("active");
                 document.querySelector(".demo").classList.add("active");
