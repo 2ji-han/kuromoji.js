@@ -2,14 +2,16 @@
     "name": "@f1w3/kuromoji.js",
     "version": "0.1.3",
     "author": "f1w3",
-    "main": "dist/cjs/index.min.cjs",
     "type": "module",
+    "main": "dist/cjs/index.min.cjs",
     "module": "dist/index.min.js",
+    "types": "dist/types/kuromoji.d.ts",
     "files": [
         "dist"
     ],
     "exports": {
         ".": {
+            "types": "./dist/types/kuromoji.d.ts",
             "import": "./dist/index.min.js",
             "require": "./dist/cjs/index.min.cjs"
         }
@@ -20,10 +22,8 @@
     "devDependencies": {
         "@types/bun": "latest",
         "@types/pako": "^2.0.3",
-        "@biomejs/biome": "^1.9.4"
-    },
-    "peerDependencies": {
-        "typescript": "^5.0.0"
+        "@biomejs/biome": "^1.9.4",
+        "typescript": "^5.7.2"
     },
     "description": "JavaScript implementation of Japanese morphological analyzer",
     "license": "Apache-2.0",
@@ -35,6 +35,7 @@
         "build:node-minify": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --minify --target node --format cjs --entry-naming [dir]/cjs/index.min.cjs --sourcemap=linked",
         "build:browser": "bun build src/browser/kuromoji.ts --outdir ./dist/browser --target browser --entry-naming [dir]/index.js --sourcemap=linked",
         "build:browser-minify": "bun build src/browser/kuromoji.ts --outdir ./dist/browser --minify --target browser --entry-naming [dir]/index.min.js --sourcemap=linked",
+        "build:declaration": "bunx tsc -P tsconfig.types.json",
         "lint": "biome lint ./src",
         "format": "biome format ./src",
         "check": "biome check ./src",
