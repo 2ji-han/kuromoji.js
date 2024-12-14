@@ -1,5 +1,16 @@
 # automatically generated file
 
+<a name="0.1.3"></a>
+## [0.1.3](https://github.com/takuyaa/kuromoji.js/compare/0.1.2...0.1.3) (2024-12-15)
+
+### Breaking Changes
+
+* rewrite to typescript
+
+### Performance Improvements
+
+* Increase speed by using the latest functions
+
 <a name="0.1.2"></a>
 ## [0.1.2](https://github.com/takuyaa/kuromoji.js/compare/0.1.1...0.1.2) (2018-03-20)
 
