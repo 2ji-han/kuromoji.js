@@ -28,7 +28,7 @@
     "description": "JavaScript implementation of Japanese morphological analyzer",
     "license": "Apache-2.0",
     "scripts": {
-        "build": "bun run build:bun && bun run build:bun-minify && bun run build:node && bun run build:node-minify && bun run build:browser && bun run build:browser-minify",
+        "build": "bun run build:bun && bun run build:bun-minify && bun run build:node && bun run build:node-minify && bun run build:browser && bun run build:browser-minify && build:declaration",
         "build:bun": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --minify --target bun --entry-naming [dir]/index.min.js --sourcemap=linked",
         "build:bun-minify": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --target bun --entry-naming [dir]/index.js --sourcemap=linked",
         "build:node": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --target node --format cjs --entry-naming [dir]/cjs/index.min.cjs --sourcemap=linked",
