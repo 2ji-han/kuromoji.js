@@ -17,7 +17,7 @@ Once again, I would like to thank you!
 
 - [x] Tests Pass 100% :partying_face:
 - [x] async to promise/await :partying_face:
-- [ ] Support and build for browser
+- [x] Support and build for browser :partying_face:
 - [ ] Asynchronization of init functions(eg. `await kuromoji.builder()`)
 - [ ] Support Stream
 - [ ] kuromoji-server
@@ -32,7 +32,7 @@ Once again, I would like to thank you!
 JavaScript implementation of Japanese morphological analyzer.
 This is a pure JavaScript porting of [Kuromoji](https://www.atilika.com/ja/kuromoji/).
 
-You can see how kuromoji.js works in [demo site](https://takuyaa.github.io/kuromoji.js/demo/tokenize.html).
+You can see how kuromoji.js works in [demo site](https://coco-ly.com/kuromoji.js/).
 
 ## Directory
 
