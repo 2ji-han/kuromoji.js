@@ -8,6 +8,12 @@
     "files": [
         "dist"
     ],
+    "exports": {
+        ".": {
+            "import": "./dist/index.min.js",
+            "require": "./dist/cjs/index.min.cjs"
+        }
+    },
     "dependencies": {
         "pako": "^2.1.0"
     },
