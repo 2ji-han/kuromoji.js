@@ -1,7 +1,7 @@
 {
     "name": "@kuromoji/kuromoji.js",
     "version": "0.1.3",
-    "author": "Takuya Asano <takuya.a@gmail.com>",
+    "author": "f1w3",
     "main": "dist/cjs/index.min.cjs",
     "type": "module",
     "module": "dist/index.min.js",
@@ -39,5 +39,21 @@
     },
     "trustedDependencies": [
         "@biomejs/biome"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/f1w3/kuromoji.js.git"
+    },
+    "homepage": "https://github.com/f1w3/kuromoji.js#readme",
+    "bugs": {
+        "url": "https://github.com/f1w3/kuromoji.js/issues"
+    },
+    "keywords": [
+        "japanese",
+        "morphological analyzer",
+        "nlp",
+        "pos",
+        "pos tagger",
+        "tokenizer"
     ]
 }
