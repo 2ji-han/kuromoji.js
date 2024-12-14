@@ -3,6 +3,9 @@ on:
   push:
     paths:
       - '.github/workflows/build.yml'
+      - 'package.json'
+      - 'tsconfig.json'
+      - 'tsconfig.types.json'
       - 'src/**/*'
     branches:
       - 'master'
