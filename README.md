@@ -45,11 +45,24 @@ Directory tree is as follows:
 
 ## Usage
 
+Install with package manager:
+```
+npm install f1w3/kuromoji.js
+pnpm install f1w3/kuromoji.js
+bun install f1w3/kuromoji.js
+```
+
+Load this library as follows:
+```typescript
+import kuromoji from "@f1w3/kuromoji.js";
+const kuromoji = require("@f1w3/kuromoji.js").default;
+```
+
 You can tokenize sentences with only 5 lines of code.
 If you need working examples, you can see the files under the demo or example directory.
 
 ```typescript
-import kuromoji from "./src/kuromoji";
+import kuromoji from "@f1w3/kuromoji.js";
 
 kuromoji.builder({ dicPath: "path/to/dictionary/dir/" }).build((err, tokenizer) => {
     // tokenizer is ready

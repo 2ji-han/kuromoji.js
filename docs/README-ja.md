@@ -17,7 +17,7 @@
 
 - [x] テストを100%にする :partying_face:
 - [x] asyncライブラリからpromise/awaitへ書き換え :partying_face:
-- [ ] ブラウザへの対応
+- [x] ブラウザへの対応 :partying_face:
 - [ ] init関数を非同期にする(eg. `await kuromoji.builder()`)
 - [ ] Streamを実装する
 - [ ] kuromoji-serverを実装する
@@ -33,7 +33,7 @@
 
 このレポジトリは[Kuromoji](https://www.atilika.com/ja/kuromoji/)の完全な移植版です
 
-kuromoji.jsがどのように動くかは[オンラインデモ](https://takuyaa.github.io/kuromoji.js/demo/tokenize.html)にて体験出来ます
+kuromoji.jsがどのように動くかは[オンラインデモ](https://coco-ly.com/kuromoji.js/)にて体験出来ます
 
 ## Directory
 
@@ -46,12 +46,26 @@ kuromoji.jsがどのように動くかは[オンラインデモ](https://takuyaa
 
 ## Usage
 
+インストールには以下のいずれかのコマンドを使用できます。
+```
+npm install f1w3/kuromoji.js
+pnpm install f1w3/kuromoji.js
+bun install f1w3/kuromoji.js
+```
+
+以下のコードのようにファイルを読み込んでください
+```typescript
+import kuromoji from "@f1w3/kuromoji.js";
+
+const kuromoji = require("@f1w3/kuromoji.js").default;
+```
+
 わずか5行のコードで文章をトークン化できます。
 
-もっと動作例が必要な場合は、[exampleディレクトリ](/kuromoji.js/example/)の下のファイルを参照してください。
+もっと動作例が必要な場合は、[exampleディレクトリ](/example/)の下のファイルを参照してください。
 
 ```typescript
-import kuromoji from "./src/kuromoji";
+import kuromoji from "@f1w3/kuromoji.js";
 
 kuromoji.builder({ dicPath: "dict/" }).build((err, tokenizer) => {
     // tokenizer is ready
@@ -95,4 +109,4 @@ kuromoji.builder({ dicPath: "dict/" }).build((err, tokenizer) => {
 } ]
 ```
 
-(上記は[src/util/IpadicFormatter.js](./src/util/IpadicFormatter.ts)にて実装されています)
+(上記は[src/kuromoji.js/util/IpadicFormatter.js](./src/kuromoji.js/util/IpadicFormatter.ts)にて実装されています)

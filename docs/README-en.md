@@ -17,7 +17,7 @@ Once again, I would like to thank you!
 
 - [x] Tests Pass 100% :partying_face:
 - [x] async to promise/await :partying_face:
-- [ ] Support and build for browser
+- [x] Support and build for browser :partying_face:
 - [ ] Asynchronization of init functions(eg. `await kuromoji.builder()`)
 - [ ] Support Stream
 - [ ] kuromoji-server
@@ -32,7 +32,7 @@ Once again, I would like to thank you!
 JavaScript implementation of Japanese morphological analyzer.
 This is a pure JavaScript porting of [Kuromoji](https://www.atilika.com/ja/kuromoji/).
 
-You can see how kuromoji.js works in [demo site](https://takuyaa.github.io/kuromoji.js/demo/tokenize.html).
+You can see how kuromoji.js works in [demo site](https://coco-ly.com/kuromoji.js/).
 
 ## Directory
 
@@ -45,11 +45,24 @@ Directory tree is as follows:
 
 ## Usage
 
+Install with package manager:
+```
+npm install f1w3/kuromoji.js
+pnpm install f1w3/kuromoji.js
+bun install f1w3/kuromoji.js
+```
+
+Load this library as follows:
+```typescript
+import kuromoji from "@f1w3/kuromoji.js";
+const kuromoji = require("@f1w3/kuromoji.js").default;
+```
+
 You can tokenize sentences with only 5 lines of code.
 If you need working examples, you can see the files under the demo or example directory.
 
 ```typescript
-import kuromoji from "./src/kuromoji";
+import kuromoji from "@f1w3/kuromoji.js";
 
 kuromoji.builder({ dicPath: "path/to/dictionary/dir/" }).build((err, tokenizer) => {
     // tokenizer is ready
@@ -93,4 +106,4 @@ The function tokenize() returns an JSON array like this:
 } ]
 ```
 
-(This is defined in [src/util/IpadicFormatter.js](./src/util/IpadicFormatter.ts))
+(This is defined in [src/kuromoji.js/util/IpadicFormatter.ts](./src/kuromoji.js/util/IpadicFormatter.ts))
