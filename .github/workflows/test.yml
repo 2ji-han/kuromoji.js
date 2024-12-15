@@ -21,6 +21,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Clean Project
+        run: bun run clean
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
