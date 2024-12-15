@@ -5,13 +5,13 @@
     "type": "module",
     "main": "dist/cjs/index.min.cjs",
     "module": "dist/index.min.js",
-    "types": "dist/types/kuromoji.d.ts",
+    "types": "./dist/types/kuromoji.js/kuromoji.d.ts",
     "files": [
         "dist"
     ],
     "exports": {
         ".": {
-            "types": "./dist/types/kuromoji.d.ts",
+            "types": "./dist/types/kuromoji.js/kuromoji.d.ts",
             "import": "./dist/index.min.js",
             "require": "./dist/cjs/index.min.cjs"
         }
