@@ -14,6 +14,11 @@
             "types": "./dist/types/kuromoji.js/kuromoji.d.ts",
             "import": "./dist/index.min.js",
             "require": "./dist/cjs/index.min.cjs"
+        },
+        "./browser": {
+            "types": "./dist/types/browser/kuromoji.d.ts",
+            "import": "./dist/browser/index.min.js",
+            "require": "./dist/browser/index.min.js"
         }
     },
     "dependencies": {
