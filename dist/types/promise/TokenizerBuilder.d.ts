@@ -5,6 +5,6 @@ export type TokenizerBuilderOption = {
 declare class TokenizerBuilder {
     #private;
     constructor(option?: TokenizerBuilderOption);
-    build(callback: (err: Error | null, tokenizer: Tokenizer) => void): void;
+    build(): Promise<Tokenizer>;
 }
 export default TokenizerBuilder;

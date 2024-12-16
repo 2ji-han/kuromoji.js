@@ -1,5 +1,5 @@
 // @bun
-// src/kuromoji.js/util/IpadicFormatter.ts
+// src/promise/util/IpadicFormatter.ts
 class IpadicFormatter {
   formatEntry(word_id, position, type, features) {
     return {
@@ -36,7 +36,7 @@ class IpadicFormatter {
 }
 var IpadicFormatter_default = IpadicFormatter;
 
-// src/kuromoji.js/util/SurrogateAwareString.ts
+// src/promise/util/SurrogateAwareString.ts
 class SurrogateAwareString {
   str;
   #index_mapping;
@@ -106,7 +106,7 @@ class SurrogateAwareString {
 }
 var SurrogateAwareString_default = SurrogateAwareString;
 
-// src/kuromoji.js/viterbi/ViterbiNode.ts
+// src/promise/viterbi/ViterbiNode.ts
 class ViterbiNode {
   name;
   cost;
@@ -133,7 +133,7 @@ class ViterbiNode {
 }
 var ViterbiNode_default = ViterbiNode;
 
-// src/kuromoji.js/viterbi/ViterbiLattice.ts
+// src/promise/viterbi/ViterbiLattice.ts
 class ViterbiLattice {
   nodes_end_at;
   eos_pos;
@@ -159,7 +159,7 @@ class ViterbiLattice {
 }
 var ViterbiLattice_default = ViterbiLattice;
 
-// src/kuromoji.js/viterbi/ViterbiBuilder.ts
+// src/promise/viterbi/ViterbiBuilder.ts
 class ViterbiBuilder {
   #trie;
   #token_info_dictionary;
@@ -222,7 +222,7 @@ class ViterbiBuilder {
 }
 var ViterbiBuilder_default = ViterbiBuilder;
 
-// src/kuromoji.js/viterbi/ViterbiSearcher.ts
+// src/promise/viterbi/ViterbiSearcher.ts
 class ViterbiSearcher {
   #connection_costs;
   constructor(connection_costs) {
@@ -286,8 +286,9 @@ class ViterbiSearcher {
 }
 var ViterbiSearcher_default = ViterbiSearcher;
 
-// src/kuromoji.js/Tokenizer.ts
+// src/promise/Tokenizer.ts
 class Tokenizer {
+  static #PUNCTUATION_REGEX = /\u3001|\u3002/g;
   #token_info_dictionary;
   #unknown_dictionary;
   #viterbi_builder;
@@ -301,7 +302,7 @@ class Tokenizer {
     this.#formatter = new IpadicFormatter_default;
   }
   static splitByPunctuation(input) {
-    const matches = input.matchAll(/\u3001|\u3002/g);
+    const matches = input.matchAll(Tokenizer.#PUNCTUATION_REGEX);
     const sentences = [];
     let lastIndex = 0;
     for (const match of matches) {
@@ -323,31 +324,42 @@ class Tokenizer {
     return tokens;
   }
   #tokenizeForSentence(sentence, tokens = []) {
-    const lattice = this.#viterbi_builder.build(sentence);
+    const lattice = this.#getLattice(sentence);
     const best_path = this.#viterbi_searcher.search(lattice);
     const last_pos = tokens.length > 0 ? tokens[tokens.length - 1].word_position : 0;
-    for (const node of best_path) {
-      tokens.push(this.#getTokenFromNode(node, last_pos));
+    const best_path_length = best_path.length;
+    for (let i = 0;i < best_path_length; i++) {
+      const node = best_path[i];
+      const token = this.#getTokenFromNode(node, last_pos);
+      tokens.push(token);
     }
     return tokens;
   }
   #getTokenFromNode(node, last_pos) {
-    const features_line = node.type === "KNOWN" ? this.#token_info_dictionary.getFeatures(node.name) : this.#unknown_dictionary.getFeatures(node.name);
-    const features = features_line ? features_line.split(",") : [];
+    if (node.type === "KNOWN") {
+      const features_line = this.#token_info_dictionary.getFeatures(node.name);
+      const features = features_line == null ? [] : features_line.split(",");
+      return this.#formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, features);
+    }
     if (node.type === "UNKNOWN") {
+      const features_line = this.#unknown_dictionary.getFeatures(node.name);
+      const features = features_line == null ? [] : features_line.split(",");
       return this.#formatter.formatUnknownEntry(node.name, last_pos + node.start_pos, node.type, features, node.surface_form);
     }
-    return this.#formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, features);
+    return this.#formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, []);
+  }
+  #getLattice(text) {
+    return this.#viterbi_builder.build(text);
   }
 }
 var Tokenizer_default = Tokenizer;
 
-// src/kuromoji.js/loader/DictionaryLoader.ts
+// src/promise/loader/DictionaryLoader.ts
 import { existsSync, readFileSync } from "fs";
 import path from "path";
 import zlib from "zlib";
 
-// src/kuromoji.js/util/DoubleArray.ts
+// src/promise/util/DoubleArray.ts
 var TERM_CHAR = "\x00";
 var TERM_CODE = 0;
 var ROOT_ID = 0;
@@ -403,12 +415,18 @@ class BufferController {
       bytes: CHECK_BYTES,
       array: newArrayBuffer(CHECK_SIGNED, CHECK_BYTES, initial_size)
     };
+    if (!this.#base.array || !this.#check.array) {
+      throw new Error("Initialization failed: Arrays are null");
+    }
     this.#base.array[ROOT_ID] = 1;
     this.#check.array[ROOT_ID] = ROOT_ID;
     this.initBase(this.#base.array, ROOT_ID + 1, this.#base.array.length);
     this.initCheck(this.#check.array, ROOT_ID + 1, this.#check.array.length);
   }
   initBase(_base, start, end) {
+    if (!this.#base.array || !this.#check.array) {
+      throw new Error("initBase() failed: Arrays not initialized");
+    }
     for (let i = start;i < end; i++) {
       _base[i] = -i + 1;
     }
@@ -426,6 +444,9 @@ class BufferController {
     }
   }
   realloc(min_size) {
+    if (!this.#base.array || !this.#check.array) {
+      throw new Error("initBase() failed: Arrays not initialized");
+    }
     const new_size = min_size * MEMORY_EXPAND_RATIO;
     const base_new_array = newArrayBuffer(this.#base.signed, this.#base.bytes, new_size);
     this.initBase(base_new_array, this.#base.array.length, new_size);
@@ -451,27 +472,42 @@ class BufferController {
     return this;
   }
   size() {
+    if (!this.#base.array || !this.#check.array) {
+      throw new Error("failed: Arrays not initialized");
+    }
     return Math.max(this.#base.array.length, this.#check.array.length);
   }
   getBase(index) {
+    if (!this.#base.array) {
+      throw new Error("failed: Arrays not initialized");
+    }
     if (this.#base.array.length - 1 < index) {
       return -index + 1;
     }
     return this.#base.array[index];
   }
   getCheck(index) {
+    if (!this.#check.array) {
+      throw new Error("failed: Arrays not initialized");
+    }
     if (this.#check.array.length - 1 < index) {
       return -index - 1;
     }
     return this.#check.array[index];
   }
   setBase(index, base_value) {
+    if (!this.#base.array) {
+      throw new Error("failed: Arrays not initialized");
+    }
     if (this.#base.array.length - 1 < index) {
       this.realloc(index);
     }
     this.#base.array[index] = base_value;
   }
   setCheck(index, check_value) {
+    if (!this.#check.array) {
+      throw new Error("failed: Arrays not initialized");
+    }
     if (this.#check.array.length - 1 < index) {
       this.realloc(index);
     }
@@ -484,6 +520,9 @@ class BufferController {
     return this.#first_unused_node;
   }
   shrink() {
+    if (!this.#base.array || !this.#check.array) {
+      throw new Error("failed: Arrays not initialized");
+    }
     let last_index = Math.max(this.#base.array.length, this.#check.array.length) - 1;
     while (0 <= this.#check.array[last_index]) {
       last_index--;
@@ -492,6 +531,9 @@ class BufferController {
     this.#check.array = this.#check.array.subarray(0, last_index + 2);
   }
   calc() {
+    if (!this.#base.array || !this.#check.array) {
+      throw new Error("failed: Arrays not initialized");
+    }
     let unused_count = 0;
     const size = this.#check.array.length;
     for (let i = 0;i < size; i++) {
@@ -506,6 +548,9 @@ class BufferController {
     };
   }
   dump() {
+    if (!this.#base.array || !this.#check.array) {
+      throw new Error("failed: Arrays not initialized");
+    }
     let dump_base = "";
     let dump_check = "";
     for (const data of this.#base.array) {
@@ -767,7 +812,7 @@ var doublearray = {
 };
 var DoubleArray_default = doublearray;
 
-// src/kuromoji.js/dict/ConnectionCosts.ts
+// src/promise/dict/ConnectionCosts.ts
 class ConnectionCosts {
   forward_dimension;
   backward_dimension;
@@ -801,7 +846,7 @@ class ConnectionCosts {
 }
 var ConnectionCosts_default = ConnectionCosts;
 
-// src/kuromoji.js/util/ByteBuffer.ts
+// src/promise/util/ByteBuffer.ts
 var encoder2 = new TextEncoder;
 var decoder2 = new TextDecoder;
 
@@ -810,12 +855,10 @@ class ByteBuffer {
   position = 0;
   constructor(arg) {
     if (arg === undefined) {
-      const initial_size = 1024 * 1024;
-      this.buffer = new Uint8Array(initial_size);
+      this.buffer = new Uint8Array(1024 * 1024);
       this.position = 0;
     } else if (typeof arg === "number") {
-      const initial_size = arg;
-      this.buffer = new Uint8Array(initial_size);
+      this.buffer = new Uint8Array(arg);
       this.position = 0;
     } else if (arg instanceof Uint8Array) {
       this.buffer = arg;
@@ -964,7 +1007,7 @@ class ByteBuffer {
 }
 var ByteBuffer_default = ByteBuffer;
 
-// src/kuromoji.js/dict/TokenInfoDictionary.ts
+// src/promise/dict/TokenInfoDictionary.ts
 class TokenInfoDictionary {
   dictionary;
   target_map;
@@ -1067,7 +1110,7 @@ class TokenInfoDictionary {
 }
 var TokenInfoDictionary_default = TokenInfoDictionary;
 
-// src/kuromoji.js/dict/CharacterClass.ts
+// src/promise/dict/CharacterClass.ts
 class CharacterClass {
   class_id;
   class_name;
@@ -1084,7 +1127,7 @@ class CharacterClass {
 }
 var CharacterClass_default = CharacterClass;
 
-// src/kuromoji.js/dict/InvokeDefinitionMap.ts
+// src/promise/dict/InvokeDefinitionMap.ts
 class InvokeDefinitionMap {
   #map;
   #lookup_table;
@@ -1142,7 +1185,7 @@ class InvokeDefinitionMap {
 }
 var InvokeDefinitionMap_default = InvokeDefinitionMap;
 
-// src/kuromoji.js/dict/CharacterDefinition.ts
+// src/promise/dict/CharacterDefinition.ts
 var DEFAULT_CATEGORY = "DEFAULT";
 
 class CharacterDefinition {
@@ -1293,7 +1336,7 @@ class CharacterDefinition {
 }
 var CharacterDefinition_default = CharacterDefinition;
 
-// src/kuromoji.js/dict/UnknownDictionary.ts
+// src/promise/dict/UnknownDictionary.ts
 class UnknownDictionary extends TokenInfoDictionary_default {
   #character_definition = null;
   characterDefinition(character_definition) {
@@ -1321,7 +1364,7 @@ class UnknownDictionary extends TokenInfoDictionary_default {
 }
 var UnknownDictionary_default = UnknownDictionary;
 
-// src/kuromoji.js/dict/DynamicDictionaries.ts
+// src/promise/dict/DynamicDictionaries.ts
 class DynamicDictionaries {
   trie;
   token_info_dictionary;
@@ -1354,7 +1397,7 @@ class DynamicDictionaries {
 }
 var DynamicDictionaries_default = DynamicDictionaries;
 
-// src/kuromoji.js/loader/DictionaryLoader.ts
+// src/promise/loader/DictionaryLoader.ts
 class DictionaryLoader {
   #dic;
   #dic_path;
@@ -1373,7 +1416,7 @@ class DictionaryLoader {
       resolve(typed_array.buffer);
     });
   });
-  load(callback) {
+  load = () => new Promise((resolve, reject) => {
     Promise.all([
       "base.dat.gz",
       "check.dat.gz",
@@ -1392,29 +1435,28 @@ class DictionaryLoader {
       this.#dic.loadTokenInfoDictionaries(new Uint8Array(buffers[2]), new Uint8Array(buffers[3]), new Uint8Array(buffers[4]));
       this.#dic.loadConnectionCosts(new Int16Array(buffers[5]));
       this.#dic.loadUnknownDictionaries(new Uint8Array(buffers[6]), new Uint8Array(buffers[7]), new Uint8Array(buffers[8]), new Uint8Array(buffers[9]), new Uint32Array(buffers[10]), new Uint8Array(buffers[11]));
-      callback(null, this.#dic);
+      resolve(this.#dic);
     }).catch((error) => {
-      callback(error, this.#dic);
+      reject(error);
     });
-  }
+  });
 }
 var DictionaryLoader_default = DictionaryLoader;
 
-// src/kuromoji.js/TokenizerBuilder.ts
+// src/promise/TokenizerBuilder.ts
 class TokenizerBuilder {
   #loader;
   constructor(option = {}) {
     this.#loader = new DictionaryLoader_default(option.dicPath);
   }
-  build(callback) {
-    this.#loader.load((err, dic) => {
-      callback(err, new Tokenizer_default(dic));
-    });
+  async build() {
+    const dictionary = await this.#loader.load();
+    return new Tokenizer_default(dictionary);
   }
 }
 var TokenizerBuilder_default = TokenizerBuilder;
 
-// src/kuromoji.js/dict/builder/CharacterDefinitionBuilder.ts
+// src/promise/dict/builder/CharacterDefinitionBuilder.ts
 var CATEGORY_DEF_PATTERN = /^(\w+)\s+(\d)\s+(\d)\s+(\d)/;
 var CATEGORY_MAPPING_PATTERN = /^(0x[0-9A-F]{4})(?:\s+([^#\s]+))(?:\s+([^#\s]+))*/;
 var RANGE_CATEGORY_MAPPING_PATTERN = /^(0x[0-9A-F]{4})\.\.(0x[0-9A-F]{4})(?:\s+([^#\s]+))(?:\s+([^#\s]+))*/;
@@ -1462,7 +1504,7 @@ class CharacterDefinitionBuilder {
 }
 var CharacterDefinitionBuilder_default = CharacterDefinitionBuilder;
 
-// src/kuromoji.js/dict/builder/ConnectionCostsBuilder.ts
+// src/promise/dict/builder/ConnectionCostsBuilder.ts
 class ConnectionCostsBuilder {
   lines;
   connection_cost;
@@ -1508,7 +1550,7 @@ class ConnectionCostsBuilder {
 }
 var ConnectionCostsBuilder_default = ConnectionCostsBuilder;
 
-// src/kuromoji.js/dict/builder/DictionaryBuilder.ts
+// src/promise/dict/builder/DictionaryBuilder.ts
 class DictionaryBuilder {
   #tid_entries;
   #unk_entries;
@@ -1585,7 +1627,7 @@ class DictionaryBuilder {
 }
 var DictionaryBuilder_default = DictionaryBuilder;
 
-// src/kuromoji.js/kuromoji.ts
+// src/promise/kuromoji.ts
 var kuromoji_default = {
   builder: (option = {}) => {
     return new TokenizerBuilder_default(option);
@@ -1600,5 +1642,5 @@ export {
   DictionaryBuilder_default as DictionaryBuilder
 };
 
-//# debugId=087CC0A0B585C64C64756E2164756E21
+//# debugId=B889B2BDA5692D2F64756E2164756E21
 //# sourceMappingURL=index.js.map

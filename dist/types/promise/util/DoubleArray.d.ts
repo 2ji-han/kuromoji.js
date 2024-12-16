@@ -5,8 +5,8 @@ declare class BufferController {
     private initBase;
     private initCheck;
     private realloc;
-    getBaseBuffer(): ArrayBuffer;
-    getCheckBuffer(): ArrayBuffer;
+    getBaseBuffer(): ArrayBuffer | null;
+    getCheckBuffer(): ArrayBuffer | null;
     loadBaseBuffer(base_buffer: ArrayBuffer): this;
     loadCheckBuffer(check_buffer: ArrayBuffer): this;
     size(): number;
