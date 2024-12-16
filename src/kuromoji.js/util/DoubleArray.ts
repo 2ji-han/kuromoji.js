@@ -46,7 +46,7 @@ type ArrayBuffer = Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Arra
 type BaseCheck = {
     signed: boolean;
     bytes: number;
-    array: ArrayBuffer | null;
+    array: ArrayBuffer;
 };
 
 class BufferController {
@@ -69,10 +69,6 @@ class BufferController {
             array: newArrayBuffer(CHECK_SIGNED, CHECK_BYTES, initial_size),
         };
 
-        if (!this.#base.array || !this.#check.array) {
-            throw new Error("Initialization failed: Arrays are null");
-        }
-
         // Initialize root node
         this.#base.array[ROOT_ID] = 1;
         this.#check.array[ROOT_ID] = ROOT_ID;
@@ -83,9 +79,6 @@ class BufferController {
     }
 
     private initBase(_base: ArrayBuffer, start: number, end: number) {
-        if (!this.#base.array || !this.#check.array) {
-            throw new Error("initBase() failed: Arrays not initialized");
-        }
         for (let i = start; i < end; i++) {
             _base[i] = -i + 1;
         }
@@ -105,9 +98,6 @@ class BufferController {
     }
 
     private realloc(min_size: number) {
-        if (!this.#base.array || !this.#check.array) {
-            throw new Error("initBase() failed: Arrays not initialized");
-        }
         const new_size = min_size * MEMORY_EXPAND_RATIO;
         const base_new_array = newArrayBuffer(this.#base.signed, this.#base.bytes, new_size);
         this.initBase(base_new_array, this.#base.array.length, new_size);
@@ -139,16 +129,10 @@ class BufferController {
     }
 
     size() {
-        if (!this.#base.array || !this.#check.array) {
-            throw new Error("failed: Arrays not initialized");
-        }
         return Math.max(this.#base.array.length, this.#check.array.length);
     }
 
     getBase(index: number) {
-        if (!this.#base.array) {
-            throw new Error("failed: Arrays not initialized");
-        }
         if (this.#base.array.length - 1 < index) {
             return -index + 1;
         }
@@ -156,9 +140,6 @@ class BufferController {
     }
 
     getCheck(index: number) {
-        if (!this.#check.array) {
-            throw new Error("failed: Arrays not initialized");
-        }
         if (this.#check.array.length - 1 < index) {
             return -index - 1;
         }
@@ -166,9 +147,6 @@ class BufferController {
     }
 
     setBase(index: number, base_value: number) {
-        if (!this.#base.array) {
-            throw new Error("failed: Arrays not initialized");
-        }
         if (this.#base.array.length - 1 < index) {
             this.realloc(index);
         }
@@ -176,9 +154,6 @@ class BufferController {
     }
 
     setCheck(index: number, check_value: number) {
-        if (!this.#check.array) {
-            throw new Error("failed: Arrays not initialized");
-        }
         if (this.#check.array.length - 1 < index) {
             this.realloc(index);
         }
@@ -194,9 +169,6 @@ class BufferController {
     }
 
     shrink() {
-        if (!this.#base.array || !this.#check.array) {
-            throw new Error("failed: Arrays not initialized");
-        }
         let last_index = Math.max(this.#base.array.length, this.#check.array.length) - 1;
         while (0 <= this.#check.array[last_index]) {
             last_index--;
@@ -206,9 +178,6 @@ class BufferController {
     }
 
     calc() {
-        if (!this.#base.array || !this.#check.array) {
-            throw new Error("failed: Arrays not initialized");
-        }
         let unused_count = 0;
         const size = this.#check.array.length;
         for (let i = 0; i < size; i++) {
@@ -224,9 +193,6 @@ class BufferController {
     }
 
     dump() {
-        if (!this.#base.array || !this.#check.array) {
-            throw new Error("failed: Arrays not initialized");
-        }
         let dump_base = "";
         let dump_check = "";
 
