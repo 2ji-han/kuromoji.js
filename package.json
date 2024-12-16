@@ -19,6 +19,11 @@
             "types": "./dist/types/browser/kuromoji.d.ts",
             "import": "./dist/browser/index.min.js",
             "require": "./dist/browser/index.min.js"
+        },
+        "./promise": {
+            "types": "./dist/types/promise/kuromoji.d.ts",
+            "import": "./dist/promise/index.min.js",
+            "require": "./dist/promise/index.min.js"
         }
     },
     "dependencies": {
@@ -33,17 +38,17 @@
     "description": "JavaScript implementation of Japanese morphological analyzer",
     "license": "Apache-2.0",
     "scripts": {
-        "build": "bun run build:bun && bun run build:bun-minify && bun run build:node && bun run build:node-minify && bun run build:browser && bun run build:browser-minify && bun run build:declaration",
+        "build": "bun run build:bun && bun run build:bun-minify && bun run build:node && bun run build:node-minify && bun run build:browser && bun run build:browser-minify && bun run build:promise && bun run build:promise-minify && bun run build:declaration",
         "build:bun": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --minify --target bun --entry-naming [dir]/index.min.js --sourcemap=linked",
         "build:bun-minify": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --target bun --entry-naming [dir]/index.js --sourcemap=linked",
         "build:node": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --target node --format cjs --entry-naming [dir]/cjs/index.min.cjs --sourcemap=linked",
         "build:node-minify": "bun build src/kuromoji.js/kuromoji.ts --outdir ./dist --minify --target node --format cjs --entry-naming [dir]/cjs/index.min.cjs --sourcemap=linked",
         "build:browser": "bun build src/browser/kuromoji.ts --outdir ./dist/browser --target browser --entry-naming [dir]/index.js --sourcemap=linked",
         "build:browser-minify": "bun build src/browser/kuromoji.ts --outdir ./dist/browser --minify --target browser --entry-naming [dir]/index.min.js --sourcemap=linked",
+        "build:promise": "bun build src/promise/kuromoji.ts --outdir ./dist --minify --target bun --entry-naming [dir]/promise/index.min.js --sourcemap=linked",
+        "build:promise-minify": "bun build src/promise/kuromoji.ts --outdir ./dist --target bun --entry-naming [dir]/promise/index.js --sourcemap=linked",
         "build:declaration": "bunx tsc -P tsconfig.types.json",
-
         "clean": "bun scripts/clean.ts",
-
         "lint": "biome lint ./src",
         "format": "biome format ./src",
         "check": "biome check ./src",
