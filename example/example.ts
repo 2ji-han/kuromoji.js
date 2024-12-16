@@ -14,17 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
- *
- * rewrite by f1w3_ | 2024
- * All rights reserved by Takuya Asano.
- * See above for more information.
- *
- */
 
 import kuromoji from "../src/kuromoji.js/kuromoji";
 
 kuromoji.builder({ dicPath: "dict" }).build((err, tokenizer) => {
+    if (err) return;
     // tokenizer is ready
     const path = tokenizer.tokenize("すもももももももものうち");
     console.log(path.length);
