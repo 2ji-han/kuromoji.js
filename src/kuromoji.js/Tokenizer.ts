@@ -47,8 +47,7 @@ class Tokenizer {
     #tokenizeForSentence(sentence: string, tokens: TOKEN[] = []): TOKEN[] {
         const lattice = this.#viterbi_builder.build(sentence);
         const best_path = this.#viterbi_searcher.search(lattice);
-        const last_pos =
-            tokens.length > 0 ? tokens[tokens.length - 1].word_position : 0;
+        const last_pos = tokens.length > 0 ? tokens[tokens.length - 1].word_position : 0;
         for (const node of best_path) {
             tokens.push(this.#getTokenFromNode(node, last_pos));
         }
@@ -73,12 +72,7 @@ class Tokenizer {
             );
         }
 
-        return this.#formatter.formatEntry(
-            node.name,
-            last_pos + node.start_pos,
-            node.type,
-            features
-        );
+        return this.#formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, features);
     }
 }
 

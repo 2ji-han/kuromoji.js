@@ -13,8 +13,7 @@ class DictionaryLoader {
 
     #loadArrayBuffer = (file: string) =>
         new Promise<ArrayBufferLike>((resolve, reject) => {
-            if (!existsSync(file))
-                return reject(new Error(`${file} does not exist`));
+            if (!existsSync(file)) return reject(new Error(`${file} does not exist`));
             const buffer = readFileSync(file);
             zlib.gunzip(new Uint8Array(buffer), (err, binary) => {
                 if (err) return reject(err);
@@ -43,16 +42,11 @@ class DictionaryLoader {
                     "unk_char.dat.gz",
                     "unk_compat.dat.gz",
                     "unk_invoke.dat.gz",
-                ].map((filename) =>
-                    this.#loadArrayBuffer(path.join(this.#dic_path, filename))
-                )
+                ].map((filename) => this.#loadArrayBuffer(path.join(this.#dic_path, filename)))
             )
                 .then((buffers) => {
                     // Trie
-                    this.#dic.loadTrie(
-                        new Int32Array(buffers[0]),
-                        new Int32Array(buffers[1])
-                    );
+                    this.#dic.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
                     // Token info dictionaries
                     this.#dic.loadTokenInfoDictionaries(
                         new Uint8Array(buffers[2]),
