@@ -6,15 +6,14 @@ export type TokenizerBuilderOption = {
 };
 
 class TokenizerBuilder {
-    #dic_path: string | undefined;
+    #loader: DictionaryLoader;
 
     constructor(option: TokenizerBuilderOption = {}) {
-        this.#dic_path = option.dicPath;
+        this.#loader = new DictionaryLoader(option.dicPath);
     }
 
-    build(callback: (err: Error[] | null, tokenizer: Tokenizer) => void) {
-        const loader = new DictionaryLoader(this.#dic_path);
-        loader.load((err, dic) => {
+    build(callback: (err: Error | null, tokenizer: Tokenizer) => void) {
+        this.#loader.load((err, dic) => {
             callback(err, new Tokenizer(dic));
         });
     }
