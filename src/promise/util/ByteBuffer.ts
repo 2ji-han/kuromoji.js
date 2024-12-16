@@ -7,12 +7,10 @@ class ByteBuffer {
 
     constructor(arg?: number | Uint8Array) {
         if (arg === undefined) {
-            const initial_size = 1024 * 1024;
-            this.buffer = new Uint8Array(initial_size);
+            this.buffer = new Uint8Array(1024 * 1024);
             this.position = 0;
         } else if (typeof arg === "number") {
-            const initial_size = arg;
-            this.buffer = new Uint8Array(initial_size);
+            this.buffer = new Uint8Array(arg);
             this.position = 0;
         } else if (arg instanceof Uint8Array) {
             this.buffer = arg;
