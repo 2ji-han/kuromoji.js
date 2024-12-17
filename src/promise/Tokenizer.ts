@@ -1,14 +1,12 @@
 import type DynamicDictionaries from "./dict/DynamicDictionaries";
 import type TokenInfoDictionary from "./dict/TokenInfoDictionary";
 import type UnknownDictionary from "./dict/UnknownDictionary";
-import IpadicFormatter, { type TOKEN } from "./util/IpadicFormatter";
+import IpadicFormatter, { type TOKEN } from "../_core/util/IpadicFormatter";
 import ViterbiBuilder from "./viterbi/ViterbiBuilder";
 import type ViterbiNode from "./viterbi/ViterbiNode";
 import ViterbiSearcher from "./viterbi/ViterbiSearcher";
 
 class Tokenizer {
-    static readonly #PUNCTUATION_REGEX = /、|。/g;
-
     #token_info_dictionary: TokenInfoDictionary;
     #unknown_dictionary: UnknownDictionary;
     #viterbi_builder: ViterbiBuilder;
@@ -23,7 +21,7 @@ class Tokenizer {
     }
 
     static splitByPunctuation(input: string): string[] {
-        const matches = input.matchAll(Tokenizer.#PUNCTUATION_REGEX);
+        const matches = input.matchAll(/、|。/g);
         const sentences = [];
         let lastIndex = 0;
         for (const match of matches) {
@@ -46,31 +44,25 @@ class Tokenizer {
         return tokens;
     }
 
-    #tokenizeForSentence(sentence: string, tokens: TOKEN[] = []) {
-        const lattice = this.#getLattice(sentence);
+    #tokenizeForSentence(sentence: string, tokens: TOKEN[] = []): TOKEN[] {
+        const lattice = this.#viterbi_builder.build(sentence);
         const best_path = this.#viterbi_searcher.search(lattice);
         const last_pos = tokens.length > 0 ? tokens[tokens.length - 1].word_position : 0;
-
-        const best_path_length = best_path.length;
-        for (let i = 0; i < best_path_length; i++) {
-            const node = best_path[i];
-            const token: TOKEN = this.#getTokenFromNode(node, last_pos);
-            tokens.push(token);
+        for (const node of best_path) {
+            tokens.push(this.#getTokenFromNode(node, last_pos));
         }
-
         return tokens;
     }
 
     #getTokenFromNode(node: ViterbiNode, last_pos: number): TOKEN {
-        if (node.type === "KNOWN") {
-            const features_line = this.#token_info_dictionary.getFeatures(node.name);
-            const features = features_line == null ? [] : features_line.split(",");
-            return this.#formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, features);
-        }
+        const features_line =
+            node.type === "KNOWN"
+                ? this.#token_info_dictionary.getFeatures(node.name)
+                : this.#unknown_dictionary.getFeatures(node.name);
+
+        const features = features_line ? features_line.split(",") : [];
+
         if (node.type === "UNKNOWN") {
-            // Unknown word
-            const features_line = this.#unknown_dictionary.getFeatures(node.name);
-            const features = features_line == null ? [] : features_line.split(",");
             return this.#formatter.formatUnknownEntry(
                 node.name,
                 last_pos + node.start_pos,
@@ -79,12 +71,8 @@ class Tokenizer {
                 node.surface_form
             );
         }
-        // TODO User dictionary
-        return this.#formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, []);
-    }
 
-    #getLattice(text: string) {
-        return this.#viterbi_builder.build(text);
+        return this.#formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, features);
     }
 }
 

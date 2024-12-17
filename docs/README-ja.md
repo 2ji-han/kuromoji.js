@@ -109,4 +109,4 @@ kuromoji.builder({ dicPath: "dict/" }).build((err, tokenizer) => {
 } ]
 ```
 
-(上記は[src/kuromoji.js/util/IpadicFormatter.js](./src/kuromoji.js/util/IpadicFormatter.ts)にて実装されています)
+(上記は[src/_core/util/IpadicFormatter.ts](/src/_core/util/IpadicFormatter.ts)にて実装されています)

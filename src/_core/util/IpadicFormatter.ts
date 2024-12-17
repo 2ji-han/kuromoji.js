@@ -1,4 +1,4 @@
-import type { WORD_TYPE } from "../viterbi/ViterbiNode";
+import type { WORD_TYPE } from "../../kuromoji.js/viterbi/ViterbiNode";
 
 export type TOKEN = {
     word_id: number;

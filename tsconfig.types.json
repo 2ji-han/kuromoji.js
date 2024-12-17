@@ -1,6 +1,6 @@
 {
     "include": ["src/**/*"],
-    "exclude": ["src/test/**/*"],
+    "exclude": ["src/test/**/*", "src/_core/**/*"],
     "compilerOptions": {
         "lib": ["ESNext", "DOM"],
         "target": "ESNext",

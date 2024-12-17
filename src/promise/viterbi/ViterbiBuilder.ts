@@ -1,8 +1,8 @@
 import type DynamicDictionaries from "../dict/DynamicDictionaries";
 import type TokenInfoDictionary from "../dict/TokenInfoDictionary";
 import type UnknownDictionary from "../dict/UnknownDictionary";
-import type { DoubleArray } from "../util/DoubleArray";
-import SurrogateAwareString from "../util/SurrogateAwareString";
+import type { DoubleArray } from "../../_core/util/DoubleArray";
+import SurrogateAwareString from "../../_core/util/SurrogateAwareString";
 import ViterbiLattice from "./ViterbiLattice";
 import ViterbiNode from "./ViterbiNode";
 

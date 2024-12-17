@@ -106,4 +106,4 @@ The function tokenize() returns an JSON array like this:
 } ]
 ```
 
-(This is defined in [src/kuromoji.js/util/IpadicFormatter.ts](./src/kuromoji.js/util/IpadicFormatter.ts))
+(This is defined in [src/_core/util/IpadicFormatter.ts](/src/_core/util/IpadicFormatter.ts))

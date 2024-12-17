@@ -28,7 +28,7 @@ class DictionaryLoader {
                 });
         });
 
-    load(callback: (error: Error[] | null, dic: DynamicDictionaries) => void) {
+    load(callback: (error: Error | null, dic: DynamicDictionaries) => void) {
         Promise.all(
             [
                 // Trie

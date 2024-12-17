@@ -1,7 +1,7 @@
 import type DynamicDictionaries from "./dict/DynamicDictionaries";
 import type TokenInfoDictionary from "./dict/TokenInfoDictionary";
 import type UnknownDictionary from "./dict/UnknownDictionary";
-import IpadicFormatter, { type TOKEN } from "./util/IpadicFormatter";
+import IpadicFormatter, { type TOKEN } from "../_core/util/IpadicFormatter";
 import ViterbiBuilder from "./viterbi/ViterbiBuilder";
 import type ViterbiNode from "./viterbi/ViterbiNode";
 import ViterbiSearcher from "./viterbi/ViterbiSearcher";
