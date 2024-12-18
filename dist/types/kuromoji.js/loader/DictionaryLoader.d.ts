@@ -1,4 +1,4 @@
-import DynamicDictionaries from "../dict/DynamicDictionaries";
+import DynamicDictionaries from "../../_core/dict/DynamicDictionaries";
 declare class DictionaryLoader {
     #private;
     constructor(dic_path?: string);

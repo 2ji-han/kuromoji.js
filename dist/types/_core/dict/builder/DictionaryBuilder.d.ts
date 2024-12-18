@@ -35,7 +35,7 @@ declare class DictionaryBuilder {
      * @returns {{trie: *, token_info_dictionary: *}}
      */
     buildTokenInfoDictionary(): {
-        trie: import("../../util/DoubleArray").DoubleArray;
+        trie: import("../../../_core/util/DoubleArray").DoubleArray;
         token_info_dictionary: TokenInfoDictionary;
     };
     buildUnknownDictionary(): UnknownDictionary;
@@ -44,6 +44,6 @@ declare class DictionaryBuilder {
      *
      * @returns {DoubleArray} Double-Array trie
      */
-    buildDoubleArray(): import("../../util/DoubleArray").DoubleArray;
+    buildDoubleArray(): import("../../../_core/util/DoubleArray").DoubleArray;
 }
 export default DictionaryBuilder;

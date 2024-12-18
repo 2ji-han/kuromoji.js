@@ -1,4 +1,4 @@
-import ByteBuffer from "../util/ByteBuffer";
+import ByteBuffer from "../../_core/util/ByteBuffer";
 declare class TokenInfoDictionary {
     dictionary: ByteBuffer;
     target_map: Map<number, number[]>;

@@ -1,4 +1,4 @@
-import Tokenizer from "./Tokenizer";
+import Tokenizer from "../_core/Tokenizer";
 export type TokenizerBuilderOption = {
     dicPath?: string | undefined;
 };

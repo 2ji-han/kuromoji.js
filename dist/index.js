@@ -1,353 +1,5 @@
 // @bun
-// src/kuromoji.js/util/IpadicFormatter.ts
-class IpadicFormatter {
-  formatEntry(word_id, position, type, features) {
-    return {
-      word_id,
-      word_type: type,
-      word_position: position,
-      surface_form: features[0],
-      pos: features[1],
-      pos_detail_1: features[2],
-      pos_detail_2: features[3],
-      pos_detail_3: features[4],
-      conjugated_type: features[5],
-      conjugated_form: features[6],
-      basic_form: features[7],
-      reading: features[8],
-      pronunciation: features[9]
-    };
-  }
-  formatUnknownEntry(word_id, position, type, features, surface_form) {
-    return {
-      word_id,
-      word_type: type,
-      word_position: position,
-      surface_form,
-      pos: features[1],
-      pos_detail_1: features[2],
-      pos_detail_2: features[3],
-      pos_detail_3: features[4],
-      conjugated_type: features[5],
-      conjugated_form: features[6],
-      basic_form: features[7]
-    };
-  }
-}
-var IpadicFormatter_default = IpadicFormatter;
-
-// src/kuromoji.js/util/SurrogateAwareString.ts
-class SurrogateAwareString {
-  str;
-  #index_mapping;
-  length;
-  constructor(str) {
-    this.str = str;
-    this.#index_mapping = [];
-    const str_length = str.length;
-    for (let pos = 0;pos < str_length; pos++) {
-      const ch = str.charAt(pos);
-      this.#index_mapping.push(pos);
-      if (SurrogateAwareString.isSurrogatePair(ch)) {
-        pos++;
-      }
-    }
-    this.length = this.#index_mapping.length;
-  }
-  slice(index) {
-    if (this.#index_mapping.length <= index) {
-      return "";
-    }
-    const surrogate_aware_index = this.#index_mapping[index];
-    return this.str.slice(surrogate_aware_index);
-  }
-  charAt(index) {
-    if (this.str.length <= index) {
-      return "";
-    }
-    const surrogate_aware_start_index = this.#index_mapping[index];
-    const surrogate_aware_end_index = this.#index_mapping[index + 1];
-    if (surrogate_aware_end_index == null) {
-      return this.str.slice(surrogate_aware_start_index);
-    }
-    return this.str.slice(surrogate_aware_start_index, surrogate_aware_end_index);
-  }
-  charCodeAt(index) {
-    if (this.#index_mapping.length <= index) {
-      return Number.NaN;
-    }
-    const surrogate_aware_index = this.#index_mapping[index];
-    const upper = this.str.charCodeAt(surrogate_aware_index);
-    let lower;
-    if (upper >= 55296 && upper <= 56319 && surrogate_aware_index < this.str.length) {
-      lower = this.str.charCodeAt(surrogate_aware_index + 1);
-      if (lower >= 56320 && lower <= 57343) {
-        return (upper - 55296) * 1024 + lower - 56320 + 65536;
-      }
-    }
-    return upper;
-  }
-  toString() {
-    return this.str;
-  }
-  add(other) {
-    return new SurrogateAwareString(this.str + other.str);
-  }
-  append(str) {
-    return new SurrogateAwareString(this.str + str);
-  }
-  static isSurrogatePair(ch) {
-    const utf16_code = ch.charCodeAt(0);
-    if (utf16_code >= 55296 && utf16_code <= 56319) {
-      return true;
-    }
-    return false;
-  }
-}
-var SurrogateAwareString_default = SurrogateAwareString;
-
-// src/kuromoji.js/viterbi/ViterbiNode.ts
-class ViterbiNode {
-  name;
-  cost;
-  start_pos;
-  length;
-  left_id;
-  right_id;
-  prev;
-  surface_form;
-  shortest_cost;
-  type;
-  constructor(node_name, node_cost, start_pos, length, type, left_id, right_id, surface_form) {
-    this.name = node_name;
-    this.cost = node_cost;
-    this.start_pos = start_pos;
-    this.length = length;
-    this.left_id = left_id;
-    this.right_id = right_id;
-    this.prev = null;
-    this.surface_form = surface_form;
-    this.shortest_cost = type === "BOS" ? 0 : Number.MAX_VALUE;
-    this.type = type;
-  }
-}
-var ViterbiNode_default = ViterbiNode;
-
-// src/kuromoji.js/viterbi/ViterbiLattice.ts
-class ViterbiLattice {
-  nodes_end_at;
-  eos_pos;
-  constructor() {
-    this.nodes_end_at = [];
-    this.nodes_end_at[0] = [new ViterbiNode_default(-1, 0, 0, 0, "BOS", 0, 0, "")];
-    this.eos_pos = 1;
-  }
-  append(node) {
-    const last_pos = node.start_pos + node.length - 1;
-    if (this.eos_pos < last_pos) {
-      this.eos_pos = last_pos;
-    }
-    const prev_nodes = this.nodes_end_at[last_pos] ?? [];
-    prev_nodes.push(node);
-    this.nodes_end_at[last_pos] = prev_nodes;
-  }
-  appendEos() {
-    const last_index = this.nodes_end_at.length;
-    this.eos_pos++;
-    this.nodes_end_at[last_index] = [new ViterbiNode_default(-1, 0, this.eos_pos, 0, "EOS", 0, 0, "")];
-  }
-}
-var ViterbiLattice_default = ViterbiLattice;
-
-// src/kuromoji.js/viterbi/ViterbiBuilder.ts
-class ViterbiBuilder {
-  #trie;
-  #token_info_dictionary;
-  #unknown_dictionary;
-  constructor(dic) {
-    this.#trie = dic.trie;
-    this.#token_info_dictionary = dic.token_info_dictionary;
-    this.#unknown_dictionary = dic.unknown_dictionary;
-  }
-  build(sentence_str) {
-    const lattice = new ViterbiLattice_default;
-    const sentence = new SurrogateAwareString_default(sentence_str);
-    const sentence_length = sentence.length;
-    for (let pos = 0;pos < sentence_length; pos++) {
-      const tail = sentence.slice(pos);
-      const vocabulary = this.#trie.commonPrefixSearch(tail);
-      const vocabulary_length = vocabulary.length;
-      for (let n = 0;n < vocabulary_length; n++) {
-        const trie_id = vocabulary[n].v;
-        const key = vocabulary[n].k;
-        const token_info_ids = this.#token_info_dictionary.target_map.get(trie_id);
-        if (!token_info_ids)
-          throw new Error("TokenInfo dictionary is broken");
-        for (const token_info_id of token_info_ids) {
-          const left_id = this.#token_info_dictionary.dictionary.getShort(token_info_id);
-          const right_id = this.#token_info_dictionary.dictionary.getShort(token_info_id + 2);
-          const word_cost = this.#token_info_dictionary.dictionary.getShort(token_info_id + 4);
-          lattice.append(new ViterbiNode_default(token_info_id, word_cost, pos + 1, key.length, "KNOWN", left_id, right_id, key));
-        }
-      }
-      const head_char = tail.charAt(0);
-      const head_char_class = this.#unknown_dictionary.lookup(head_char);
-      if (!vocabulary?.length || head_char_class.is_always_invoke) {
-        let key = head_char;
-        const tail_length = tail.length;
-        if (head_char_class.is_grouping && tail_length > 1) {
-          const class_name = head_char_class.class_name;
-          for (let k = 1;k < tail_length; k++) {
-            const next_char = tail.charAt(k);
-            if (this.#unknown_dictionary.lookup(next_char).class_name !== class_name) {
-              break;
-            }
-            key += next_char;
-          }
-        }
-        const unk_ids = this.#unknown_dictionary.target_map.get(head_char_class.class_id);
-        if (!unk_ids)
-          throw new Error("Unknown dictionary is broken");
-        const unk_length = unk_ids.length;
-        const unknown_dict = this.#unknown_dictionary.dictionary;
-        for (let j = 0;j < unk_length; j++) {
-          const unk_id = unk_ids[j];
-          lattice.append(new ViterbiNode_default(unk_id, unknown_dict.getShort(unk_id + 4), pos + 1, key.length, "UNKNOWN", unknown_dict.getShort(unk_id), unknown_dict.getShort(unk_id + 2), key));
-        }
-      }
-    }
-    lattice.appendEos();
-    return lattice;
-  }
-}
-var ViterbiBuilder_default = ViterbiBuilder;
-
-// src/kuromoji.js/viterbi/ViterbiSearcher.ts
-class ViterbiSearcher {
-  #connection_costs;
-  constructor(connection_costs) {
-    this.#connection_costs = connection_costs;
-  }
-  search(_lattice) {
-    let lattice = _lattice;
-    lattice = this.#forward(lattice);
-    return this.#backward(lattice);
-  }
-  #forward(lattice) {
-    let i = 1;
-    for (i = 1;i <= lattice.eos_pos; i++) {
-      const nodes = lattice.nodes_end_at[i];
-      if (nodes == null)
-        continue;
-      for (const node of nodes) {
-        let cost = Number.MAX_VALUE;
-        let shortest_prev_node = null;
-        const index = node.start_pos - 1;
-        if (!(index in lattice.nodes_end_at)) {
-          continue;
-        }
-        const prev_nodes = lattice.nodes_end_at[index];
-        for (const prev_node of prev_nodes) {
-          let edge_cost;
-          if (node.left_id == null || prev_node.right_id == null) {
-            console.log("Left or right is null");
-            edge_cost = 0;
-          } else {
-            edge_cost = this.#connection_costs.get(prev_node.right_id, node.left_id);
-          }
-          const _cost = prev_node.shortest_cost + edge_cost + node.cost;
-          if (_cost < cost) {
-            shortest_prev_node = prev_node;
-            cost = _cost;
-          }
-        }
-        node.prev = shortest_prev_node;
-        node.shortest_cost = cost;
-      }
-    }
-    return lattice;
-  }
-  #backward(lattice) {
-    const shortest_path = [];
-    const eos = lattice.nodes_end_at[lattice.nodes_end_at.length - 1][0];
-    let node_back = eos.prev;
-    if (node_back == null) {
-      return [];
-    }
-    while (node_back.type !== "BOS") {
-      shortest_path.push(node_back);
-      if (node_back.prev == null) {
-        return [];
-      }
-      node_back = node_back.prev;
-    }
-    return shortest_path.reverse();
-  }
-}
-var ViterbiSearcher_default = ViterbiSearcher;
-
-// src/kuromoji.js/Tokenizer.ts
-class Tokenizer {
-  #token_info_dictionary;
-  #unknown_dictionary;
-  #viterbi_builder;
-  #viterbi_searcher;
-  #formatter;
-  constructor(dic) {
-    this.#token_info_dictionary = dic.token_info_dictionary;
-    this.#unknown_dictionary = dic.unknown_dictionary;
-    this.#viterbi_builder = new ViterbiBuilder_default(dic);
-    this.#viterbi_searcher = new ViterbiSearcher_default(dic.connection_costs);
-    this.#formatter = new IpadicFormatter_default;
-  }
-  static splitByPunctuation(input) {
-    const matches = input.matchAll(/\u3001|\u3002/g);
-    const sentences = [];
-    let lastIndex = 0;
-    for (const match of matches) {
-      const index = match.index;
-      sentences.push(input.slice(lastIndex, index + 1));
-      lastIndex = index + 1;
-    }
-    if (lastIndex < input.length) {
-      sentences.push(input.slice(lastIndex));
-    }
-    return sentences;
-  }
-  tokenize(text) {
-    const sentences = Tokenizer.splitByPunctuation(text);
-    const tokens = [];
-    for (const sentence of sentences) {
-      this.#tokenizeForSentence(sentence, tokens);
-    }
-    return tokens;
-  }
-  #tokenizeForSentence(sentence, tokens = []) {
-    const lattice = this.#viterbi_builder.build(sentence);
-    const best_path = this.#viterbi_searcher.search(lattice);
-    const last_pos = tokens.length > 0 ? tokens[tokens.length - 1].word_position : 0;
-    for (const node of best_path) {
-      tokens.push(this.#getTokenFromNode(node, last_pos));
-    }
-    return tokens;
-  }
-  #getTokenFromNode(node, last_pos) {
-    const features_line = node.type === "KNOWN" ? this.#token_info_dictionary.getFeatures(node.name) : this.#unknown_dictionary.getFeatures(node.name);
-    const features = features_line ? features_line.split(",") : [];
-    if (node.type === "UNKNOWN") {
-      return this.#formatter.formatUnknownEntry(node.name, last_pos + node.start_pos, node.type, features, node.surface_form);
-    }
-    return this.#formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, features);
-  }
-}
-var Tokenizer_default = Tokenizer;
-
-// src/kuromoji.js/loader/DictionaryLoader.ts
-import { existsSync, readFileSync } from "fs";
-import path from "path";
-import zlib from "zlib";
-
-// src/kuromoji.js/util/DoubleArray.ts
+// src/_core/util/DoubleArray.ts
 var TERM_CHAR = "\x00";
 var TERM_CODE = 0;
 var ROOT_ID = 0;
@@ -767,7 +419,7 @@ var doublearray = {
 };
 var DoubleArray_default = doublearray;
 
-// src/kuromoji.js/dict/ConnectionCosts.ts
+// src/_core/dict/ConnectionCosts.ts
 class ConnectionCosts {
   forward_dimension;
   backward_dimension;
@@ -801,7 +453,7 @@ class ConnectionCosts {
 }
 var ConnectionCosts_default = ConnectionCosts;
 
-// src/kuromoji.js/util/ByteBuffer.ts
+// src/_core/util/ByteBuffer.ts
 var encoder2 = new TextEncoder;
 var decoder2 = new TextDecoder;
 
@@ -964,7 +616,7 @@ class ByteBuffer {
 }
 var ByteBuffer_default = ByteBuffer;
 
-// src/kuromoji.js/dict/TokenInfoDictionary.ts
+// src/_core/dict/TokenInfoDictionary.ts
 class TokenInfoDictionary {
   dictionary;
   target_map;
@@ -1067,7 +719,77 @@ class TokenInfoDictionary {
 }
 var TokenInfoDictionary_default = TokenInfoDictionary;
 
-// src/kuromoji.js/dict/CharacterClass.ts
+// src/_core/util/SurrogateAwareString.ts
+class SurrogateAwareString {
+  str;
+  #index_mapping;
+  length;
+  constructor(str) {
+    this.str = str;
+    this.#index_mapping = [];
+    const str_length = str.length;
+    for (let pos = 0;pos < str_length; pos++) {
+      const ch = str.charAt(pos);
+      this.#index_mapping.push(pos);
+      if (SurrogateAwareString.isSurrogatePair(ch)) {
+        pos++;
+      }
+    }
+    this.length = this.#index_mapping.length;
+  }
+  slice(index) {
+    if (this.#index_mapping.length <= index) {
+      return "";
+    }
+    const surrogate_aware_index = this.#index_mapping[index];
+    return this.str.slice(surrogate_aware_index);
+  }
+  charAt(index) {
+    if (this.str.length <= index) {
+      return "";
+    }
+    const surrogate_aware_start_index = this.#index_mapping[index];
+    const surrogate_aware_end_index = this.#index_mapping[index + 1];
+    if (surrogate_aware_end_index == null) {
+      return this.str.slice(surrogate_aware_start_index);
+    }
+    return this.str.slice(surrogate_aware_start_index, surrogate_aware_end_index);
+  }
+  charCodeAt(index) {
+    if (this.#index_mapping.length <= index) {
+      return Number.NaN;
+    }
+    const surrogate_aware_index = this.#index_mapping[index];
+    const upper = this.str.charCodeAt(surrogate_aware_index);
+    let lower;
+    if (upper >= 55296 && upper <= 56319 && surrogate_aware_index < this.str.length) {
+      lower = this.str.charCodeAt(surrogate_aware_index + 1);
+      if (lower >= 56320 && lower <= 57343) {
+        return (upper - 55296) * 1024 + lower - 56320 + 65536;
+      }
+    }
+    return upper;
+  }
+  toString() {
+    return this.str;
+  }
+  add(other) {
+    return new SurrogateAwareString(this.str + other.str);
+  }
+  append(str) {
+    return new SurrogateAwareString(this.str + str);
+  }
+  static isSurrogatePair(ch) {
+    const utf16_code = ch.charCodeAt(0);
+    if (utf16_code >= 55296 && utf16_code <= 56319) {
+      return true;
+    }
+    return false;
+  }
+}
+var SurrogateAwareString_default = SurrogateAwareString;
+
+// src/_core/dict/CharacterClass.ts
 class CharacterClass {
   class_id;
   class_name;
@@ -1084,7 +806,7 @@ class CharacterClass {
 }
 var CharacterClass_default = CharacterClass;
 
-// src/kuromoji.js/dict/InvokeDefinitionMap.ts
+// src/_core/dict/InvokeDefinitionMap.ts
 class InvokeDefinitionMap {
   #map;
   #lookup_table;
@@ -1142,7 +864,7 @@ class InvokeDefinitionMap {
 }
 var InvokeDefinitionMap_default = InvokeDefinitionMap;
 
-// src/kuromoji.js/dict/CharacterDefinition.ts
+// src/_core/dict/CharacterDefinition.ts
 var DEFAULT_CATEGORY = "DEFAULT";
 
 class CharacterDefinition {
@@ -1293,7 +1015,7 @@ class CharacterDefinition {
 }
 var CharacterDefinition_default = CharacterDefinition;
 
-// src/kuromoji.js/dict/UnknownDictionary.ts
+// src/_core/dict/UnknownDictionary.ts
 class UnknownDictionary extends TokenInfoDictionary_default {
   #character_definition = null;
   characterDefinition(character_definition) {
@@ -1321,7 +1043,7 @@ class UnknownDictionary extends TokenInfoDictionary_default {
 }
 var UnknownDictionary_default = UnknownDictionary;
 
-// src/kuromoji.js/dict/DynamicDictionaries.ts
+// src/_core/dict/DynamicDictionaries.ts
 class DynamicDictionaries {
   trie;
   token_info_dictionary;
@@ -1354,67 +1076,7 @@ class DynamicDictionaries {
 }
 var DynamicDictionaries_default = DynamicDictionaries;
 
-// src/kuromoji.js/loader/DictionaryLoader.ts
-class DictionaryLoader {
-  #dic;
-  #dic_path;
-  constructor(dic_path = "dict/") {
-    this.#dic = new DynamicDictionaries_default;
-    this.#dic_path = dic_path;
-  }
-  #loadArrayBuffer = (file) => new Promise((resolve, reject) => {
-    if (!existsSync(file))
-      return reject(new Error(`${file} does not exist`));
-    const buffer = readFileSync(file);
-    zlib.gunzip(new Uint8Array(buffer), (err, binary) => {
-      if (err)
-        return reject(err);
-      const typed_array = new Uint8Array(binary);
-      resolve(typed_array.buffer);
-    });
-  });
-  load(callback) {
-    Promise.all([
-      "base.dat.gz",
-      "check.dat.gz",
-      "tid.dat.gz",
-      "tid_pos.dat.gz",
-      "tid_map.dat.gz",
-      "cc.dat.gz",
-      "unk.dat.gz",
-      "unk_pos.dat.gz",
-      "unk_map.dat.gz",
-      "unk_char.dat.gz",
-      "unk_compat.dat.gz",
-      "unk_invoke.dat.gz"
-    ].map((filename) => this.#loadArrayBuffer(path.join(this.#dic_path, filename)))).then((buffers) => {
-      this.#dic.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
-      this.#dic.loadTokenInfoDictionaries(new Uint8Array(buffers[2]), new Uint8Array(buffers[3]), new Uint8Array(buffers[4]));
-      this.#dic.loadConnectionCosts(new Int16Array(buffers[5]));
-      this.#dic.loadUnknownDictionaries(new Uint8Array(buffers[6]), new Uint8Array(buffers[7]), new Uint8Array(buffers[8]), new Uint8Array(buffers[9]), new Uint32Array(buffers[10]), new Uint8Array(buffers[11]));
-      callback(null, this.#dic);
-    }).catch((error) => {
-      callback(error, this.#dic);
-    });
-  }
-}
-var DictionaryLoader_default = DictionaryLoader;
-
-// src/kuromoji.js/TokenizerBuilder.ts
-class TokenizerBuilder {
-  #loader;
-  constructor(option = {}) {
-    this.#loader = new DictionaryLoader_default(option.dicPath);
-  }
-  build(callback) {
-    this.#loader.load((err, dic) => {
-      callback(err, new Tokenizer_default(dic));
-    });
-  }
-}
-var TokenizerBuilder_default = TokenizerBuilder;
-
-// src/kuromoji.js/dict/builder/CharacterDefinitionBuilder.ts
+// src/_core/dict/builder/CharacterDefinitionBuilder.ts
 var CATEGORY_DEF_PATTERN = /^(\w+)\s+(\d)\s+(\d)\s+(\d)/;
 var CATEGORY_MAPPING_PATTERN = /^(0x[0-9A-F]{4})(?:\s+([^#\s]+))(?:\s+([^#\s]+))*/;
 var RANGE_CATEGORY_MAPPING_PATTERN = /^(0x[0-9A-F]{4})\.\.(0x[0-9A-F]{4})(?:\s+([^#\s]+))(?:\s+([^#\s]+))*/;
@@ -1462,7 +1124,7 @@ class CharacterDefinitionBuilder {
 }
 var CharacterDefinitionBuilder_default = CharacterDefinitionBuilder;
 
-// src/kuromoji.js/dict/builder/ConnectionCostsBuilder.ts
+// src/_core/dict/builder/ConnectionCostsBuilder.ts
 class ConnectionCostsBuilder {
   lines;
   connection_cost;
@@ -1508,7 +1170,7 @@ class ConnectionCostsBuilder {
 }
 var ConnectionCostsBuilder_default = ConnectionCostsBuilder;
 
-// src/kuromoji.js/dict/builder/DictionaryBuilder.ts
+// src/_core/dict/builder/DictionaryBuilder.ts
 class DictionaryBuilder {
   #tid_entries;
   #unk_entries;
@@ -1585,6 +1247,342 @@ class DictionaryBuilder {
 }
 var DictionaryBuilder_default = DictionaryBuilder;
 
+// src/_core/util/IpadicFormatter.ts
+class IpadicFormatter {
+  formatEntry(word_id, position, type, features) {
+    return {
+      word_id,
+      word_type: type,
+      word_position: position,
+      surface_form: features[0],
+      pos: features[1],
+      pos_detail_1: features[2],
+      pos_detail_2: features[3],
+      pos_detail_3: features[4],
+      conjugated_type: features[5],
+      conjugated_form: features[6],
+      basic_form: features[7],
+      reading: features[8],
+      pronunciation: features[9]
+    };
+  }
+  formatUnknownEntry(word_id, position, type, features, surface_form) {
+    return {
+      word_id,
+      word_type: type,
+      word_position: position,
+      surface_form,
+      pos: features[1],
+      pos_detail_1: features[2],
+      pos_detail_2: features[3],
+      pos_detail_3: features[4],
+      conjugated_type: features[5],
+      conjugated_form: features[6],
+      basic_form: features[7]
+    };
+  }
+}
+var IpadicFormatter_default = IpadicFormatter;
+
+// src/_core/viterbi/ViterbiNode.ts
+class ViterbiNode {
+  name;
+  cost;
+  start_pos;
+  length;
+  left_id;
+  right_id;
+  prev;
+  surface_form;
+  shortest_cost;
+  type;
+  constructor(node_name, node_cost, start_pos, length, type, left_id, right_id, surface_form) {
+    this.name = node_name;
+    this.cost = node_cost;
+    this.start_pos = start_pos;
+    this.length = length;
+    this.left_id = left_id;
+    this.right_id = right_id;
+    this.prev = null;
+    this.surface_form = surface_form;
+    this.shortest_cost = type === "BOS" ? 0 : Number.MAX_VALUE;
+    this.type = type;
+  }
+}
+var ViterbiNode_default = ViterbiNode;
+
+// src/_core/viterbi/ViterbiLattice.ts
+class ViterbiLattice {
+  nodes_end_at;
+  eos_pos;
+  constructor() {
+    this.nodes_end_at = [];
+    this.nodes_end_at[0] = [new ViterbiNode_default(-1, 0, 0, 0, "BOS", 0, 0, "")];
+    this.eos_pos = 1;
+  }
+  append(node) {
+    const last_pos = node.start_pos + node.length - 1;
+    if (this.eos_pos < last_pos) {
+      this.eos_pos = last_pos;
+    }
+    const prev_nodes = this.nodes_end_at[last_pos] ?? [];
+    prev_nodes.push(node);
+    this.nodes_end_at[last_pos] = prev_nodes;
+  }
+  appendEos() {
+    const last_index = this.nodes_end_at.length;
+    this.eos_pos++;
+    this.nodes_end_at[last_index] = [new ViterbiNode_default(-1, 0, this.eos_pos, 0, "EOS", 0, 0, "")];
+  }
+}
+var ViterbiLattice_default = ViterbiLattice;
+
+// src/_core/viterbi/ViterbiBuilder.ts
+class ViterbiBuilder {
+  #trie;
+  #token_info_dictionary;
+  #unknown_dictionary;
+  constructor(dic) {
+    this.#trie = dic.trie;
+    this.#token_info_dictionary = dic.token_info_dictionary;
+    this.#unknown_dictionary = dic.unknown_dictionary;
+  }
+  build(sentence_str) {
+    const lattice = new ViterbiLattice_default;
+    const sentence = new SurrogateAwareString_default(sentence_str);
+    const sentence_length = sentence.length;
+    for (let pos = 0;pos < sentence_length; pos++) {
+      const tail = sentence.slice(pos);
+      const vocabulary = this.#trie.commonPrefixSearch(tail);
+      const vocabulary_length = vocabulary.length;
+      for (let n = 0;n < vocabulary_length; n++) {
+        const trie_id = vocabulary[n].v;
+        const key = vocabulary[n].k;
+        const token_info_ids = this.#token_info_dictionary.target_map.get(trie_id);
+        if (!token_info_ids)
+          throw new Error("TokenInfo dictionary is broken");
+        for (const token_info_id of token_info_ids) {
+          const left_id = this.#token_info_dictionary.dictionary.getShort(token_info_id);
+          const right_id = this.#token_info_dictionary.dictionary.getShort(token_info_id + 2);
+          const word_cost = this.#token_info_dictionary.dictionary.getShort(token_info_id + 4);
+          lattice.append(new ViterbiNode_default(token_info_id, word_cost, pos + 1, key.length, "KNOWN", left_id, right_id, key));
+        }
+      }
+      const head_char = tail.charAt(0);
+      const head_char_class = this.#unknown_dictionary.lookup(head_char);
+      if (!vocabulary?.length || head_char_class.is_always_invoke) {
+        let key = head_char;
+        const tail_length = tail.length;
+        if (head_char_class.is_grouping && tail_length > 1) {
+          const class_name = head_char_class.class_name;
+          for (let k = 1;k < tail_length; k++) {
+            const next_char = tail.charAt(k);
+            if (this.#unknown_dictionary.lookup(next_char).class_name !== class_name) {
+              break;
+            }
+            key += next_char;
+          }
+        }
+        const unk_ids = this.#unknown_dictionary.target_map.get(head_char_class.class_id);
+        if (!unk_ids)
+          throw new Error("Unknown dictionary is broken");
+        const unk_length = unk_ids.length;
+        const unknown_dict = this.#unknown_dictionary.dictionary;
+        for (let j = 0;j < unk_length; j++) {
+          const unk_id = unk_ids[j];
+          lattice.append(new ViterbiNode_default(unk_id, unknown_dict.getShort(unk_id + 4), pos + 1, key.length, "UNKNOWN", unknown_dict.getShort(unk_id), unknown_dict.getShort(unk_id + 2), key));
+        }
+      }
+    }
+    lattice.appendEos();
+    return lattice;
+  }
+}
+var ViterbiBuilder_default = ViterbiBuilder;
+
+// src/_core/viterbi/ViterbiSearcher.ts
+class ViterbiSearcher {
+  #connection_costs;
+  constructor(connection_costs) {
+    this.#connection_costs = connection_costs;
+  }
+  search(_lattice) {
+    let lattice = _lattice;
+    lattice = this.#forward(lattice);
+    return this.#backward(lattice);
+  }
+  #forward(lattice) {
+    let i = 1;
+    for (i = 1;i <= lattice.eos_pos; i++) {
+      const nodes = lattice.nodes_end_at[i];
+      if (nodes == null)
+        continue;
+      for (const node of nodes) {
+        let cost = Number.MAX_VALUE;
+        let shortest_prev_node = null;
+        const index = node.start_pos - 1;
+        if (!(index in lattice.nodes_end_at)) {
+          continue;
+        }
+        const prev_nodes = lattice.nodes_end_at[index];
+        for (const prev_node of prev_nodes) {
+          let edge_cost;
+          if (node.left_id == null || prev_node.right_id == null) {
+            console.log("Left or right is null");
+            edge_cost = 0;
+          } else {
+            edge_cost = this.#connection_costs.get(prev_node.right_id, node.left_id);
+          }
+          const _cost = prev_node.shortest_cost + edge_cost + node.cost;
+          if (_cost < cost) {
+            shortest_prev_node = prev_node;
+            cost = _cost;
+          }
+        }
+        node.prev = shortest_prev_node;
+        node.shortest_cost = cost;
+      }
+    }
+    return lattice;
+  }
+  #backward(lattice) {
+    const shortest_path = [];
+    const eos = lattice.nodes_end_at[lattice.nodes_end_at.length - 1][0];
+    let node_back = eos.prev;
+    if (node_back == null) {
+      return [];
+    }
+    while (node_back.type !== "BOS") {
+      shortest_path.push(node_back);
+      if (node_back.prev == null) {
+        return [];
+      }
+      node_back = node_back.prev;
+    }
+    return shortest_path.reverse();
+  }
+}
+var ViterbiSearcher_default = ViterbiSearcher;
+
+// src/_core/Tokenizer.ts
+class Tokenizer {
+  #token_info_dictionary;
+  #unknown_dictionary;
+  #viterbi_builder;
+  #viterbi_searcher;
+  #formatter;
+  constructor(dic) {
+    this.#token_info_dictionary = dic.token_info_dictionary;
+    this.#unknown_dictionary = dic.unknown_dictionary;
+    this.#viterbi_builder = new ViterbiBuilder_default(dic);
+    this.#viterbi_searcher = new ViterbiSearcher_default(dic.connection_costs);
+    this.#formatter = new IpadicFormatter_default;
+  }
+  static splitByPunctuation(input) {
+    const matches = input.matchAll(/\u3001|\u3002/g);
+    const sentences = [];
+    let lastIndex = 0;
+    for (const match of matches) {
+      const index = match.index;
+      sentences.push(input.slice(lastIndex, index + 1));
+      lastIndex = index + 1;
+    }
+    if (lastIndex < input.length) {
+      sentences.push(input.slice(lastIndex));
+    }
+    return sentences;
+  }
+  tokenize(text) {
+    const sentences = Tokenizer.splitByPunctuation(text);
+    const tokens = [];
+    for (const sentence of sentences) {
+      this.#tokenizeForSentence(sentence, tokens);
+    }
+    return tokens;
+  }
+  #tokenizeForSentence(sentence, tokens = []) {
+    const lattice = this.#viterbi_builder.build(sentence);
+    const best_path = this.#viterbi_searcher.search(lattice);
+    const last_pos = tokens.length > 0 ? tokens[tokens.length - 1].word_position : 0;
+    for (const node of best_path) {
+      tokens.push(this.#getTokenFromNode(node, last_pos));
+    }
+    return tokens;
+  }
+  #getTokenFromNode(node, last_pos) {
+    const features_line = node.type === "KNOWN" ? this.#token_info_dictionary.getFeatures(node.name) : this.#unknown_dictionary.getFeatures(node.name);
+    const features = features_line ? features_line.split(",") : [];
+    if (node.type === "UNKNOWN") {
+      return this.#formatter.formatUnknownEntry(node.name, last_pos + node.start_pos, node.type, features, node.surface_form);
+    }
+    return this.#formatter.formatEntry(node.name, last_pos + node.start_pos, node.type, features);
+  }
+}
+var Tokenizer_default = Tokenizer;
+
+// src/kuromoji.js/loader/DictionaryLoader.ts
+import { existsSync, readFileSync } from "fs";
+import path from "path";
+import zlib from "zlib";
+class DictionaryLoader {
+  #dic;
+  #dic_path;
+  constructor(dic_path = "dict/") {
+    this.#dic = new DynamicDictionaries_default;
+    this.#dic_path = dic_path;
+  }
+  #loadArrayBuffer = (file) => new Promise((resolve, reject) => {
+    if (!existsSync(file))
+      return reject(new Error(`${file} does not exist`));
+    const buffer = readFileSync(file);
+    zlib.gunzip(new Uint8Array(buffer), (err, binary) => {
+      if (err)
+        return reject(err);
+      const typed_array = new Uint8Array(binary);
+      resolve(typed_array.buffer);
+    });
+  });
+  load(callback) {
+    Promise.all([
+      "base.dat.gz",
+      "check.dat.gz",
+      "tid.dat.gz",
+      "tid_pos.dat.gz",
+      "tid_map.dat.gz",
+      "cc.dat.gz",
+      "unk.dat.gz",
+      "unk_pos.dat.gz",
+      "unk_map.dat.gz",
+      "unk_char.dat.gz",
+      "unk_compat.dat.gz",
+      "unk_invoke.dat.gz"
+    ].map((filename) => this.#loadArrayBuffer(path.join(this.#dic_path, filename)))).then((buffers) => {
+      this.#dic.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
+      this.#dic.loadTokenInfoDictionaries(new Uint8Array(buffers[2]), new Uint8Array(buffers[3]), new Uint8Array(buffers[4]));
+      this.#dic.loadConnectionCosts(new Int16Array(buffers[5]));
+      this.#dic.loadUnknownDictionaries(new Uint8Array(buffers[6]), new Uint8Array(buffers[7]), new Uint8Array(buffers[8]), new Uint8Array(buffers[9]), new Uint32Array(buffers[10]), new Uint8Array(buffers[11]));
+      callback(null, this.#dic);
+    }).catch((error) => {
+      callback(error, this.#dic);
+    });
+  }
+}
+var DictionaryLoader_default = DictionaryLoader;
+
+// src/kuromoji.js/TokenizerBuilder.ts
+class TokenizerBuilder {
+  #loader;
+  constructor(option = {}) {
+    this.#loader = new DictionaryLoader_default(option.dicPath);
+  }
+  build(callback) {
+    this.#loader.load((err, dic) => {
+      callback(err, new Tokenizer_default(dic));
+    });
+  }
+}
+var TokenizerBuilder_default = TokenizerBuilder;
+
 // src/kuromoji.js/kuromoji.ts
 var kuromoji_default = {
   builder: (option = {}) => {
@@ -1600,5 +1598,5 @@ export {
   DictionaryBuilder_default as DictionaryBuilder
 };
 
-//# debugId=087CC0A0B585C64C64756E2164756E21
+//# debugId=FF71F34F7A4B4B6064756E2164756E21
 //# sourceMappingURL=index.js.map
