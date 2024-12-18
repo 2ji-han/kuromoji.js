@@ -1,6 +1,6 @@
 import path from "node:path";
 import pako from "pako";
-import DynamicDictionaries from "../dict/DynamicDictionaries";
+import DynamicDictionaries from "../../_core/dict/DynamicDictionaries";
 
 class DictionaryLoader {
     #dic: DynamicDictionaries;

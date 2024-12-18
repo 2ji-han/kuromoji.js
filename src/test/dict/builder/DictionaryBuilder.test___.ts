@@ -18,8 +18,8 @@
 import { beforeEach, describe, expect, it } from "bun:test";
 import fs from "node:fs";
 
-import Tokenizer from "../../../kuromoji.js/Tokenizer";
-import type DynamicDictionaries from "../../../kuromoji.js/dict/DynamicDictionaries";
+import Tokenizer from "../../../_core/Tokenizer";
+import type DynamicDictionaries from "../../../_core/dict/DynamicDictionaries";
 import kuromoji from "../../../kuromoji.js/kuromoji";
 
 const DIC_DIR = "test/_resource/minimum-dic/";

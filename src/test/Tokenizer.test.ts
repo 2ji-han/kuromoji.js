@@ -16,7 +16,7 @@
  */
 
 import { beforeEach, describe, expect, it } from "bun:test";
-import Tokenizer from "../kuromoji.js/Tokenizer";
+import Tokenizer from "../_core/Tokenizer";
 import kuromoji from "../kuromoji.js/kuromoji";
 
 const DIC_DIR = "dict/";

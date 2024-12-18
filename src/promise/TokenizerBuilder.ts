@@ -1,4 +1,4 @@
-import Tokenizer from "./Tokenizer";
+import Tokenizer from "../_core/Tokenizer";
 import DictionaryLoader from "./loader/DictionaryLoader";
 
 export type TokenizerBuilderOption = {

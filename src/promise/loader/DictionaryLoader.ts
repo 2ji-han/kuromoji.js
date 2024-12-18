@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
-import DynamicDictionaries from "../dict/DynamicDictionaries";
+import DynamicDictionaries from "../../_core/dict/DynamicDictionaries";
 
 class DictionaryLoader {
     #dic: DynamicDictionaries;
