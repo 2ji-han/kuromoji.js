@@ -1,5 +1,5 @@
-import TokenizerBuilder, { type TokenizerBuilderOption } from "./TokenizerBuilder";
 import DictionaryBuilder from "../_core/dict/builder/DictionaryBuilder";
+import TokenizerBuilder, { type TokenizerBuilderOption } from "./TokenizerBuilder";
 
 export { TokenizerBuilder, type TokenizerBuilderOption, DictionaryBuilder };
 
