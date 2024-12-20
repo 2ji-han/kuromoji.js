@@ -1,17 +1,6 @@
 // @bun
-// src/_core/util/DoubleArray.ts
-var TERM_CHAR = "\x00";
-var TERM_CODE = 0;
-var ROOT_ID = 0;
-var NOT_FOUND = -1;
-var BASE_SIGNED = true;
-var CHECK_SIGNED = true;
-var BASE_BYTES = 4;
-var CHECK_BYTES = 4;
-var MEMORY_EXPAND_RATIO = 2;
-var encoder = new TextEncoder;
-var decoder = new TextDecoder;
-var newArrayBuffer = (signed, bytes, size) => {
+// src/_core/util/CreateTypedArray.ts
+var CreateTypedArray_default = (signed, bytes, size) => {
   if (signed) {
     switch (bytes) {
       case 1:
@@ -21,7 +10,7 @@ var newArrayBuffer = (signed, bytes, size) => {
       case 4:
         return new Int32Array(size);
       default:
-        throw new RangeError(`Invalid newArray parameter element_bytes:${bytes}`);
+        throw new RangeError(`Invalid parameter: ${bytes}`);
     }
   }
   switch (bytes) {
@@ -32,12 +21,17 @@ var newArrayBuffer = (signed, bytes, size) => {
     case 4:
       return new Uint32Array(size);
     default:
-      throw new RangeError(`Invalid newArray parameter element_bytes:${bytes}`);
+      throw new RangeError(`Invalid parameter: ${bytes}`);
   }
 };
-var arrayCopy = (src, src_offset, length) => {
-  return src.slice(src_offset, src_offset + length);
-};
+
+// src/_core/util/DoubleArray.ts
+var TERM_CHAR = "\x00";
+var TERM_CODE = 0;
+var ROOT_ID = 0;
+var NOT_FOUND = -1;
+var encoder = new TextEncoder;
+var decoder = new TextDecoder;
 
 class BufferController {
   #first_unused_node;
@@ -46,21 +40,21 @@ class BufferController {
   constructor(initial_size = 1024) {
     this.#first_unused_node = ROOT_ID + 1;
     this.#base = {
-      signed: BASE_SIGNED,
-      bytes: BASE_BYTES,
-      array: newArrayBuffer(BASE_SIGNED, BASE_BYTES, initial_size)
+      signed: true,
+      bytes: 4,
+      array: CreateTypedArray_default(true, 4, initial_size)
     };
     this.#check = {
-      signed: CHECK_SIGNED,
-      bytes: CHECK_BYTES,
-      array: newArrayBuffer(CHECK_SIGNED, CHECK_BYTES, initial_size)
+      signed: true,
+      bytes: 4,
+      array: CreateTypedArray_default(true, 4, initial_size)
     };
     this.#base.array[ROOT_ID] = 1;
     this.#check.array[ROOT_ID] = ROOT_ID;
-    this.initBase(this.#base.array, ROOT_ID + 1, this.#base.array.length);
-    this.initCheck(this.#check.array, ROOT_ID + 1, this.#check.array.length);
+    this.#initBase(this.#base.array, ROOT_ID + 1, this.#base.array.length);
+    this.#initCheck(this.#check.array, ROOT_ID + 1, this.#check.array.length);
   }
-  initBase(_base, start, end) {
+  #initBase(_base, start, end) {
     for (let i = start;i < end; i++) {
       _base[i] = -i + 1;
     }
@@ -72,19 +66,19 @@ class BufferController {
       _base[start] = -last_used_id;
     }
   }
-  initCheck(_check, start, end) {
+  #initCheck(_check, start, end) {
     for (let i = start;i < end; i++) {
       _check[i] = -i - 1;
     }
   }
-  realloc(min_size) {
-    const new_size = min_size * MEMORY_EXPAND_RATIO;
-    const base_new_array = newArrayBuffer(this.#base.signed, this.#base.bytes, new_size);
-    this.initBase(base_new_array, this.#base.array.length, new_size);
+  #realloc(min_size) {
+    const new_size = min_size * 2;
+    const base_new_array = CreateTypedArray_default(this.#base.signed, this.#base.bytes, new_size);
+    this.#initBase(base_new_array, this.#base.array.length, new_size);
     base_new_array.set(this.#base.array);
     this.#base.array = base_new_array;
-    const check_new_array = newArrayBuffer(this.#check.signed, this.#check.bytes, new_size);
-    this.initCheck(check_new_array, this.#check.array.length, new_size);
+    const check_new_array = CreateTypedArray_default(this.#check.signed, this.#check.bytes, new_size);
+    this.#initCheck(check_new_array, this.#check.array.length, new_size);
     check_new_array.set(this.#check.array);
     this.#check.array = check_new_array;
   }
@@ -119,13 +113,13 @@ class BufferController {
   }
   setBase(index, base_value) {
     if (this.#base.array.length - 1 < index) {
-      this.realloc(index);
+      this.#realloc(index);
     }
     this.#base.array[index] = base_value;
   }
   setCheck(index, check_value) {
     if (this.#check.array.length - 1 < index) {
-      this.realloc(index);
+      this.#realloc(index);
     }
     this.#check.array[index] = check_value;
   }
@@ -213,9 +207,9 @@ class DoubleArrayBuilder {
     return new DoubleArray(this.#bufferController);
   }
   #_build(parent_index, position, start, length) {
-    const children_info = this.getChildrenInfo(position, start, length);
-    const _base = this.findAllocatableBase(children_info);
-    this.setBufferController(parent_index, children_info, _base);
+    const children_info = this.#getChildrenInfo(position, start, length);
+    const _base = this.#findAllocatableBase(children_info);
+    this.#setBufferController(parent_index, children_info, _base);
     for (let i = 0;i < children_info.length; i = i + 3) {
       const child_code = children_info[i];
       if (child_code === TERM_CODE) {
@@ -227,7 +221,7 @@ class DoubleArrayBuilder {
       this.#_build(child_index, position + 1, child_start, child_len);
     }
   }
-  getChildrenInfo(position, start, length) {
+  #getChildrenInfo(position, start, length) {
     let current_char = this.#keys[start].k[position];
     let children_info = new Int32Array(length * 3);
     let i = 0;
@@ -249,7 +243,7 @@ class DoubleArrayBuilder {
     children_info = children_info.subarray(0, i);
     return children_info;
   }
-  setBufferController(parent_id, children_info, _base) {
+  #setBufferController(parent_id, children_info, _base) {
     const bufferController = this.#bufferController;
     bufferController.setBase(parent_id, _base);
     for (let i = 0;i < children_info.length; i = i + 3) {
@@ -276,7 +270,7 @@ class DoubleArrayBuilder {
       }
     }
   }
-  findAllocatableBase(children_info) {
+  #findAllocatableBase(children_info) {
     const bufferController = this.#bufferController;
     let _base;
     let curr = bufferController.getFirstUnusedNode();
@@ -290,7 +284,7 @@ class DoubleArrayBuilder {
       for (let i = 0;i < children_info.length; i = i + 3) {
         const code = children_info[i];
         const candidate_id = _base + code;
-        if (!this.isUnusedNode(candidate_id)) {
+        if (!this.#isUnusedNode(candidate_id)) {
           curr = -bufferController.getCheck(curr);
           empty_area_found = false;
           break;
@@ -301,7 +295,7 @@ class DoubleArrayBuilder {
       }
     }
   }
-  isUnusedNode(index) {
+  #isUnusedNode(index) {
     const bufferController = this.#bufferController;
     const check = bufferController.getCheck(index);
     if (index === ROOT_ID) {
@@ -329,7 +323,7 @@ class DoubleArray {
     let child = NOT_FOUND;
     for (let i = 0;i < buffer.length; i++) {
       const code = buffer[i];
-      child = this.traverse(parent, code);
+      child = this.#traverse(parent, code);
       if (child === NOT_FOUND) {
         return false;
       }
@@ -348,7 +342,7 @@ class DoubleArray {
     let child = NOT_FOUND;
     for (let i = 0;i < buffer.length; i++) {
       const code = buffer[i];
-      child = this.traverse(parent, code);
+      child = this.#traverse(parent, code);
       if (child === NOT_FOUND) {
         return NOT_FOUND;
       }
@@ -367,10 +361,10 @@ class DoubleArray {
     let child = NOT_FOUND;
     for (let i = 0;i < buffer.length; i++) {
       const code = buffer[i];
-      child = this.traverse(parent, code);
+      child = this.#traverse(parent, code);
       if (child !== NOT_FOUND) {
         parent = child;
-        const grand_child = this.traverse(child, TERM_CODE);
+        const grand_child = this.#traverse(child, TERM_CODE);
         if (grand_child !== NOT_FOUND) {
           const base = this.#bufferController.getBase(grand_child);
           const r = {
@@ -380,7 +374,7 @@ class DoubleArray {
           if (base <= 0) {
             r.v = -base - 1;
           }
-          r.k = decoder.decode(arrayCopy(buffer, 0, i + 1));
+          r.k = decoder.decode(buffer.slice(0, i + 1));
           result.push(r);
         }
         continue;
@@ -389,7 +383,7 @@ class DoubleArray {
     }
     return result;
   }
-  traverse(parent, code) {
+  #traverse(parent, code) {
     const child = this.#bufferController.getBase(parent) + code;
     if (this.#bufferController.getCheck(child) === parent) {
       return child;
@@ -406,7 +400,7 @@ class DoubleArray {
     return this.#bufferController.dump();
   }
 }
-var doublearray = {
+var DoubleArray_default = {
   builder: (initial_size = 1024) => {
     return new DoubleArrayBuilder(initial_size);
   },
@@ -417,7 +411,6 @@ var doublearray = {
     return new DoubleArray(bufferController);
   }
 };
-var DoubleArray_default = doublearray;
 
 // src/_core/dict/ConnectionCosts.ts
 class ConnectionCosts {
@@ -458,56 +451,66 @@ var encoder2 = new TextEncoder;
 var decoder2 = new TextDecoder;
 
 class ByteBuffer {
-  buffer;
-  position = 0;
+  #_buffer;
+  #_position = 0;
+  get buffer() {
+    return this.#_buffer;
+  }
+  set buffer(value) {
+    this.#_buffer = value;
+  }
+  get position() {
+    return this.#_position;
+  }
+  set position(value) {
+    this.#_position = value;
+  }
   constructor(arg) {
     if (arg === undefined) {
-      const initial_size = 1024 * 1024;
-      this.buffer = new Uint8Array(initial_size);
-      this.position = 0;
+      this.#_buffer = new Uint8Array(1024 * 1024);
+      this.#_position = 0;
     } else if (typeof arg === "number") {
-      const initial_size = arg;
-      this.buffer = new Uint8Array(initial_size);
-      this.position = 0;
+      this.#_buffer = new Uint8Array(arg);
+      this.#_position = 0;
     } else if (arg instanceof Uint8Array) {
-      this.buffer = arg;
-      this.position = 0;
+      this.#_buffer = arg;
+      this.#_position = 0;
     } else {
-      throw `${typeof arg} is invalid parameter type for ByteBuffer constructor`;
+      throw `${typeof arg} is invalid parameter type`;
     }
   }
   size() {
-    return this.buffer.length;
+    return this.#_buffer.length;
   }
   reallocate() {
-    const new_array = new Uint8Array(this.buffer.length * 2);
-    new_array.set(this.buffer);
-    this.buffer = new_array;
+    const new_array = new Uint8Array(this.#_buffer.length * 2);
+    new_array.set(this.#_buffer);
+    this.#_buffer = new_array;
   }
   shrink() {
-    this.buffer = this.buffer.subarray(0, this.position);
-    return this.buffer;
+    this.#_buffer = this.#_buffer.subarray(0, this.#_position);
+    return this.#_buffer;
   }
   put(b) {
-    if (this.buffer.length < this.position + 1) {
+    if (this.#_buffer.length < this.#_position + 1) {
       this.reallocate();
     }
     if (typeof b === "boolean") {
-      this.buffer[this.position++] = b ? 1 : 0;
+      this.#_buffer[this.#_position++] = b ? 1 : 0;
     } else {
-      this.buffer[this.position++] = b;
+      this.#_buffer[this.#_position++] = b;
     }
   }
   get(_index = null) {
     let index = _index;
     if (index == null) {
-      index = this.position;
-      this.position += 1;
+      index = this.#_position;
+      this.#_position += 1;
     }
-    if (this.buffer.length < index + 1) {
+    if (this.#_buffer.length < index + 1) {
       return 0;
     }
-    return this.buffer[index];
+    return this.#_buffer[index];
   }
   putShort(num) {
     if (65535 < num) {
@@ -521,14 +524,14 @@ class ByteBuffer {
   getShort(_index) {
     let index = _index;
     if (index == null) {
-      index = this.position;
-      this.position += 2;
+      index = this.#_position;
+      this.#_position += 2;
     }
-    if (this.buffer.length < index + 2) {
+    if (this.#_buffer.length < index + 2) {
       return 0;
     }
-    const lower = this.buffer[index];
-    const upper = this.buffer[index + 1];
+    const lower = this.#_buffer[index];
+    const upper = this.#_buffer[index + 1];
     let value = (upper << 8) + lower;
     if (value & 32768) {
       value = -(value - 1 ^ 65535);
@@ -551,67 +554,65 @@ class ByteBuffer {
   getInt(_index = null) {
     let index = _index;
     if (index == null) {
-      index = this.position;
-      this.position += 4;
+      index = this.#_position;
+      this.#_position += 4;
     }
-    if (this.buffer.length < index + 4) {
+    if (this.#_buffer.length < index + 4) {
       return 0;
     }
-    const b0 = this.buffer[index];
-    const b1 = this.buffer[index + 1];
-    const b2 = this.buffer[index + 2];
-    const b3 = this.buffer[index + 3];
+    const b0 = this.#_buffer[index];
+    const b1 = this.#_buffer[index + 1];
+    const b2 = this.#_buffer[index + 2];
+    const b3 = this.#_buffer[index + 3];
     return (b3 << 24) + (b2 << 16) + (b1 << 8) + b0;
   }
   readInt() {
-    const pos = this.position;
-    this.position += 4;
+    const pos = this.#_position;
+    this.#_position += 4;
     return this.getInt(pos);
   }
   putString(str) {
     const bytes = encoder2.encode(str);
-    if (!bytes)
-      throw new Error("bytes null.");
     for (const byte of bytes) {
       this.put(byte);
     }
     this.put(0);
   }
-  getString(_index = this.position) {
+  getString(_index = this.#_position) {
     let index = _index;
     const buf = [];
     let ch;
-    while (index < this.buffer.length) {
+    while (index < this.#_buffer.length) {
       ch = this.get(index++);
       if (ch === 0)
         break;
       buf.push(ch);
     }
-    this.position = index;
+    this.#_position = index;
     return decoder2.decode(new Uint8Array(buf));
   }
   getUtf32(_index = null) {
     let index = _index;
     if (index == null) {
-      index = this.position;
-      this.position += 4;
+      index = this.#_position;
+      this.#_position += 4;
     }
-    if (this.buffer.length < index + 4) {
+    if (this.#_buffer.length < index + 4) {
       return 0;
     }
-    const codePoint = this.buffer.subarray(index, index + 4);
+    const codePoint = this.#_buffer.subarray(index, index + 4);
     return new DataView(codePoint.buffer).getUint32(0, false);
   }
   getBool(_index = null) {
     let index = _index;
     if (index == null) {
-      index = this.position;
-      this.position += 1;
+      index = this.#_position;
+      this.#_position += 1;
     }
-    if (this.buffer.length < index + 1) {
+    if (this.#_buffer.length < index + 1) {
       return false;
     }
-    return Boolean(this.buffer[index]);
+    return Boolean(this.#_buffer[index]);
   }
 }
 var ByteBuffer_default = ByteBuffer;
@@ -721,14 +722,13 @@ var TokenInfoDictionary_default = TokenInfoDictionary;
 
 // src/_core/util/SurrogateAwareString.ts
 class SurrogateAwareString {
-  str;
+  #str;
   #index_mapping;
   length;
   constructor(str) {
-    this.str = str;
+    this.#str = str;
     this.#index_mapping = [];
-    const str_length = str.length;
-    for (let pos = 0;pos < str_length; pos++) {
+    for (let pos = 0;pos < str.length; pos++) {
       const ch = str.charAt(pos);
       this.#index_mapping.push(pos);
       if (SurrogateAwareString.isSurrogatePair(ch)) {
@@ -742,28 +742,28 @@ class SurrogateAwareString {
       return "";
     }
     const surrogate_aware_index = this.#index_mapping[index];
-    return this.str.slice(surrogate_aware_index);
+    return this.#str.slice(surrogate_aware_index);
   }
   charAt(index) {
-    if (this.str.length <= index) {
+    if (this.#str.length <= index) {
       return "";
     }
     const surrogate_aware_start_index = this.#index_mapping[index];
     const surrogate_aware_end_index = this.#index_mapping[index + 1];
     if (surrogate_aware_end_index == null) {
-      return this.str.slice(surrogate_aware_start_index);
+      return this.#str.slice(surrogate_aware_start_index);
     }
-    return this.str.slice(surrogate_aware_start_index, surrogate_aware_end_index);
+    return this.#str.slice(surrogate_aware_start_index, surrogate_aware_end_index);
   }
   charCodeAt(index) {
     if (this.#index_mapping.length <= index) {
       return Number.NaN;
     }
     const surrogate_aware_index = this.#index_mapping[index];
-    const upper = this.str.charCodeAt(surrogate_aware_index);
+    const upper = this.#str.charCodeAt(surrogate_aware_index);
     let lower;
-    if (upper >= 55296 && upper <= 56319 && surrogate_aware_index < this.str.length) {
-      lower = this.str.charCodeAt(surrogate_aware_index + 1);
+    if (upper >= 55296 && upper <= 56319 && surrogate_aware_index < this.#str.length) {
+      lower = this.#str.charCodeAt(surrogate_aware_index + 1);
       if (lower >= 56320 && lower <= 57343) {
         return (upper - 55296) * 1024 + lower - 56320 + 65536;
       }
@@ -771,13 +771,13 @@ class SurrogateAwareString {
     return upper;
   }
   toString() {
-    return this.str;
+    return this.#str;
   }
   add(other) {
-    return new SurrogateAwareString(this.str + other.str);
+    return new SurrogateAwareString(this.#str + other.#str);
   }
   append(str) {
-    return new SurrogateAwareString(this.str + str);
+    return new SurrogateAwareString(this.#str + str);
   }
   static isSurrogatePair(ch) {
     const utf16_code = ch.charCodeAt(0);
@@ -1598,5 +1598,5 @@ export {
   DictionaryBuilder_default as DictionaryBuilder
 };
 
-//# debugId=FF71F34F7A4B4B6064756E2164756E21
+//# debugId=18C0514930D6834E64756E2164756E21
 //# sourceMappingURL=index.js.map

@@ -1,6 +1,5 @@
 declare class SurrogateAwareString {
     #private;
-    str: string;
     length: number;
     /**
      * String wrapper for UTF-16 surrogate pair (4 bytes)

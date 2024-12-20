@@ -1,6 +1,9 @@
 declare class ByteBuffer {
-    buffer: Uint8Array;
-    position: number;
+    #private;
+    get buffer(): Uint8Array<ArrayBufferLike>;
+    set buffer(value: Uint8Array<ArrayBufferLike>);
+    get position(): number;
+    set position(value: number);
     constructor(arg?: number | Uint8Array);
     size(): number;
     reallocate(): void;

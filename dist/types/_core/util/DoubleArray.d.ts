@@ -2,9 +2,6 @@ type ArrayBuffer = Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Arra
 declare class BufferController {
     #private;
     constructor(initial_size?: number);
-    private initBase;
-    private initCheck;
-    private realloc;
     getBaseBuffer(): ArrayBuffer;
     getCheckBuffer(): ArrayBuffer;
     loadBaseBuffer(base_buffer: ArrayBuffer): this;
@@ -49,16 +46,6 @@ declare class DoubleArrayBuilder {
         k: string | Uint8Array;
         v: number;
     }[], sorted?: boolean): DoubleArray;
-    getChildrenInfo(position: number, start: number, length: number): Int32Array<globalThis.ArrayBuffer>;
-    setBufferController(parent_id: number, children_info: Int32Array, _base: number): void;
-    /**
-     * Find BASE value that all children are allocatable in double array's region
-     */
-    findAllocatableBase(children_info: Int32Array): number;
-    /**
-     * Check this double array index is unused or not
-     */
-    isUnusedNode(index: number): boolean;
 }
 /**
  * Factory method of double array
@@ -91,7 +78,6 @@ declare class DoubleArray {
         k: string;
         v: number;
     }[];
-    traverse(parent: number, code: number): number;
     size(): number;
     calc(): {
         all: number;
@@ -100,9 +86,9 @@ declare class DoubleArray {
     };
     dump(): string;
 }
-declare const doublearray: {
+export { DoubleArrayBuilder, DoubleArray };
+declare const _default: {
     builder: (initial_size?: number) => DoubleArrayBuilder;
     load: (base_buffer: ArrayBuffer, check_buffer: ArrayBuffer) => DoubleArray;
 };
-export { DoubleArrayBuilder, DoubleArray };
-export default doublearray;
+export default _default;
