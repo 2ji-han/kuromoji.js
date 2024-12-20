@@ -1,45 +1,12 @@
+import createTypedArray from "./CreateTypedArray";
+
 const TERM_CHAR = "\u0000"; // terminal character
 const TERM_CODE = 0; // terminal character code
 const ROOT_ID = 0; // index of root node
 const NOT_FOUND = -1; // traverse() returns if no nodes found
-const BASE_SIGNED = true;
-const CHECK_SIGNED = true;
-const BASE_BYTES = 4;
-const CHECK_BYTES = 4;
-const MEMORY_EXPAND_RATIO = 2;
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
-
-// Array utility functions
-const newArrayBuffer = (signed: boolean, bytes: number, size: number) => {
-    if (signed) {
-        switch (bytes) {
-            case 1:
-                return new Int8Array(size);
-            case 2:
-                return new Int16Array(size);
-            case 4:
-                return new Int32Array(size);
-            default:
-                throw new RangeError(`Invalid newArray parameter element_bytes:${bytes}`);
-        }
-    }
-    switch (bytes) {
-        case 1:
-            return new Uint8Array(size);
-        case 2:
-            return new Uint16Array(size);
-        case 4:
-            return new Uint32Array(size);
-        default:
-            throw new RangeError(`Invalid newArray parameter element_bytes:${bytes}`);
-    }
-};
-
-const arrayCopy = (src: Uint8Array, src_offset: number, length: number) => {
-    return src.slice(src_offset, src_offset + length);
-};
 
 type ArrayBuffer = Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array;
 
@@ -58,15 +25,15 @@ class BufferController {
         this.#first_unused_node = ROOT_ID + 1;
 
         this.#base = {
-            signed: BASE_SIGNED,
-            bytes: BASE_BYTES,
-            array: newArrayBuffer(BASE_SIGNED, BASE_BYTES, initial_size),
+            signed: true,
+            bytes: 4,
+            array: createTypedArray(true, 4, initial_size),
         };
 
         this.#check = {
-            signed: CHECK_SIGNED,
-            bytes: CHECK_BYTES,
-            array: newArrayBuffer(CHECK_SIGNED, CHECK_BYTES, initial_size),
+            signed: true,
+            bytes: 4,
+            array: createTypedArray(true, 4, initial_size),
         };
 
         // Initialize root node
@@ -74,11 +41,11 @@ class BufferController {
         this.#check.array[ROOT_ID] = ROOT_ID;
 
         // Initialize BASE and CHECK arrays
-        this.initBase(this.#base.array, ROOT_ID + 1, this.#base.array.length);
-        this.initCheck(this.#check.array, ROOT_ID + 1, this.#check.array.length);
+        this.#initBase(this.#base.array, ROOT_ID + 1, this.#base.array.length);
+        this.#initCheck(this.#check.array, ROOT_ID + 1, this.#check.array.length);
     }
 
-    private initBase(_base: ArrayBuffer, start: number, end: number) {
+    #initBase(_base: ArrayBuffer, start: number, end: number) {
         for (let i = start; i < end; i++) {
             _base[i] = -i + 1;
         }
@@ -91,21 +58,21 @@ class BufferController {
         }
     }
 
-    private initCheck(_check: ArrayBuffer, start: number, end: number) {
+    #initCheck(_check: ArrayBuffer, start: number, end: number) {
         for (let i = start; i < end; i++) {
             _check[i] = -i - 1;
         }
     }
 
-    private realloc(min_size: number) {
-        const new_size = min_size * MEMORY_EXPAND_RATIO;
-        const base_new_array = newArrayBuffer(this.#base.signed, this.#base.bytes, new_size);
-        this.initBase(base_new_array, this.#base.array.length, new_size);
+    #realloc(min_size: number) {
+        const new_size = min_size * 2;
+        const base_new_array = createTypedArray(this.#base.signed, this.#base.bytes, new_size);
+        this.#initBase(base_new_array, this.#base.array.length, new_size);
         base_new_array.set(this.#base.array);
         this.#base.array = base_new_array;
 
-        const check_new_array = newArrayBuffer(this.#check.signed, this.#check.bytes, new_size);
-        this.initCheck(check_new_array, this.#check.array.length, new_size);
+        const check_new_array = createTypedArray(this.#check.signed, this.#check.bytes, new_size);
+        this.#initCheck(check_new_array, this.#check.array.length, new_size);
         check_new_array.set(this.#check.array);
         this.#check.array = check_new_array;
     }
@@ -148,14 +115,14 @@ class BufferController {
 
     setBase(index: number, base_value: number) {
         if (this.#base.array.length - 1 < index) {
-            this.realloc(index);
+            this.#realloc(index);
         }
         this.#base.array[index] = base_value;
     }
 
     setCheck(index: number, check_value: number) {
         if (this.#check.array.length - 1 < index) {
-            this.realloc(index);
+            this.#realloc(index);
         }
         this.#check.array[index] = check_value;
     }
@@ -278,10 +245,10 @@ class DoubleArrayBuilder {
      * Append nodes to BASE and CHECK array recursively
      */
     #_build(parent_index: number, position: number, start: number, length: number) {
-        const children_info = this.getChildrenInfo(position, start, length);
-        const _base = this.findAllocatableBase(children_info);
+        const children_info = this.#getChildrenInfo(position, start, length);
+        const _base = this.#findAllocatableBase(children_info);
 
-        this.setBufferController(parent_index, children_info, _base);
+        this.#setBufferController(parent_index, children_info, _base);
 
         for (let i = 0; i < children_info.length; i = i + 3) {
             const child_code = children_info[i];
@@ -295,7 +262,7 @@ class DoubleArrayBuilder {
         }
     }
 
-    getChildrenInfo(position: number, start: number, length: number) {
+    #getChildrenInfo(position: number, start: number, length: number) {
         let current_char = this.#keys[start].k[position];
         let children_info = new Int32Array(length * 3);
         let i = 0;
@@ -321,7 +288,7 @@ class DoubleArrayBuilder {
         return children_info;
     }
 
-    setBufferController(parent_id: number, children_info: Int32Array, _base: number) {
+    #setBufferController(parent_id: number, children_info: Int32Array, _base: number) {
         const bufferController = this.#bufferController;
         bufferController.setBase(parent_id, _base); // Update BASE of parent node
         for (let i = 0; i < children_info.length; i = i + 3) {
@@ -376,7 +343,7 @@ class DoubleArrayBuilder {
     /**
      * Find BASE value that all children are allocatable in double array's region
      */
-    findAllocatableBase(children_info: Int32Array) {
+    #findAllocatableBase(children_info: Int32Array) {
         const bufferController = this.#bufferController;
 
         // Assertion: keys are sorted by byte order
@@ -413,7 +380,7 @@ class DoubleArrayBuilder {
                 const code = children_info[i];
                 const candidate_id = _base + code;
 
-                if (!this.isUnusedNode(candidate_id)) {
+                if (!this.#isUnusedNode(candidate_id)) {
                     // candidate_id is used node
                     // next
                     curr = -bufferController.getCheck(curr);
@@ -435,7 +402,7 @@ class DoubleArrayBuilder {
     /**
      * Check this double array index is unused or not
      */
-    isUnusedNode(index: number) {
+    #isUnusedNode(index: number) {
         const bufferController = this.#bufferController;
         const check = bufferController.getCheck(index);
 
@@ -483,7 +450,7 @@ class DoubleArray {
         for (let i = 0; i < buffer.length; i++) {
             const code = buffer[i];
 
-            child = this.traverse(parent, code);
+            child = this.#traverse(parent, code);
             if (child === NOT_FOUND) {
                 return false;
             }
@@ -512,7 +479,7 @@ class DoubleArray {
         let child = NOT_FOUND;
         for (let i = 0; i < buffer.length; i++) {
             const code = buffer[i];
-            child = this.traverse(parent, code);
+            child = this.#traverse(parent, code);
             if (child === NOT_FOUND) {
                 return NOT_FOUND;
             }
@@ -541,11 +508,11 @@ class DoubleArray {
         let child = NOT_FOUND;
         for (let i = 0; i < buffer.length; i++) {
             const code = buffer[i];
-            child = this.traverse(parent, code);
+            child = this.#traverse(parent, code);
             if (child !== NOT_FOUND) {
                 parent = child;
                 // look forward by terminal character code to check this node is a leaf or not
-                const grand_child = this.traverse(child, TERM_CODE);
+                const grand_child = this.#traverse(child, TERM_CODE);
                 if (grand_child !== NOT_FOUND) {
                     const base = this.#bufferController.getBase(grand_child);
                     const r: { k: string; v: number } = {
@@ -558,7 +525,7 @@ class DoubleArray {
                         r.v = -base - 1;
                     }
                     // If child is a leaf node, add word to result
-                    r.k = decoder.decode(arrayCopy(buffer, 0, i + 1));
+                    r.k = decoder.decode(buffer.slice(0, i + 1));
                     result.push(r);
                 }
                 continue;
@@ -568,7 +535,7 @@ class DoubleArray {
         return result;
     }
 
-    traverse(parent: number, code: number) {
+    #traverse(parent: number, code: number) {
         const child = this.#bufferController.getBase(parent) + code;
         if (this.#bufferController.getCheck(child) === parent) {
             return child;
@@ -589,7 +556,9 @@ class DoubleArray {
     }
 }
 
-const doublearray = {
+export { DoubleArrayBuilder, DoubleArray };
+
+export default {
     builder: (initial_size = 1024) => {
         return new DoubleArrayBuilder(initial_size);
     },
@@ -600,7 +569,3 @@ const doublearray = {
         return new DoubleArray(bufferController);
     },
 };
-
-export { DoubleArrayBuilder, DoubleArray };
-
-export default doublearray;
