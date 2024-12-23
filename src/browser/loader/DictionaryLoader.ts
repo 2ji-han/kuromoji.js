@@ -11,12 +11,8 @@ class DictionaryLoader {
 
     async #decompress(buffer: ArrayBuffer): Promise<ArrayBuffer> {
         const decompressionStream = new DecompressionStream("gzip");
-        const decompressedStream = new Blob([buffer])
-            .stream()
-            .pipeThrough(decompressionStream);
-        const decompressedBuffer = await new Response(
-            decompressedStream
-        ).arrayBuffer();
+        const decompressedStream = new Blob([buffer]).stream().pipeThrough(decompressionStream);
+        const decompressedBuffer = await new Response(decompressedStream).arrayBuffer();
         return decompressedBuffer;
     }
 
@@ -52,16 +48,11 @@ class DictionaryLoader {
                 "unk_char.dat.gz",
                 "unk_compat.dat.gz",
                 "unk_invoke.dat.gz",
-            ].map((filename) =>
-                this.#loadArrayBuffer(path.join(this.#dic_path, filename))
-            )
+            ].map((filename) => this.#loadArrayBuffer(path.join(this.#dic_path, filename)))
         )
             .then((buffers) => {
                 // Trie
-                this.#dic.loadTrie(
-                    new Int32Array(buffers[0]),
-                    new Int32Array(buffers[1])
-                );
+                this.#dic.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
                 // Token info dictionaries
                 this.#dic.loadTokenInfoDictionaries(
                     new Uint8Array(buffers[2]),
