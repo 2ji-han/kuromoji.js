@@ -1525,10 +1525,8 @@ import { existsSync, readFileSync } from "fs";
 import path from "path";
 import zlib from "zlib";
 class DictionaryLoader {
-  #dic;
   #dic_path;
   constructor(dic_path = "dict/") {
-    this.#dic = new DynamicDictionaries_default;
     this.#dic_path = dic_path;
   }
   #loadArrayBuffer = (file) => new Promise((resolve, reject) => {
@@ -1543,6 +1541,7 @@ class DictionaryLoader {
     });
   });
   load(callback) {
+    const dictionaries = new DynamicDictionaries_default;
     Promise.all([
       "base.dat.gz",
       "check.dat.gz",
@@ -1557,13 +1556,13 @@ class DictionaryLoader {
       "unk_compat.dat.gz",
       "unk_invoke.dat.gz"
     ].map((filename) => this.#loadArrayBuffer(path.join(this.#dic_path, filename)))).then((buffers) => {
-      this.#dic.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
-      this.#dic.loadTokenInfoDictionaries(new Uint8Array(buffers[2]), new Uint8Array(buffers[3]), new Uint8Array(buffers[4]));
-      this.#dic.loadConnectionCosts(new Int16Array(buffers[5]));
-      this.#dic.loadUnknownDictionaries(new Uint8Array(buffers[6]), new Uint8Array(buffers[7]), new Uint8Array(buffers[8]), new Uint8Array(buffers[9]), new Uint32Array(buffers[10]), new Uint8Array(buffers[11]));
-      callback(null, this.#dic);
+      dictionaries.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
+      dictionaries.loadTokenInfoDictionaries(new Uint8Array(buffers[2]), new Uint8Array(buffers[3]), new Uint8Array(buffers[4]));
+      dictionaries.loadConnectionCosts(new Int16Array(buffers[5]));
+      dictionaries.loadUnknownDictionaries(new Uint8Array(buffers[6]), new Uint8Array(buffers[7]), new Uint8Array(buffers[8]), new Uint8Array(buffers[9]), new Uint32Array(buffers[10]), new Uint8Array(buffers[11]));
+      callback(null, dictionaries);
     }).catch((error) => {
-      callback(error, this.#dic);
+      callback(error, dictionaries);
     });
   }
 }
@@ -1598,5 +1597,5 @@ export {
   DictionaryBuilder_default as DictionaryBuilder
 };
 
-//# debugId=18C0514930D6834E64756E2164756E21
+//# debugId=22A416457875D28964756E2164756E21
 //# sourceMappingURL=index.js.map

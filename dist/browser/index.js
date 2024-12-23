@@ -1728,27 +1728,22 @@ var q = g;
 
 // src/browser/loader/DictionaryLoader.ts
 class DictionaryLoader {
-  #dic;
   #dic_path;
   constructor(dic_path = "dict/") {
-    this.#dic = new DynamicDictionaries_default;
     this.#dic_path = dic_path;
-  }
-  async#decompress(buffer) {
-    const decompressionStream = new DecompressionStream("gzip");
-    const decompressedStream = new Blob([buffer]).stream().pipeThrough(decompressionStream);
-    const decompressedBuffer = await new Response(decompressedStream).arrayBuffer();
-    return decompressedBuffer;
   }
   #loadArrayBuffer = (url) => new Promise((resolve, reject) => {
     fetch(url).then(async (res) => await res.arrayBuffer()).then(async (buffer) => {
-      const resultBuffer = await this.#decompress(buffer);
-      resolve(resultBuffer);
+      const decompressionStream = new DecompressionStream("gzip");
+      const decompressedStream = new Blob([buffer]).stream().pipeThrough(decompressionStream);
+      const decompressedBuffer = await new Response(decompressedStream).arrayBuffer();
+      resolve(decompressedBuffer);
     }).catch((err) => {
       reject(err);
     });
   });
   load(callback) {
+    const dictionaries = new DynamicDictionaries_default;
     Promise.all([
       "base.dat.gz",
       "check.dat.gz",
@@ -1763,13 +1758,13 @@ class DictionaryLoader {
       "unk_compat.dat.gz",
       "unk_invoke.dat.gz"
     ].map((filename) => this.#loadArrayBuffer(q.join(this.#dic_path, filename)))).then((buffers) => {
-      this.#dic.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
-      this.#dic.loadTokenInfoDictionaries(new Uint8Array(buffers[2]), new Uint8Array(buffers[3]), new Uint8Array(buffers[4]));
-      this.#dic.loadConnectionCosts(new Int16Array(buffers[5]));
-      this.#dic.loadUnknownDictionaries(new Uint8Array(buffers[6]), new Uint8Array(buffers[7]), new Uint8Array(buffers[8]), new Uint8Array(buffers[9]), new Uint32Array(buffers[10]), new Uint8Array(buffers[11]));
-      callback(null, this.#dic);
+      dictionaries.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
+      dictionaries.loadTokenInfoDictionaries(new Uint8Array(buffers[2]), new Uint8Array(buffers[3]), new Uint8Array(buffers[4]));
+      dictionaries.loadConnectionCosts(new Int16Array(buffers[5]));
+      dictionaries.loadUnknownDictionaries(new Uint8Array(buffers[6]), new Uint8Array(buffers[7]), new Uint8Array(buffers[8]), new Uint8Array(buffers[9]), new Uint32Array(buffers[10]), new Uint8Array(buffers[11]));
+      callback(null, dictionaries);
     }).catch((error) => {
-      callback(error, this.#dic);
+      callback(error, dictionaries);
     });
   }
 }
@@ -1804,5 +1799,5 @@ export {
   DictionaryBuilder_default as DictionaryBuilder
 };
 
-//# debugId=1BA9FDB64BABB10964756E2164756E21
+//# debugId=EBEE0B21400B112E64756E2164756E21
 //# sourceMappingURL=index.js.map
