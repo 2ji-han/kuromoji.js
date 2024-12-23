@@ -4,10 +4,8 @@ import zlib from "node:zlib";
 import DynamicDictionaries from "../../_core/dict/DynamicDictionaries";
 
 class DictionaryLoader {
-    #dic: DynamicDictionaries;
     #dic_path: string;
     constructor(dic_path = "dict/") {
-        this.#dic = new DynamicDictionaries();
         this.#dic_path = dic_path;
     }
 
@@ -24,6 +22,7 @@ class DictionaryLoader {
 
     load = () =>
         new Promise<DynamicDictionaries>((resolve, reject) => {
+            const dictionaries = new DynamicDictionaries();
             Promise.all(
                 [
                     // Trie
@@ -46,17 +45,17 @@ class DictionaryLoader {
             )
                 .then((buffers) => {
                     // Trie
-                    this.#dic.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
+                    dictionaries.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
                     // Token info dictionaries
-                    this.#dic.loadTokenInfoDictionaries(
+                    dictionaries.loadTokenInfoDictionaries(
                         new Uint8Array(buffers[2]),
                         new Uint8Array(buffers[3]),
                         new Uint8Array(buffers[4])
                     );
                     // Connection cost matrix
-                    this.#dic.loadConnectionCosts(new Int16Array(buffers[5]));
+                    dictionaries.loadConnectionCosts(new Int16Array(buffers[5]));
                     // Unknown dictionaries
-                    this.#dic.loadUnknownDictionaries(
+                    dictionaries.loadUnknownDictionaries(
                         new Uint8Array(buffers[6]),
                         new Uint8Array(buffers[7]),
                         new Uint8Array(buffers[8]),
@@ -65,7 +64,7 @@ class DictionaryLoader {
                         new Uint8Array(buffers[11])
                     );
                     //// this.#dic.loadUnknownDictionaries(char_buffer, unk_buffer);
-                    resolve(this.#dic);
+                    resolve(dictionaries);
                 })
                 .catch((error) => {
                     reject(error);
