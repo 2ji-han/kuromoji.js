@@ -24,14 +24,6 @@
                 display: none;
             }
 
-            .title {
-                width: 70%;
-                font-size: 30px;
-                text-align: left;
-                margin: 0 auto;
-                cursor: default;
-            }
-
             .active {
                 display: block;
             }
@@ -72,14 +64,61 @@
                 padding-bottom: 5px;
                 cursor: default;
             }
+
+            .header {
+                display: flex;
+                margin-top: 15px;
+                width: 70%;
+                margin: 0 auto;
+                cursor: default;
+            }
+
+            .title {
+                font-size: 30px;
+                cursor: default;
+            }
+
+            .buildTime {
+                margin-left: auto;
+                margin-right: 10px;
+                font-size: 15px;
+                vertical-align: bottom;
+                display: flex;
+                align-items: flex-end;
+            }
+
+            .buildTime div {
+                display: inline;
+            }
+
+            .tokenizeTime {
+                font-size: 15px;
+                vertical-align: bottom;
+                display: flex;
+                align-items: flex-end;
+            }
+
+            .tokenizeTime div {
+                display: inline;
+            }
         </style>
     </head>
     <body>
-        <div class="loading active">
-            Loading
-        </div>
+        <div class="loading active">Loading</div>
         <div class="demo">
-            <div class="title">Kuromoji.js demo</div>
+            <div class="header">
+                <div class="title">Kuromoji.js demo</div>
+                <div class="buildTime">
+                    build:
+                    <div id="buildTime"></div>
+                    ms
+                </div>
+                <div class="tokenizeTime">
+                    tokenize:
+                    <div id="tokenizeTime"></div>
+                    ms
+                </div>
+            </div>
             <input
                 type="text"
                 value="すもももももももものうち"
@@ -109,12 +148,19 @@
 
             let tokenizer = null;
 
-            kuromoji.builder({ dicPath: "/kuromoji.js/dict" }).build((err, _tokenizer) => {
-                tokenizer = _tokenizer;
-                document.querySelector(".loading").classList.remove("active");
-                document.querySelector(".demo").classList.add("active");
-                tokenize();
-            });
+            const buildTime = Date.now();
+            kuromoji
+                .builder({ dicPath: "/kuromoji.js/dict" })
+                .build((err, _tokenizer) => {
+                    document.getElementById("buildTime").textContent =
+                        Date.now() - buildTime;
+                    tokenizer = _tokenizer;
+                    document
+                        .querySelector(".loading")
+                        .classList.remove("active");
+                    document.querySelector(".demo").classList.add("active");
+                    tokenize();
+                });
 
             const fields = [
                 "surface_form",
@@ -132,7 +178,10 @@
             const tokenize = () => {
                 if (tokenizer == null) return;
                 const text = document.getElementById("text").value;
+                const tokenizeTime = Date.now();
                 const tokens = tokenizer.tokenize(text);
+                document.getElementById("tokenizeTime").textContent =
+                    Date.now() - tokenizeTime;
                 const el = document.getElementById("tokens");
                 el.innerHTML = "";
                 for (const token of tokens) {
