@@ -18,7 +18,7 @@
 - [x] テストを100%にする :partying_face:
 - [x] asyncライブラリからpromise/awaitへ書き換え :partying_face:
 - [x] ブラウザへの対応 :partying_face:
-- [ ] init関数を非同期にする(eg. `await kuromoji.builder()`)
+- [x] init関数を非同期にする(eg. `await kuromoji.builder()`) :partying_face:
 - [ ] Streamを実装する
 - [ ] kuromoji-serverを実装する
 - [ ] ユーザー辞書を実装する
@@ -72,6 +72,16 @@ kuromoji.builder({ dicPath: "dict/" }).build((err, tokenizer) => {
     const path = tokenizer.tokenize("すもももももももものうち");
     console.log(path);
 });
+```
+
+トップレベルawaitを用いたロードもサポートされるようになりました！
+```typescript
+import kuromoji from "../src/promise/kuromoji";
+
+const tokenizer = await kuromoji.builder({ dicPath: "path/to/dictionary/dir/" }).build();
+
+const path = tokenizer.tokenize("すもももももももものうち");
+console.log(path.length);
 ```
 
 ## API

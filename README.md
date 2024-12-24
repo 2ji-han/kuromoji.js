@@ -18,7 +18,7 @@ Once again, I would like to thank you!
 - [x] Tests Pass 100% :partying_face:
 - [x] async to promise/await :partying_face:
 - [x] Support and build for browser :partying_face:
-- [ ] Asynchronization of init functions(eg. `await kuromoji.builder()`)
+- [x] Asynchronization of init functions(eg. `await kuromoji.builder()`) :partying_face:
 - [ ] Support Stream
 - [ ] kuromoji-server
 - [ ] Support user dictionary
@@ -69,6 +69,17 @@ kuromoji.builder({ dicPath: "path/to/dictionary/dir/" }).build((err, tokenizer) 
     const path = tokenizer.tokenize("すもももももももものうち");
     console.log(path);
 });
+```
+
+Also, Loading with top-level await is also supported as follows
+
+```typescript
+import kuromoji from "../src/promise/kuromoji";
+
+const tokenizer = await kuromoji.builder({ dicPath: "path/to/dictionary/dir/" }).build();
+
+const path = tokenizer.tokenize("すもももももももものうち");
+console.log(path.length);
 ```
 
 ## API
