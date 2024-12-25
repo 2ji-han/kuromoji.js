@@ -1520,21 +1520,24 @@ class Tokenizer {
 }
 var Tokenizer_default = Tokenizer;
 
-// src/browser/loader/DictionaryLoader.ts
+// src/kuromoji.js/loader/DictionaryLoader.ts
+import { existsSync, readFileSync } from "fs";
 import path from "path";
+import zlib from "zlib";
 class DictionaryLoader {
   #dic_path;
   constructor(dic_path = "dict/") {
     this.#dic_path = dic_path;
   }
-  #loadArrayBuffer = (url) => new Promise((resolve, reject) => {
-    fetch(url).then(async (res) => await res.arrayBuffer()).then(async (buffer) => {
-      const decompressionStream = new DecompressionStream("gzip");
-      const decompressedStream = new Blob([buffer]).stream().pipeThrough(decompressionStream);
-      const decompressedBuffer = await new Response(decompressedStream).arrayBuffer();
-      resolve(decompressedBuffer);
-    }).catch((err) => {
-      reject(err);
+  #loadArrayBuffer = (file) => new Promise((resolve, reject) => {
+    if (!existsSync(file))
+      return reject(new Error(`${file} does not exist`));
+    const buffer = readFileSync(file);
+    zlib.gunzip(new Uint8Array(buffer), (err, binary) => {
+      if (err)
+        return reject(err);
+      const typed_array = new Uint8Array(binary);
+      resolve(typed_array.buffer);
     });
   });
   load(callback) {
@@ -1565,7 +1568,7 @@ class DictionaryLoader {
 }
 var DictionaryLoader_default = DictionaryLoader;
 
-// src/browser/TokenizerBuilder.ts
+// src/kuromoji.js/TokenizerBuilder.ts
 class TokenizerBuilder {
   #loader;
   constructor(option = {}) {
@@ -1579,7 +1582,7 @@ class TokenizerBuilder {
 }
 var TokenizerBuilder_default = TokenizerBuilder;
 
-// src/browser/kuromoji.ts
+// src/kuromoji.js/kuromoji.ts
 var kuromoji_default = {
   builder: (option = {}) => {
     return new TokenizerBuilder_default(option);
@@ -1594,5 +1597,5 @@ export {
   DictionaryBuilder_default as DictionaryBuilder
 };
 
-//# debugId=97E326DC8C72B8AC64756E2164756E21
+//# debugId=71E57EC6C2FB378464756E2164756E21
 //# sourceMappingURL=index.js.map

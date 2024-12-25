@@ -1,4 +1,53 @@
-// @bun
+var __create = Object.create;
+var __getProtoOf = Object.getPrototypeOf;
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __toESM = (mod, isNodeMode, target) => {
+  target = mod != null ? __create(__getProtoOf(mod)) : {};
+  const to = isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target;
+  for (let key of __getOwnPropNames(mod))
+    if (!__hasOwnProp.call(to, key))
+      __defProp(to, key, {
+        get: () => mod[key],
+        enumerable: true
+      });
+  return to;
+};
+var __moduleCache = /* @__PURE__ */ new WeakMap;
+var __toCommonJS = (from) => {
+  var entry = __moduleCache.get(from), desc;
+  if (entry)
+    return entry;
+  entry = __defProp({}, "__esModule", { value: true });
+  if (from && typeof from === "object" || typeof from === "function")
+    __getOwnPropNames(from).map((key) => !__hasOwnProp.call(entry, key) && __defProp(entry, key, {
+      get: () => from[key],
+      enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+    }));
+  __moduleCache.set(from, entry);
+  return entry;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, {
+      get: all[name],
+      enumerable: true,
+      configurable: true,
+      set: (newValue) => all[name] = () => newValue
+    });
+};
+
+// src/promise/kuromoji.ts
+var exports_kuromoji = {};
+__export(exports_kuromoji, {
+  default: () => kuromoji_default,
+  TokenizerBuilder: () => TokenizerBuilder_default,
+  DictionaryBuilder: () => DictionaryBuilder_default
+});
+module.exports = __toCommonJS(exports_kuromoji);
+
 // src/_core/util/CreateTypedArray.ts
 var CreateTypedArray_default = (signed, bytes, size) => {
   if (signed) {
@@ -1479,7 +1528,7 @@ class Tokenizer {
     this.#formatter = new IpadicFormatter_default;
   }
   static splitByPunctuation(input) {
-    const matches = input.matchAll(/\u3001|\u3002/g);
+    const matches = input.matchAll(/、|。/g);
     const sentences = [];
     let lastIndex = 0;
     for (const match of matches) {
@@ -1520,24 +1569,27 @@ class Tokenizer {
 }
 var Tokenizer_default = Tokenizer;
 
-// src/browser/loader/DictionaryLoader.ts
-import path from "path";
+// src/promise/loader/DictionaryLoader.ts
+var import_node_fs = require("node:fs");
+var import_node_path = __toESM(require("node:path"));
+var import_node_zlib = __toESM(require("node:zlib"));
 class DictionaryLoader {
   #dic_path;
   constructor(dic_path = "dict/") {
     this.#dic_path = dic_path;
   }
-  #loadArrayBuffer = (url) => new Promise((resolve, reject) => {
-    fetch(url).then(async (res) => await res.arrayBuffer()).then(async (buffer) => {
-      const decompressionStream = new DecompressionStream("gzip");
-      const decompressedStream = new Blob([buffer]).stream().pipeThrough(decompressionStream);
-      const decompressedBuffer = await new Response(decompressedStream).arrayBuffer();
-      resolve(decompressedBuffer);
-    }).catch((err) => {
-      reject(err);
+  #loadArrayBuffer = (file) => new Promise((resolve, reject) => {
+    if (!import_node_fs.existsSync(file))
+      return reject(new Error(`${file} does not exist`));
+    const buffer = import_node_fs.readFileSync(file);
+    import_node_zlib.default.gunzip(new Uint8Array(buffer), (err, binary) => {
+      if (err)
+        return reject(err);
+      const typed_array = new Uint8Array(binary);
+      resolve(typed_array.buffer);
     });
   });
-  load(callback) {
+  load = () => new Promise((resolve, reject) => {
     const dictionaries = new DynamicDictionaries_default;
     Promise.all([
       "base.dat.gz",
@@ -1552,34 +1604,33 @@ class DictionaryLoader {
       "unk_char.dat.gz",
       "unk_compat.dat.gz",
       "unk_invoke.dat.gz"
-    ].map((filename) => this.#loadArrayBuffer(path.join(this.#dic_path, filename)))).then((buffers) => {
+    ].map((filename) => this.#loadArrayBuffer(import_node_path.default.join(this.#dic_path, filename)))).then((buffers) => {
       dictionaries.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
       dictionaries.loadTokenInfoDictionaries(new Uint8Array(buffers[2]), new Uint8Array(buffers[3]), new Uint8Array(buffers[4]));
       dictionaries.loadConnectionCosts(new Int16Array(buffers[5]));
       dictionaries.loadUnknownDictionaries(new Uint8Array(buffers[6]), new Uint8Array(buffers[7]), new Uint8Array(buffers[8]), new Uint8Array(buffers[9]), new Uint32Array(buffers[10]), new Uint8Array(buffers[11]));
-      callback(null, dictionaries);
+      resolve(dictionaries);
     }).catch((error) => {
-      callback(error, dictionaries);
+      reject(error);
     });
-  }
+  });
 }
 var DictionaryLoader_default = DictionaryLoader;
 
-// src/browser/TokenizerBuilder.ts
+// src/promise/TokenizerBuilder.ts
 class TokenizerBuilder {
   #loader;
   constructor(option = {}) {
     this.#loader = new DictionaryLoader_default(option.dicPath);
   }
-  build(callback) {
-    this.#loader.load((err, dic) => {
-      callback(err, new Tokenizer_default(dic));
-    });
+  async build() {
+    const dictionary = await this.#loader.load();
+    return new Tokenizer_default(dictionary);
   }
 }
 var TokenizerBuilder_default = TokenizerBuilder;
 
-// src/browser/kuromoji.ts
+// src/promise/kuromoji.ts
 var kuromoji_default = {
   builder: (option = {}) => {
     return new TokenizerBuilder_default(option);
@@ -1588,11 +1639,6 @@ var kuromoji_default = {
     return new DictionaryBuilder_default;
   }
 };
-export {
-  kuromoji_default as default,
-  TokenizerBuilder_default as TokenizerBuilder,
-  DictionaryBuilder_default as DictionaryBuilder
-};
 
-//# debugId=97E326DC8C72B8AC64756E2164756E21
+//# debugId=7500A1F15E6506FA64756E2164756E21
 //# sourceMappingURL=index.js.map
