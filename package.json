@@ -3,8 +3,8 @@
     "version": "0.1.3",
     "author": "f1w3",
     "type": "module",
-    "main": "dist/cjs/index.min.cjs",
-    "module": "dist/index.min.js",
+    "main": "dist/kuromoji.js/cjs/index.min.cjs",
+    "module": "dist/kuromoji.js/index.min.js",
     "types": "./dist/types/kuromoji.js/kuromoji.d.ts",
     "files": [
         "dist"
@@ -12,18 +12,18 @@
     "exports": {
         ".": {
             "types": "./dist/types/kuromoji.js/kuromoji.d.ts",
-            "import": "./dist/index.min.js",
-            "require": "./dist/cjs/index.min.cjs"
+            "import": "./dist/kuromoji.js/index.min.js",
+            "require": "./dist/kuromoji.js/cjs/index.min.js"
         },
         "./browser": {
             "types": "./dist/types/browser/kuromoji.d.ts",
             "import": "./dist/browser/index.min.js",
-            "require": "./dist/browser/index.min.js"
+            "require": "./dist/browser/cjs/index.min.js"
         },
         "./promise": {
             "types": "./dist/types/promise/kuromoji.d.ts",
             "import": "./dist/promise/index.min.js",
-            "require": "./dist/promise/index.min.js"
+            "require": "./dist/promise/cjs/index.min.js"
         }
     },
     "devDependencies": {

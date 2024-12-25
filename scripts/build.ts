@@ -14,26 +14,11 @@ for await (const file of glob.scan({ cwd: "./src" })) {
         entrypoints: [basefile],
         outdir: OUTDIR,
         target: "bun",
-        naming: `[dir]/${path.dir}/index.js`,
-        sourcemap: "linked",
-    });
-    Bun.build({
-        entrypoints: [basefile],
-        outdir: OUTDIR,
-        target: "bun",
         naming: `[dir]/${path.dir}/index.min.js`,
         minify: true,
         sourcemap: "linked",
     });
 
-    Bun.build({
-        entrypoints: [basefile],
-        outdir: OUTDIR,
-        target: "node",
-        format: "cjs",
-        naming: `[dir]/${path.dir}/cjs/index.js`,
-        sourcemap: "linked",
-    });
     Bun.build({
         entrypoints: [basefile],
         outdir: OUTDIR,
