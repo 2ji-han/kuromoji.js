@@ -3,7 +3,7 @@ import { parse, join } from "node:path";
 
 const OUTDIR = "./dist";
 
-await $`bun tsc -P tsconfig.types.json`;
+await $`bunx tsc -P tsconfig.types.json`;
 
 const glob = new Glob("**/kuromoji.ts");
 
