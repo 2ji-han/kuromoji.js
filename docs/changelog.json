@@ -1,4 +1,12 @@
 {
+    "0.1.4": {
+        "date": "2024-12-28",
+        "messages": {
+            "Bug Fixes": [
+                "fix files path in package.json"
+            ]
+        }
+    },
     "0.1.3": {
         "date": "2024-12-15",
         "messages": {
