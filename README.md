@@ -47,24 +47,24 @@ Directory tree is as follows:
 
 Install with package manager:
 ```
-npm install f1w3/kuromoji.js
-pnpm install f1w3/kuromoji.js
-bun install f1w3/kuromoji.js
+npm install kuromoji.js
+pnpm install kuromoji.js
+bun install kuromoji.js
 ```
 
 Load this library as follows:
 ```typescript
-import kuromoji from "@f1w3/kuromoji.js";
-const kuromoji = require("@f1w3/kuromoji.js").default;
+import kuromoji from "kuromoji.js";
+const kuromoji = require("kuromoji.js").default;
 ```
 
 You can tokenize sentences with only 5 lines of code.
 If you need working examples, you can see the files under the demo or example directory.
 
 ```typescript
-import kuromoji from "@f1w3/kuromoji.js";
+import kuromoji from "kuromoji.js";
 
-kuromoji.builder({ dicPath: "path/to/dictionary/dir/" }).build((err, tokenizer) => {
+kuromoji.builder({ dicPath: "./node_modules/kuromoji.js/dict" }).build((err, tokenizer) => {
     // tokenizer is ready
     const path = tokenizer.tokenize("すもももももももものうち");
     console.log(path);
@@ -74,9 +74,9 @@ kuromoji.builder({ dicPath: "path/to/dictionary/dir/" }).build((err, tokenizer) 
 Also, Loading with top-level await is also supported as follows
 
 ```typescript
-import kuromoji from "../src/promise/kuromoji";
+import kuromoji from "kuromoji.js/promise";
 
-const tokenizer = await kuromoji.builder({ dicPath: "path/to/dictionary/dir/" }).build();
+const tokenizer = await kuromoji.builder({ dicPath: "./node_modules/kuromoji.js/dict" }).build();
 
 const path = tokenizer.tokenize("すもももももももものうち");
 console.log(path.length);

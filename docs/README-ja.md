@@ -48,16 +48,15 @@ kuromoji.jsがどのように動くかは[オンラインデモ](https://coco-ly
 
 インストールには以下のいずれかのコマンドを使用できます。
 ```
-npm install f1w3/kuromoji.js
-pnpm install f1w3/kuromoji.js
-bun install f1w3/kuromoji.js
+npm install kuromoji.js
+pnpm install kuromoji.js
+bun install kuromoji.js
 ```
 
 以下のコードのようにファイルを読み込んでください
 ```typescript
-import kuromoji from "@f1w3/kuromoji.js";
-
-const kuromoji = require("@f1w3/kuromoji.js").default;
+import kuromoji from "kuromoji.js";
+const kuromoji = require("kuromoji.js").default;
 ```
 
 わずか5行のコードで文章をトークン化できます。
@@ -65,9 +64,9 @@ const kuromoji = require("@f1w3/kuromoji.js").default;
 もっと動作例が必要な場合は、[exampleディレクトリ](/example/)の下のファイルを参照してください。
 
 ```typescript
-import kuromoji from "@f1w3/kuromoji.js";
+import kuromoji from "kuromoji.js";
 
-kuromoji.builder({ dicPath: "dict/" }).build((err, tokenizer) => {
+kuromoji.builder({ dicPath: "./node_modules/kuromoji.js/dict" }).build((err, tokenizer) => {
     // tokenizer is ready
     const path = tokenizer.tokenize("すもももももももものうち");
     console.log(path);
@@ -76,9 +75,9 @@ kuromoji.builder({ dicPath: "dict/" }).build((err, tokenizer) => {
 
 トップレベルawaitを用いたロードもサポートされるようになりました！
 ```typescript
-import kuromoji from "../src/promise/kuromoji";
+import kuromoji from "kuromoji.js/promise";
 
-const tokenizer = await kuromoji.builder({ dicPath: "path/to/dictionary/dir/" }).build();
+const tokenizer = await kuromoji.builder({ dicPath: "./node_modules/kuromoji.js/dict" }).build();
 
 const path = tokenizer.tokenize("すもももももももものうち");
 console.log(path.length);
