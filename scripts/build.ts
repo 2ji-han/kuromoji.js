@@ -4,15 +4,13 @@ import { parse, join } from "node:path";
 import { stat, readdir, writeFile, exists } from "node:fs/promises";
 
 const OUTDIR = "./dist";
-const HASH_PATH = join(process.cwd(), 'scripts', '_hashes.json');
+const HASH_PATH = join(process.cwd(), "scripts", "_hashes.json");
 
 const isExists = await exists(HASH_PATH);
 
-if (!isExists) {
-    writeFile(HASH_PATH, "{}");
-}
-
-const hashes = await Bun.file(HASH_PATH).json() as Record<string, string>; 
+const hashes = isExists
+    ? ((await Bun.file(HASH_PATH).json()) as Record<string, string>)
+    : {};
 
 const computeDirHash = async (dir: string) => {
     const hash = createHash("md5");
@@ -65,6 +63,5 @@ for await (const file of glob.scan({ cwd: "./src" })) {
     });
     await writeFile(HASH_PATH, JSON.stringify(hashes, null, 4));
 }
-
 
 await $`bunx tsc -P tsconfig.types.json`;
