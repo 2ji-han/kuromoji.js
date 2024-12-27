@@ -43,7 +43,7 @@ jobs:
       - name: Check for changes in dist
         id: changes
         run: |
-          git add ./dist
+          git add -f ./dist
           if git diff --cached --quiet; then
             echo "no_changes=true" >> $GITHUB_ENV
           else
