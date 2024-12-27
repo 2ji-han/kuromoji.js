@@ -1,10 +1,16 @@
 import { Glob, $ } from "bun";
 import { createHash } from "node:crypto";
 import { parse, join } from "node:path";
-import { stat, readdir, writeFile } from "node:fs/promises";
+import { stat, readdir, writeFile, exists } from "node:fs/promises";
 
 const OUTDIR = "./dist";
-const HASH_PATH = join(process.cwd(), OUTDIR, '_hashes.json');
+const HASH_PATH = join(process.cwd(), 'scripts', '_hashes.json');
+
+const isExists = await exists(HASH_PATH);
+
+if (!isExists) {
+    writeFile(HASH_PATH, "{}");
+}
 
 const hashes = await Bun.file(HASH_PATH).json() as Record<string, string>; 
 
@@ -39,7 +45,6 @@ for await (const file of glob.scan({ cwd: "./src" })) {
     if (hash === lastHash) {
         continue;
     }
-    console.log("Building: ", basedir);
     hashes[basedir] = hash;
     Bun.build({
         entrypoints: [basefile],
