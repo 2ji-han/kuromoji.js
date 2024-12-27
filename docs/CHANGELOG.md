@@ -1,5 +1,12 @@
 # automatically generated file
 
+<a name="0.1.4"></a>
+## [0.1.4](https://github.com/takuyaa/kuromoji.js/compare/0.1.3...0.1.4) (2024-12-28)
+
+### Bug Fixes
+
+* fix files path in package.json
+
 <a name="0.1.3"></a>
 ## [0.1.3](https://github.com/takuyaa/kuromoji.js/compare/0.1.2...0.1.3) (2024-12-15)
 
