@@ -36,5 +36,4 @@ publish
 
 # Others
 .DS_Store
-dist/
 docs/CHANGELOG.md

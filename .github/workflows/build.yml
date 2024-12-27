@@ -40,17 +40,7 @@ jobs:
       - name: Build project
         run: bun run build
 
-      - name: Check for changes in dist
-        id: changes
-        run: |
-          git add -f ./dist
-          if git diff --cached --quiet; then
-            echo "no_changes=true" >> $GITHUB_ENV
-          else
-            echo "no_changes=false" >> $GITHUB_ENV
-
       - name: Push to GitHub
-        if: env.no_changes == 'false'
         uses: EndBug/add-and-commit@v9.1.1
         with:
           add: '-f ./dist'

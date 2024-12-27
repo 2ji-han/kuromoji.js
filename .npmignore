@@ -3,3 +3,10 @@ docs/
 example/
 node_modules/
 scripts/
+src/
+biome.json
+bun.lockb
+NOTICE.md
+README.md
+tsconfig.json
+tsconfig.types.json
