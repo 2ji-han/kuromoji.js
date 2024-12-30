@@ -1,5 +1,16 @@
 # automatically generated file
 
+<a name="0.1.5"></a>
+## [0.1.5](https://github.com/takuyaa/kuromoji.js/compare/0.1.4...0.1.5) (2024-12-30)
+
+### Bug Fixes
+
+* fix browserify build error
+
+### Miscellaneous
+
+* Support string, undefined and null as input of tokenizer.tokenize()
+
 <a name="0.1.4"></a>
 ## [0.1.4](https://github.com/takuyaa/kuromoji.js/compare/0.1.3...0.1.4) (2024-12-28)
 
