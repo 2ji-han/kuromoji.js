@@ -20,23 +20,19 @@ class Tokenizer {
         this.#formatter = new IpadicFormatter(); // TODO Other dictionaries
     }
 
-    static splitByPunctuation(input: string): string[] {
-        const matches = input.matchAll(/、|。/g);
-        const sentences = [];
+    tokenize(text: string) {
+        const matches = text.matchAll(/、|。/g);
+        const sentences: string[] = [];
         let lastIndex = 0;
         for (const match of matches) {
             const index = match.index;
-            sentences.push(input.slice(lastIndex, index + 1));
+            sentences.push(text.slice(lastIndex, index + 1));
             lastIndex = index + 1;
         }
-        if (lastIndex < input.length) {
-            sentences.push(input.slice(lastIndex));
+        if (lastIndex < text.length) {
+            sentences.push(text.slice(lastIndex));
         }
-        return sentences;
-    }
 
-    tokenize(text: string) {
-        const sentences = Tokenizer.splitByPunctuation(text);
         const tokens: TOKEN[] = [];
         for (const sentence of sentences) {
             this.#tokenizeForSentence(sentence, tokens);

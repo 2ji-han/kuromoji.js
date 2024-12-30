@@ -16,36 +16,10 @@
  */
 
 import { beforeEach, describe, expect, it } from "bun:test";
-import Tokenizer from "../_core/Tokenizer";
+import type Tokenizer from "../_core/Tokenizer";
 import kuromoji from "../kuromoji.js/kuromoji";
 
 const DIC_DIR = "dict/";
-
-describe("Tokenizer static method test", () => {
-    it("splitByPunctuation", () => {
-        expect(Tokenizer.splitByPunctuation("すもももももももものうち")).toStrictEqual(["すもももももももものうち"]);
-    });
-    it("splitByPunctuation", () => {
-        expect(Tokenizer.splitByPunctuation("、")).toStrictEqual(["、"]);
-    });
-    it("splitByPunctuation", () => {
-        expect(Tokenizer.splitByPunctuation("。")).toStrictEqual(["。"]);
-    });
-    it("splitByPunctuation", () => {
-        expect(Tokenizer.splitByPunctuation("すもも、も、もも。もも、も、もも。")).toStrictEqual([
-            "すもも、",
-            "も、",
-            "もも。",
-            "もも、",
-            "も、",
-            "もも。",
-        ]);
-    });
-    it("splitByPunctuation", () => {
-        expect(Tokenizer.splitByPunctuation("、𠮷野屋。漢字。")).toStrictEqual(["、", "𠮷野屋。", "漢字。"]);
-    });
-});
-
 describe("Tokenizer for IPADic", () => {
     let tokenizer: Tokenizer | null = null;
 
