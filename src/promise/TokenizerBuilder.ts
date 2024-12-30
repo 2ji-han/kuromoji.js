@@ -1,15 +1,25 @@
 import Tokenizer from "../_core/Tokenizer";
 import DictionaryLoader from "./loader/DictionaryLoader";
 
-export type TokenizerBuilderOption = {
-    dicPath?: string | undefined;
+export type TokenizerBuilderConfig = {
+    dicPath: string;
 };
+
+export type TokenizerBuilderOptions = TokenizerBuilderConfig | string | undefined;
 
 class TokenizerBuilder {
     #loader: DictionaryLoader;
 
-    constructor(option: TokenizerBuilderOption = {}) {
-        this.#loader = new DictionaryLoader(option.dicPath);
+    constructor(_option: TokenizerBuilderOptions) {
+        let option: string;
+        if (_option === undefined) {
+            option = "./node_modules/kuromoji.js/dict";
+        } else if (typeof _option === "string") {
+            option = _option;
+        } else {
+            option = _option.dicPath;
+        }
+        this.#loader = new DictionaryLoader(option);
     }
 
     async build(): Promise<Tokenizer> {

@@ -5,7 +5,7 @@ import DynamicDictionaries from "../../_core/dict/DynamicDictionaries";
 
 class DictionaryLoader {
     #dic_path: string;
-    constructor(dic_path = "dict/") {
+    constructor(dic_path: string) {
         this.#dic_path = dic_path;
     }
 

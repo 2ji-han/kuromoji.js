@@ -1,9 +1,11 @@
 import path from "node:path";
 import DynamicDictionaries from "../../_core/dict/DynamicDictionaries";
 
+export type DictionaryLoaderCallback = (error: Error | null, dic: DynamicDictionaries) => void;
+
 class DictionaryLoader {
     #dic_path: string;
-    constructor(dic_path = "dict/") {
+    constructor(dic_path: string) {
         this.#dic_path = dic_path;
     }
 
@@ -22,7 +24,7 @@ class DictionaryLoader {
                 });
         });
 
-    load(callback: (error: Error | null, dic: DynamicDictionaries) => void) {
+    load(callback: DictionaryLoaderCallback) {
         const dictionaries = new DynamicDictionaries();
         Promise.all(
             [

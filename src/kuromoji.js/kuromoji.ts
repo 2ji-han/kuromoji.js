@@ -1,11 +1,11 @@
 import DictionaryBuilder from "../_core/dict/builder/DictionaryBuilder";
-import TokenizerBuilder, { type TokenizerBuilderOption } from "./TokenizerBuilder";
+import TokenizerBuilder, { type TokenizerBuilderOptions } from "./TokenizerBuilder";
 
-export { TokenizerBuilder, type TokenizerBuilderOption, DictionaryBuilder };
+export { TokenizerBuilder, type TokenizerBuilderOptions, DictionaryBuilder };
 
 // Public methods
 export default {
-    builder: (option: TokenizerBuilderOption = {}) => {
+    builder: (option?: TokenizerBuilderOptions) => {
         return new TokenizerBuilder(option);
     },
     dictionaryBuilder: () => {
