@@ -5,18 +5,43 @@ import InvokeDefinitionMap from "./InvokeDefinitionMap";
 const DEFAULT_CATEGORY = "DEFAULT";
 
 class CharacterDefinition {
-    character_category_map: Uint8Array;
-    compatible_category_map: Uint32Array;
-    invoke_definition_map: null | InvokeDefinitionMap;
+    #_character_category_map: Uint8Array;
+    #_compatible_category_map: Uint32Array;
+    #_invoke_definition_map: null | InvokeDefinitionMap;
+
+    get character_category_map() {
+        return this.#_character_category_map;
+    }
+
+    set character_category_map(value) {
+        this.#_character_category_map = value;
+    }
+
+    get compatible_category_map() {
+        return this.#_compatible_category_map;
+    }
+
+    set compatible_category_map(value) {
+        this.#_compatible_category_map = value;
+    }
+
+    get invoke_definition_map() {
+        return this.#_invoke_definition_map;
+    }
+
+    set invoke_definition_map(value) {
+        this.#_invoke_definition_map = value;
+    }
+
     /**
      * CharacterDefinition represents char.def file and
      * defines behavior of unknown word processing
      * @constructor
      */
     constructor() {
-        this.character_category_map = new Uint8Array(65536); // for all UCS2 code points
-        this.compatible_category_map = new Uint32Array(65536); // for all UCS2 code points
-        this.invoke_definition_map = null;
+        this.#_character_category_map = new Uint8Array(65536); // for all UCS2 code points
+        this.#_compatible_category_map = new Uint32Array(65536); // for all UCS2 code points
+        this.#_invoke_definition_map = null;
     }
 
     /**
@@ -28,9 +53,9 @@ class CharacterDefinition {
      */
     load(cat_map_buffer: Uint8Array, compat_cat_map_buffer: Uint32Array, invoke_def_buffer: Uint8Array) {
         const char_def = new CharacterDefinition();
-        char_def.character_category_map = cat_map_buffer;
-        char_def.compatible_category_map = compat_cat_map_buffer;
-        char_def.invoke_definition_map = InvokeDefinitionMap.load(invoke_def_buffer);
+        char_def.#_character_category_map = cat_map_buffer;
+        char_def.#_compatible_category_map = compat_cat_map_buffer;
+        char_def.#_invoke_definition_map = InvokeDefinitionMap.load(invoke_def_buffer);
         return char_def;
     }
 
@@ -87,9 +112,16 @@ class CharacterDefinition {
      * Initializing method
      * @param {Array} category_mapping Array of category mapping
      */
-    initCategoryMappings(category_mapping: { start: number; end?: number; default: string; compatible: string[] }[]) {
-        if (!this.invoke_definition_map) {
-            throw new Error("CharacterDefinition.initCategoryMappings: invoke_definition_map is null");
+    initCategoryMappings(
+        category_mapping: {
+            start: number;
+            end?: number;
+            default: string;
+            compatible: string[];
+        }[]
+    ) {
+        if (!this.#_invoke_definition_map) {
+            throw new Error("CharacterDefinition.initCategoryMappings: #_invoke_definition_map is null");
         }
         // Initialize map by DEFAULT class
         let code_point = 0;
@@ -99,41 +131,41 @@ class CharacterDefinition {
                 const mapping = category_mapping[i];
                 for (code_point = mapping.start; code_point <= (mapping.end || mapping.start); code_point++) {
                     // Default Category class ID
-                    const id = this.invoke_definition_map.lookup(mapping.default);
+                    const id = this.#_invoke_definition_map.lookup(mapping.default);
                     if (id == null) {
                         throw new Error(
-                            "CharacterDefinition.initCategoryMappings: invoke_definition_map.lookup() returns null"
+                            "CharacterDefinition.initCategoryMappings: #_invoke_definition_map.lookup() returns null"
                         );
                     }
-                    this.character_category_map[code_point] = id;
+                    this.#_character_category_map[code_point] = id;
 
                     for (let j = 0; j < mapping.compatible.length; j++) {
-                        let bitset = this.compatible_category_map[code_point];
+                        let bitset = this.#_compatible_category_map[code_point];
                         const compatible_category = mapping.compatible[j];
                         if (compatible_category == null) {
                             continue;
                         }
-                        const class_id = this.invoke_definition_map.lookup(compatible_category); // Default Category
+                        const class_id = this.#_invoke_definition_map.lookup(compatible_category); // Default Category
                         if (class_id == null) {
                             continue;
                         }
                         const class_id_bit = 1 << class_id;
                         bitset = bitset | class_id_bit; // Set a bit of class ID 例えば、class_idが3のとき、3ビット目に1を立てる
-                        this.compatible_category_map[code_point] = bitset;
+                        this.#_compatible_category_map[code_point] = bitset;
                     }
                 }
             }
         }
-        const default_id = this.invoke_definition_map.lookup(DEFAULT_CATEGORY);
+        const default_id = this.#_invoke_definition_map.lookup(DEFAULT_CATEGORY);
         if (default_id == null) {
             return;
         }
-        const ccm_length = this.compatible_category_map.length;
+        const ccm_length = this.#_compatible_category_map.length;
         for (code_point = 0; code_point < ccm_length; code_point++) {
             // 他に何のクラスも定義されていなかったときだけ DEFAULT
-            if (this.character_category_map[code_point] === 0) {
+            if (this.#_character_category_map[code_point] === 0) {
                 // DEFAULT class ID に対応するビットだけ1を立てる
-                this.character_category_map[code_point] = 1 << default_id;
+                this.#_character_category_map[code_point] = 1 << default_id;
             }
         }
     }
@@ -145,8 +177,8 @@ class CharacterDefinition {
      */
     lookupCompatibleCategory(ch: string) {
         const classes: CharacterClass[] = [];
-        if (!this.invoke_definition_map) {
-            throw new Error("CharacterDefinition.lookupCompatibleCategory: invoke_definition_map is null");
+        if (!this.#_invoke_definition_map) {
+            throw new Error("CharacterDefinition.lookupCompatibleCategory: #_invoke_definition_map is null");
         }
         /*
         if (SurrogateAwareString.isSurrogatePair(ch)) {
@@ -156,8 +188,8 @@ class CharacterDefinition {
         */
         const code = ch.charCodeAt(0);
         let integer: number | null = null;
-        if (code < this.compatible_category_map.length) {
-            integer = this.compatible_category_map[code]; // Bitset
+        if (code < this.#_compatible_category_map.length) {
+            integer = this.#_compatible_category_map[code]; // Bitset
         }
         if (integer == null || integer === 0) {
             return classes;
@@ -165,7 +197,7 @@ class CharacterDefinition {
         for (let bit = 0; bit < 32; bit++) {
             // Treat "bit" as a class ID
             if ((integer << (31 - bit)) >>> 31 === 1) {
-                const character_class = this.invoke_definition_map.getCharacterClass(bit);
+                const character_class = this.#_invoke_definition_map.getCharacterClass(bit);
                 if (character_class == null) {
                     continue;
                 }
@@ -181,23 +213,23 @@ class CharacterDefinition {
      * @returns {CharacterClass} character class
      */
     lookup(ch: string) {
-        if (!this.invoke_definition_map) {
-            throw new Error("CharacterDefinition.lookup: invoke_definition_map is null");
+        if (!this.#_invoke_definition_map) {
+            throw new Error("CharacterDefinition.lookup: #_invoke_definition_map is null");
         }
         let class_id: number | null = null;
         const code = ch.charCodeAt(0);
         if (SurrogateAwareString.isSurrogatePair(ch)) {
             // Surrogate pair character codes can not be defined by char.def, so set DEFAULT category
-            class_id = this.invoke_definition_map.lookup(DEFAULT_CATEGORY);
-        } else if (code < this.character_category_map.length) {
-            class_id = this.character_category_map[code]; // Read as integer value
+            class_id = this.#_invoke_definition_map.lookup(DEFAULT_CATEGORY);
+        } else if (code < this.#_character_category_map.length) {
+            class_id = this.#_character_category_map[code]; // Read as integer value
         }
 
         if (class_id == null) {
-            class_id = this.invoke_definition_map.lookup(DEFAULT_CATEGORY);
+            class_id = this.#_invoke_definition_map.lookup(DEFAULT_CATEGORY);
         }
 
-        return this.invoke_definition_map.getCharacterClass(class_id as number);
+        return this.#_invoke_definition_map.getCharacterClass(class_id as number);
     }
 }
 

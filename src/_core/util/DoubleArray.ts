@@ -10,48 +10,43 @@ const decoder = new TextDecoder();
 
 type ArrayBuffer = Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array;
 
-type BaseCheck = {
-    signed: boolean;
-    bytes: number;
-    array: ArrayBuffer;
-};
-
 class BufferController {
     #first_unused_node: number;
-    #base: BaseCheck;
-    #check: BaseCheck;
+
+    #base_signed: boolean;
+    #check_signed: boolean;
+    #base_bytes: number;
+    #check_bytes: number;
+    #base_array: ArrayBuffer;
+    #check_array: ArrayBuffer;
 
     constructor(initial_size = 1024) {
         this.#first_unused_node = ROOT_ID + 1;
 
-        this.#base = {
-            signed: true,
-            bytes: 4,
-            array: createTypedArray(true, 4, initial_size),
-        };
+        this.#base_signed = true;
+        this.#base_bytes = 4;
+        this.#base_array = createTypedArray(true, 4, initial_size);
 
-        this.#check = {
-            signed: true,
-            bytes: 4,
-            array: createTypedArray(true, 4, initial_size),
-        };
+        this.#check_signed = true;
+        this.#check_bytes = 4;
+        this.#check_array = createTypedArray(true, 4, initial_size);
 
         // Initialize root node
-        this.#base.array[ROOT_ID] = 1;
-        this.#check.array[ROOT_ID] = ROOT_ID;
+        this.#base_array[ROOT_ID] = 1;
+        this.#check_array[ROOT_ID] = ROOT_ID;
 
         // Initialize BASE and CHECK arrays
-        this.#initBase(this.#base.array, ROOT_ID + 1, this.#base.array.length);
-        this.#initCheck(this.#check.array, ROOT_ID + 1, this.#check.array.length);
+        this.#initBase(this.#base_array, ROOT_ID + 1, this.#base_array.length);
+        this.#initCheck(this.#check_array, ROOT_ID + 1, this.#check_array.length);
     }
 
     #initBase(_base: ArrayBuffer, start: number, end: number) {
         for (let i = start; i < end; i++) {
             _base[i] = -i + 1;
         }
-        if (0 < this.#check.array[this.#check.array.length - 1]) {
-            let last_used_id = this.#check.array.length - 2;
-            while (0 < this.#check.array[last_used_id]) {
+        if (0 < this.#check_array[this.#check_array.length - 1]) {
+            let last_used_id = this.#check_array.length - 2;
+            while (0 < this.#check_array[last_used_id]) {
                 last_used_id--;
             }
             _base[start] = -last_used_id;
@@ -66,65 +61,65 @@ class BufferController {
 
     #realloc(min_size: number) {
         const new_size = min_size * 2;
-        const base_new_array = createTypedArray(this.#base.signed, this.#base.bytes, new_size);
-        this.#initBase(base_new_array, this.#base.array.length, new_size);
-        base_new_array.set(this.#base.array);
-        this.#base.array = base_new_array;
+        const base_new_array = createTypedArray(this.#base_signed, this.#base_bytes, new_size);
+        this.#initBase(base_new_array, this.#base_array.length, new_size);
+        base_new_array.set(this.#base_array);
+        this.#base_array = base_new_array;
 
-        const check_new_array = createTypedArray(this.#check.signed, this.#check.bytes, new_size);
-        this.#initCheck(check_new_array, this.#check.array.length, new_size);
-        check_new_array.set(this.#check.array);
-        this.#check.array = check_new_array;
+        const check_new_array = createTypedArray(this.#check_signed, this.#check_bytes, new_size);
+        this.#initCheck(check_new_array, this.#check_array.length, new_size);
+        check_new_array.set(this.#check_array);
+        this.#check_array = check_new_array;
     }
 
     getBaseBuffer() {
-        return this.#base.array;
+        return this.#check_array;
     }
 
     getCheckBuffer() {
-        return this.#check.array;
+        return this.#check_array;
     }
 
     loadBaseBuffer(base_buffer: ArrayBuffer) {
-        this.#base.array = base_buffer;
+        this.#base_array = base_buffer;
         return this;
     }
 
     loadCheckBuffer(check_buffer: ArrayBuffer) {
-        this.#check.array = check_buffer;
+        this.#check_array = check_buffer;
         return this;
     }
 
     size() {
-        return Math.max(this.#base.array.length, this.#check.array.length);
+        return Math.max(this.#base_array.length, this.#check_array.length);
     }
 
     getBase(index: number) {
-        if (this.#base.array.length - 1 < index) {
+        if (this.#base_array.length - 1 < index) {
             return -index + 1;
         }
-        return this.#base.array[index];
+        return this.#base_array[index];
     }
 
     getCheck(index: number) {
-        if (this.#check.array.length - 1 < index) {
+        if (this.#check_array.length - 1 < index) {
             return -index - 1;
         }
-        return this.#check.array[index];
+        return this.#check_array[index];
     }
 
     setBase(index: number, base_value: number) {
-        if (this.#base.array.length - 1 < index) {
+        if (this.#base_array.length - 1 < index) {
             this.#realloc(index);
         }
-        this.#base.array[index] = base_value;
+        this.#base_array[index] = base_value;
     }
 
     setCheck(index: number, check_value: number) {
-        if (this.#check.array.length - 1 < index) {
+        if (this.#check_array.length - 1 < index) {
             this.#realloc(index);
         }
-        this.#check.array[index] = check_value;
+        this.#check_array[index] = check_value;
     }
 
     setFirstUnusedNode(index: number) {
@@ -136,19 +131,19 @@ class BufferController {
     }
 
     shrink() {
-        let last_index = Math.max(this.#base.array.length, this.#check.array.length) - 1;
-        while (0 <= this.#check.array[last_index]) {
+        let last_index = Math.max(this.#base_array.length, this.#check_array.length) - 1;
+        while (0 <= this.#check_array[last_index]) {
             last_index--;
         }
-        this.#base.array = this.#base.array.subarray(0, last_index + 2);
-        this.#check.array = this.#check.array.subarray(0, last_index + 2);
+        this.#base_array = this.#base_array.subarray(0, last_index + 2);
+        this.#check_array = this.#check_array.subarray(0, last_index + 2);
     }
 
     calc() {
         let unused_count = 0;
-        const size = this.#check.array.length;
+        const size = this.#check_array.length;
         for (let i = 0; i < size; i++) {
-            if (this.#check.array[i] < 0) {
+            if (this.#check_array[i] < 0) {
                 unused_count++;
             }
         }
@@ -163,10 +158,10 @@ class BufferController {
         let dump_base = "";
         let dump_check = "";
 
-        for (const data of this.#base.array) {
+        for (const data of this.#base_array) {
             dump_base += ` ${data}`;
         }
-        for (const data of this.#check.array) {
+        for (const data of this.#check_array) {
             dump_check += ` ${data}`;
         }
 
