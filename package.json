@@ -43,7 +43,8 @@
         "lint:fix": "biome lint ./src --write",
         "format:fix": "biome format ./src --write",
         "check:fix": "biome check ./src --write",
-        "changelog": "bun scripts/changelog.ts"
+        "changelog": "bun scripts/changelog.ts",
+        "publish": "bun scripts/clean.ts && bun install && bun scripts/build.ts && bun test && bun publish"
     },
     "trustedDependencies": [
         "@biomejs/biome"

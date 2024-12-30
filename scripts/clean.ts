@@ -2,7 +2,8 @@ import fs from "node:fs/promises";
 
 const paths = [
     "node_modules",
-    "dist"
+    "dist",
+    "scripts/_hashes.json",
 ];
 
 for (const path of paths) {
