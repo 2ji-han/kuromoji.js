@@ -36,6 +36,7 @@ const computeDirHash = async (dir: string) => {
 const glob = new Glob("**/kuromoji.ts");
 for await (const file of glob.scan({ cwd: "./src" })) {
     const path = parse(file);
+    const basename = path.dir;
     const basedir = join("src", path.dir);
     const basefile = join("src", file);
     const hash = await computeDirHash(basedir);
@@ -47,19 +48,20 @@ for await (const file of glob.scan({ cwd: "./src" })) {
     Bun.build({
         entrypoints: [basefile],
         outdir: OUTDIR,
-        target: "bun",
+        target: basename === "browser" ? "browser" : "bun",
+        format: "esm",
         naming: `[dir]/${path.dir}/index.min.js`,
         minify: true,
-        sourcemap: "linked",
+        sourcemap: basename === "browser" ? "inline" : "linked",
     });
     Bun.build({
         entrypoints: [basefile],
         outdir: OUTDIR,
-        target: "node",
+        target: basename === "browser" ? "browser" : "node",
         format: "cjs",
         naming: `[dir]/${path.dir}/cjs/index.min.js`,
         minify: true,
-        sourcemap: "linked",
+        sourcemap: basename === "browser" ? "inline" : "linked",
     });
     await writeFile(HASH_PATH, JSON.stringify(hashes, null, 4));
 }
