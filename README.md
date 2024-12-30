@@ -56,6 +56,8 @@ Load this library as follows:
 ```typescript
 import kuromoji from "kuromoji.js";
 const kuromoji = require("kuromoji.js").default;
+//browser
+import kuromoji from 'https://cdn.jsdelivr.net/npm/kuromoji.js/dist/browser/index.min.js'
 ```
 
 You can tokenize sentences with only 5 lines of code.
