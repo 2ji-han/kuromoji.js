@@ -1,6 +1,6 @@
 {
     "name": "kuromoji.js",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "author": "f1w3",
     "type": "module",
     "main": "dist/kuromoji.js/cjs/index.min.cjs",

@@ -1,4 +1,15 @@
 {
+    "0.1.5": {
+        "date": "2024-12-30",
+        "messages": {
+            "Bug Fixes": [
+                "fix browserify build error"
+            ],
+            "Miscellaneous": [
+                "Support string, undefined and null as input of tokenizer.tokenize()"
+            ]
+        }
+    },
     "0.1.4": {
         "date": "2024-12-28",
         "messages": {
