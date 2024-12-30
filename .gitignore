@@ -38,4 +38,3 @@ publish
 .DS_Store
 docs/CHANGELOG.md
 dist/
-scripts/_hashes.json
