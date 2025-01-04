@@ -20,7 +20,7 @@ import fs from "node:fs";
 
 import Tokenizer from "../../../_core/Tokenizer";
 import type DynamicDictionaries from "../../../_core/dict/DynamicDictionaries";
-import kuromoji from "../../../kuromoji.js/kuromoji";
+import kuromoji from "../../../kuromoji.js";
 
 const DIC_DIR = "test/_resource/minimum-dic/";
 const connection_costs_file = `${DIC_DIR}matrix.def`;

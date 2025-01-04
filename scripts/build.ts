@@ -3,7 +3,7 @@ import { parse, join } from "node:path";
 
 const OUTDIR = "./dist";
 
-const glob = new Glob("**/kuromoji.ts");
+const glob = new Glob("**/index.ts");
 for await (const file of glob.scan({ cwd: "./src" })) {
     const path = parse(file);
     const basename = path.dir;
