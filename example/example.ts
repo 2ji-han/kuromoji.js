@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import kuromoji from "../src/kuromoji.js/kuromoji";
+import kuromoji from "../src/kuromoji.js";
 
 kuromoji.builder().build((err, tokenizer) => {
     if (err) return;

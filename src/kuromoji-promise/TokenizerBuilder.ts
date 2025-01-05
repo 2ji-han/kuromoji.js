@@ -1,4 +1,4 @@
-import Tokenizer from "../_core/Tokenizer";
+import Tokenizer from "../kuromoji-core/Tokenizer";
 import DictionaryLoader from "./loader/DictionaryLoader";
 
 export type TokenizerBuilderConfig = {

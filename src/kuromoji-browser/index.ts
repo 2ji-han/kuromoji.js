@@ -1,4 +1,4 @@
-import DictionaryBuilder from "../_core/dict/builder/DictionaryBuilder";
+import DictionaryBuilder from "../kuromoji-core/dict/builder/DictionaryBuilder";
 import TokenizerBuilder, { type TokenizerBuilderOptions } from "./TokenizerBuilder";
 
 export { TokenizerBuilder, type TokenizerBuilderOptions, DictionaryBuilder };

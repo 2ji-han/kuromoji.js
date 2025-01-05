@@ -1,5 +1,5 @@
 import path from "node:path";
-import DynamicDictionaries from "../../_core/dict/DynamicDictionaries";
+import DynamicDictionaries from "../../kuromoji-core/dict/DynamicDictionaries";
 
 export type DictionaryLoaderCallback = (error: Error | null, dic: DynamicDictionaries) => void;
 

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
-import DynamicDictionaries from "../../_core/dict/DynamicDictionaries";
+import DynamicDictionaries from "../../kuromoji-core/dict/DynamicDictionaries";
 
 export type DictionaryLoaderCallback = (error: Error | null, dic: DynamicDictionaries) => void;
 

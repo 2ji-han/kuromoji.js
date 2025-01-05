@@ -18,11 +18,11 @@
 import { beforeEach, describe, expect, it } from "bun:test";
 import fs from "node:fs";
 
-import Tokenizer from "../../../_core/Tokenizer";
-import type DynamicDictionaries from "../../../_core/dict/DynamicDictionaries";
-import kuromoji from "../../../kuromoji.js";
+import Tokenizer from "../../../kuromoji-core/Tokenizer.js";
+import type DynamicDictionaries from "../../../kuromoji-core/dict/DynamicDictionaries.js";
+import kuromoji from "../../../kuromoji.js/index.js";
 
-const DIC_DIR = "test/_resource/minimum-dic/";
+const DIC_DIR = "src/test/_resource/minimum-dic/";
 const connection_costs_file = `${DIC_DIR}matrix.def`;
 const char_def_file = `${DIC_DIR}char.def`;
 const unk_def_file = `${DIC_DIR}unk.def`;

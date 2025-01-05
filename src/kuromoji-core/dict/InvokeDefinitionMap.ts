@@ -1,4 +1,4 @@
-import ByteBuffer from "../../_core/util/ByteBuffer";
+import ByteBuffer from "../util/ByteBuffer";
 import CharacterClass from "./CharacterClass";
 
 /**

@@ -1,4 +1,4 @@
-import ByteBuffer from "../../_core/util/ByteBuffer";
+import ByteBuffer from "../util/ByteBuffer";
 
 class TokenInfoDictionary {
     dictionary: ByteBuffer;

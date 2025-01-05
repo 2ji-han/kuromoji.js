@@ -1,4 +1,4 @@
-import kuromoji from "../src/promise/kuromoji";
+import kuromoji from "../src/kuromoji-promise";
 
 const tokenizer = await kuromoji.builder({ dicPath: "dict" }).build();
 

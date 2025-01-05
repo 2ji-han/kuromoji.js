@@ -1,4 +1,4 @@
-import SurrogateAwareString from "../../_core/util/SurrogateAwareString";
+import SurrogateAwareString from "../util/SurrogateAwareString";
 import CharacterClass from "./CharacterClass";
 import InvokeDefinitionMap from "./InvokeDefinitionMap";
 
