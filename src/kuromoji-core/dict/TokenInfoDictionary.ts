@@ -68,15 +68,13 @@ class TokenInfoDictionary {
         return token_info_id;
     }
 
-    addMapping(source: number | null, target: number): void {
-        let mapping = source == null ? null : this.target_map.get(source);
+    addMapping(source: number, target: number): void {
+        let mapping = this.target_map.get(source);
         if (mapping == null) {
             mapping = [];
         }
         mapping.push(target);
-        if (source != null) {
-            this.target_map.set(source, mapping);
-        }
+        this.target_map.set(source, mapping);
     }
 
     targetMapToBuffer(): Uint8Array {

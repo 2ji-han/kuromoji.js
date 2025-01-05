@@ -109,12 +109,14 @@ class DictionaryBuilder {
                 throw new Error("invoke_definition_map is null");
             }
             const class_id = char_def.invoke_definition_map.lookup(class_name);
+            if (class_id == null) console.warn(`${token_info_id} is not found in invoke_definition_map`);
             // Assertion
             // if (trie_id < 0) {
             //     console.log("Not Found:" + surface_form);
             // }
-    
-            unk_dictionary.addMapping(class_id, Number.parseInt(token_info_id));
+            if (class_id !== null) {
+                unk_dictionary.addMapping(class_id, Number.parseInt(token_info_id));
+            }
         }
     
         return unk_dictionary;
