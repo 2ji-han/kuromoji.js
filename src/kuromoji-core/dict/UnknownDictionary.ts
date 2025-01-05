@@ -4,6 +4,10 @@ import TokenInfoDictionary from "./TokenInfoDictionary";
 class UnknownDictionary extends TokenInfoDictionary {
     #character_definition: CharacterDefinition | null = null;
 
+    get character_definition() {
+        return this.#character_definition;
+    }
+
     characterDefinition(character_definition: CharacterDefinition) {
         this.#character_definition = character_definition;
         return this;

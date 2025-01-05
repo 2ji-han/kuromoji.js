@@ -25,10 +25,20 @@ class TokenInfoDictionary {
             const word_cost = Number.parseInt(entry[3]);
             const feature = entry.slice(4).join(","); // TODO Optimize
             // Assertion
-            if (!Number.isFinite(left_id) || !Number.isFinite(right_id) || !Number.isFinite(word_cost)) {
+            if (
+                !Number.isFinite(left_id) ||
+                !Number.isFinite(right_id) ||
+                !Number.isFinite(word_cost)
+            ) {
                 console.log(entry);
             }
-            const token_info_id = this.put(left_id, right_id, word_cost, surface_form, feature);
+            const token_info_id = this.put(
+                left_id,
+                right_id,
+                word_cost,
+                surface_form,
+                feature
+            );
             dictionary_entries[token_info_id] = surface_form;
         }
 
@@ -39,7 +49,13 @@ class TokenInfoDictionary {
         return dictionary_entries;
     }
 
-    put(left_id: number, right_id: number, word_cost: number, surface_form: string, feature: string): number {
+    put(
+        left_id: number,
+        right_id: number,
+        word_cost: number,
+        surface_form: string,
+        feature: string
+    ): number {
         const token_info_id = this.dictionary.position;
         const pos_id = this.pos_buffer.position;
 
@@ -52,14 +68,15 @@ class TokenInfoDictionary {
         return token_info_id;
     }
 
-    addMapping(source: number, target: number): void {
-        let mapping = this.target_map.get(source);
+    addMapping(source: number | null, target: number): void {
+        let mapping = source == null ? null : this.target_map.get(source);
         if (mapping == null) {
             mapping = [];
         }
         mapping.push(target);
-
-        this.target_map.set(source, mapping);
+        if (source != null) {
+            this.target_map.set(source, mapping);
+        }
     }
 
     targetMapToBuffer(): Uint8Array {

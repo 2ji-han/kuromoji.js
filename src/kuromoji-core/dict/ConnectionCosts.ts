@@ -12,6 +12,10 @@ class ConnectionCosts {
         this.#buffer[1] = backward_dimension;
     }
 
+    get buffer() {
+        return this.#buffer;
+    }
+
     put(forward_id: number, backward_id: number, cost: number) {
         const index = forward_id * this.backward_dimension + backward_id + 2;
         if (this.#buffer.length < index + 1) {
