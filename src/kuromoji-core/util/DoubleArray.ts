@@ -8,7 +8,7 @@ const NOT_FOUND = -1; // traverse() returns if no nodes found
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-type ArrayBuffer = Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array;
+export type TypedArrayBuffer = Uint8Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array;
 
 class BufferController {
     #first_unused_node: number;
@@ -17,8 +17,8 @@ class BufferController {
     #check_signed: boolean;
     #base_bytes: number;
     #check_bytes: number;
-    #base_array: ArrayBuffer;
-    #check_array: ArrayBuffer;
+    #base_array: TypedArrayBuffer;
+    #check_array: TypedArrayBuffer;
 
     constructor(initial_size = 1024) {
         this.#first_unused_node = ROOT_ID + 1;
@@ -40,7 +40,7 @@ class BufferController {
         this.#initCheck(this.#check_array, ROOT_ID + 1, this.#check_array.length);
     }
 
-    #initBase(_base: ArrayBuffer, start: number, end: number) {
+    #initBase(_base: TypedArrayBuffer, start: number, end: number) {
         for (let i = start; i < end; i++) {
             _base[i] = -i + 1;
         }
@@ -53,7 +53,7 @@ class BufferController {
         }
     }
 
-    #initCheck(_check: ArrayBuffer, start: number, end: number) {
+    #initCheck(_check: TypedArrayBuffer, start: number, end: number) {
         for (let i = start; i < end; i++) {
             _check[i] = -i - 1;
         }
@@ -80,12 +80,12 @@ class BufferController {
         return this.#check_array;
     }
 
-    loadBaseBuffer(base_buffer: ArrayBuffer) {
+    loadBaseBuffer(base_buffer: TypedArrayBuffer) {
         this.#base_array = base_buffer;
         return this;
     }
 
-    loadCheckBuffer(check_buffer: ArrayBuffer) {
+    loadCheckBuffer(check_buffer: TypedArrayBuffer) {
         this.#check_array = check_buffer;
         return this;
     }
@@ -429,6 +429,10 @@ class DoubleArray {
         this.#bufferController.shrink();
     }
 
+    get bufferController() {
+        return this.#bufferController;
+    }
+
     /**
      * Look up a given key in this trie
      *
@@ -557,7 +561,7 @@ export default {
     builder: (initial_size = 1024) => {
         return new DoubleArrayBuilder(initial_size);
     },
-    load: (base_buffer: ArrayBuffer, check_buffer: ArrayBuffer) => {
+    load: (base_buffer: TypedArrayBuffer, check_buffer: TypedArrayBuffer) => {
         const bufferController = new BufferController(0);
         bufferController.loadBaseBuffer(base_buffer);
         bufferController.loadCheckBuffer(check_buffer);
