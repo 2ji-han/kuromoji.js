@@ -10,17 +10,16 @@ class IPADic {
     /**
      * @constructor
      */
-    #costMatrixDefinition: DictionaryReader;
-    #characterDefinition: DictionaryReader;
-    #unknownWordDefinition: DictionaryReader;
-    #tokenInfoDictionaries: SequentialDictionariesReader;
+    costMatrixDefinition: DictionaryReader;
+    characterDefinition: DictionaryReader;
+    unknownWordDefinition: DictionaryReader;
+    tokenInfoDictionaries: SequentialDictionariesReader;
 
     constructor(_dictionaryPath = "src/mecab-ipadic-seed/lib") {
         const dictionaryPath = path.join(process.cwd(), _dictionaryPath);
-        console.log(dictionaryPath);
-        this.#costMatrixDefinition = new DictionaryReader("matrix.def", dictionaryPath);
-        this.#characterDefinition = new DictionaryReader("char.def", dictionaryPath);
-        this.#unknownWordDefinition = new DictionaryReader("unk.def", dictionaryPath);
+        this.costMatrixDefinition = new DictionaryReader("matrix.def", dictionaryPath);
+        this.characterDefinition = new DictionaryReader("char.def", dictionaryPath);
+        this.unknownWordDefinition = new DictionaryReader("unk.def", dictionaryPath);
         const readers = fs
             .readdirSync(dictionaryPath)
             .filter((filename) => {
@@ -29,7 +28,7 @@ class IPADic {
             .map((filename) => {
                 return new DictionaryReader(filename, dictionaryPath);
             });
-        this.#tokenInfoDictionaries = new SequentialDictionariesReader(readers);
+        this.tokenInfoDictionaries = new SequentialDictionariesReader(readers);
     }
 
     /**
@@ -38,7 +37,7 @@ class IPADic {
      * @returns {Promise} Promise which is resolved when reading completed
      */
     readMatrixDef(callback: (line: string) => void) {
-        return this.#costMatrixDefinition.read(callback);
+        return this.costMatrixDefinition.read(callback);
     }
 
     /**
@@ -47,7 +46,7 @@ class IPADic {
      * @returns {Promise} Promise which is resolved when reading completed
      */
     readCharDef(callback: (line: string) => void) {
-        return this.#characterDefinition.read(callback);
+        return this.characterDefinition.read(callback);
     }
 
     /**
@@ -56,7 +55,7 @@ class IPADic {
      * @returns {Promise} Promise which is resolved when reading completed
      */
     readUnkDef(callback: (line: string) => void) {
-        return this.#unknownWordDefinition.read(callback);
+        return this.unknownWordDefinition.read(callback);
     }
 
     /**
@@ -65,7 +64,7 @@ class IPADic {
      * @returns {Promise} Promise which is resolved when reading completed
      */
     readTokenInfo(callback: (line: string) => void) {
-        return this.#tokenInfoDictionaries.read(callback);
+        return this.tokenInfoDictionaries.read(callback);
     }
 }
 
