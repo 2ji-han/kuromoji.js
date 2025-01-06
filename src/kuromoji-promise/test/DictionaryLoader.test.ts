@@ -1,23 +1,6 @@
-/*
- * Copyright 2014 Takuya Asano
- * Copyright 2010-2014 Atilika Inc. and contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import { beforeEach, describe, expect, it } from "bun:test";
 import type DynamicDictionaries from "../../kuromoji-core/dict/DynamicDictionaries";
-import DictionaryLoader from "../../kuromoji.js/loader/DictionaryLoader";
+import DictionaryLoader from "../loader/DictionaryLoader";
 
 const DIC_DIR = "dict/";
 
@@ -26,7 +9,7 @@ describe("DictionaryLoader", () => {
 
     beforeEach((done) => {
         const loader = new DictionaryLoader(DIC_DIR);
-        loader.load((err, dic) => {
+        loader.load().then((dic) => {
             dictionaries = dic;
             done();
         });
@@ -55,18 +38,28 @@ describe("DictionaryLoader", () => {
 describe("DictionaryLoader about loading", () => {
     it("could load directory path without suffix /", (done) => {
         const loader = new DictionaryLoader("dict"); // not have suffix /
-        loader.load((err, dic) => {
-            expect(err).toBeNull();
-            expect(dic).not.toBeUndefined();
-            done();
-        });
+        loader
+            .load()
+            .then((dic) => {
+                expect(dic).not.toBeUndefined();
+                done();
+            })
+            .catch((err) => {
+                expect(err).toBeNull();
+                done();
+            });
     });
     it("couldn't load dictionary, then call with error", (done) => {
         const loader = new DictionaryLoader("non-exist/dictionaries");
-        loader.load((err, dic) => {
-            expect(err).toBeObject();
-            expect(err).not.toBeNull();
-            done();
-        });
+        loader
+            .load()
+            .then((dic) => {
+                expect(dic).toBeNull();
+                done();
+            })
+            .catch((err) => {
+                expect(err).not.toBeNull();
+                done();
+            });
     });
 });

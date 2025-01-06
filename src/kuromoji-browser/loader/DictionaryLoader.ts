@@ -11,6 +11,7 @@ class DictionaryLoader {
 
     #loadArrayBuffer = (url: string) =>
         new Promise<ArrayBufferLike>((resolve, reject) => {
+            console.log("fetching", url);
             fetch(url)
                 .then(async (res) => await res.arrayBuffer())
                 .then(async (buffer) => {

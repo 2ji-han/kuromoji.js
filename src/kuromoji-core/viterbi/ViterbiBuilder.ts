@@ -1,7 +1,7 @@
+import type { DoubleArray } from "../../DoubleArray/DoubleArray";
 import type DynamicDictionaries from "../dict/DynamicDictionaries";
 import type TokenInfoDictionary from "../dict/TokenInfoDictionary";
 import type UnknownDictionary from "../dict/UnknownDictionary";
-import type { DoubleArray } from "../../DoubleArray/DoubleArray";
 import SurrogateAwareString from "../util/SurrogateAwareString";
 import ViterbiLattice from "./ViterbiLattice";
 import ViterbiNode from "./ViterbiNode";

@@ -62,12 +62,8 @@ describe("doublearray", () => {
             expect(load_trie.lookup("apple")).toEqual(words[0].v);
         });
         it("Original and loaded typed arrays are same", () => {
-            expect(trie.bufferController.getBaseBuffer()).toEqual(
-                load_trie.bufferController.getBaseBuffer()
-            );
-            expect(trie.bufferController.getCheckBuffer()).toEqual(
-                load_trie.bufferController.getCheckBuffer()
-            );
+            expect(trie.bufferController.getBaseBuffer()).toEqual(load_trie.bufferController.getBaseBuffer());
+            expect(trie.bufferController.getCheckBuffer()).toEqual(load_trie.bufferController.getCheckBuffer());
         });
     });
 });

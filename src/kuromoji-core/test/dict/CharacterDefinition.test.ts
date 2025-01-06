@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-import type CharacterDefinition from "../../kuromoji-core/dict/CharacterDefinition";
-import InvokeDefinitionMap from "../../kuromoji-core/dict/InvokeDefinitionMap";
-import CharacterDefinitionBuilder from "../../kuromoji-core/dict/builder/CharacterDefinitionBuilder";
+import type CharacterDefinition from "../../dict/CharacterDefinition";
+import InvokeDefinitionMap from "../../dict/InvokeDefinitionMap";
+import CharacterDefinitionBuilder from "../../dict/builder/CharacterDefinitionBuilder";
 
 import { beforeEach, describe, expect, it } from "bun:test";
 import fs from "node:fs";
 
-const DIC_DIR = "src/test/_resource/minimum-dic/";
+const DIC_DIR = "src/kuromoji-core/test/_resource/minimum-dic/";
 
 describe("CharacterDefinition from char.def", () => {
     let char_def: CharacterDefinition | null = null; // target object

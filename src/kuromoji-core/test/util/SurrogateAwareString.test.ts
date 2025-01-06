@@ -16,7 +16,7 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import SurrogateAwareString from "../../kuromoji-core/util/SurrogateAwareString";
+import SurrogateAwareString from "../../util/SurrogateAwareString";
 
 describe("SurrogateAwareString", () => {
     it("length 1", () => {

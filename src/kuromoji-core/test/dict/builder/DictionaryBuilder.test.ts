@@ -18,10 +18,10 @@
 import { beforeEach, describe, expect, it } from "bun:test";
 import fs from "node:fs";
 
-import type DynamicDictionaries from "../../../kuromoji-core/dict/DynamicDictionaries.js";
-import kuromoji from "../../../kuromoji.js/index.js";
+import type DynamicDictionaries from "../../../dict/DynamicDictionaries.js";
+import kuromoji from "../../../../kuromoji.js/index";
 
-const DIC_DIR = "src/test/_resource/minimum-dic/";
+const DIC_DIR = "src/kuromoji-core/test/_resource/minimum-dic/";
 const connection_costs_file = `${DIC_DIR}matrix.def`;
 const char_def_file = `${DIC_DIR}char.def`;
 const unk_def_file = `${DIC_DIR}unk.def`;

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
 import IPADic from "../../mecab-ipadic-seed/index";
 
-describe('IPADic', () => {
-    it('constructor', () => {
+describe("IPADic", () => {
+    it("constructor", () => {
         const dic = new IPADic();
         expect(dic).not.toBeNull();
         expect(dic.costMatrixDefinition).not.toBeNull();
@@ -10,7 +10,7 @@ describe('IPADic', () => {
         expect(dic.unknownWordDefinition).not.toBeNull();
         expect(dic.tokenInfoDictionaries).not.toBeNull();
     });
-    it('read cost matrix (matrix.def)', (done) => {
+    it("read cost matrix (matrix.def)", (done) => {
         const dic = new IPADic();
         let lines = 0;
         dic.readMatrixDef((line) => {
@@ -21,7 +21,7 @@ describe('IPADic', () => {
             done();
         });
     });
-    it('read character definition (char.def)', (done) => {
+    it("read character definition (char.def)", (done) => {
         const dic = new IPADic();
         let lines = 0;
         dic.readCharDef((line) => {
@@ -32,7 +32,7 @@ describe('IPADic', () => {
             done();
         });
     });
-    it('read unknown word definition (unk.def)', (done) => {
+    it("read unknown word definition (unk.def)", (done) => {
         const dic = new IPADic();
         let lines = 0;
         dic.readUnkDef((line) => {
@@ -43,7 +43,7 @@ describe('IPADic', () => {
             done();
         });
     });
-    it('read token info dictionaries (*.csv)', (done) => {
+    it("read token info dictionaries (*.csv)", (done) => {
         const dic = new IPADic();
         let lines = 0;
         dic.readTokenInfo((line) => {
