@@ -73,7 +73,7 @@ class BufferController {
     }
 
     getBaseBuffer() {
-        return this.#check_array;
+        return this.#base_array;
     }
 
     getCheckBuffer() {
