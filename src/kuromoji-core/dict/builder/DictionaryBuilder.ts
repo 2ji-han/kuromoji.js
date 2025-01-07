@@ -82,14 +82,15 @@ class DictionaryBuilder {
         // using as hashmap, string -> string (word_id -> surface_form) to build dictionary
         const dictionary_entries = token_info_dictionary.buildDictionary(this.#tid_entries);
         const trie = this.buildDoubleArray();
-        for (const token_info_id in dictionary_entries) {
+        for (const token_info_id_str in dictionary_entries) {
+            const token_info_id = Number.parseInt(token_info_id_str);
             const surface_form = dictionary_entries[token_info_id];
             const trie_id = trie.lookup(surface_form);
             // Assertion
             // if (trie_id < 0) {
             //     console.log("Not Found:" + surface_form);
             // }
-            token_info_dictionary.addMapping(trie_id, Number.parseInt(token_info_id));
+            token_info_dictionary.addMapping(trie_id, token_info_id) ;
         }
         return {
             trie: trie,
@@ -106,7 +107,8 @@ class DictionaryBuilder {
             throw new Error("invoke_definition_map is null");
         }
         unk_dictionary.characterDefinition(char_def);
-        for (const token_info_id in dictionary_entries) {
+        for (const token_info_id_str in dictionary_entries) {
+            const token_info_id = Number(token_info_id_str);
             const class_name = dictionary_entries[token_info_id];
             const class_id = char_def.invoke_definition_map.lookup(class_name);
             // Assertion
@@ -114,7 +116,7 @@ class DictionaryBuilder {
             //     console.log("Not Found:" + surface_form);
             //}
             if (class_id !== null) {
-                unk_dictionary.addMapping(class_id, Number.parseInt(token_info_id));
+                unk_dictionary.addMapping(class_id, token_info_id);
             } else {
                 console.warn("Not found class name: " + class_name);
             }
