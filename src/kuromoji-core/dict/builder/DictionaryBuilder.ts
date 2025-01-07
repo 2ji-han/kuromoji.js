@@ -1,4 +1,4 @@
-import doublearray from "../../../DoubleArray/DoubleArray";
+import doublearray from "../../../DoubleArray/index";
 import DynamicDictionaries from "../DynamicDictionaries";
 import TokenInfoDictionary from "../TokenInfoDictionary";
 import UnknownDictionary from "../UnknownDictionary";
@@ -102,23 +102,24 @@ class DictionaryBuilder {
         // using as hashmap, string -> string (word_id -> surface_form) to build dictionary
         const dictionary_entries = unk_dictionary.buildDictionary(this.#unk_entries);
         const char_def = this.#cd_builder.build(); // Create CharacterDefinition
+        if (char_def.invoke_definition_map == null) {
+            throw new Error("invoke_definition_map is null");
+        }
         unk_dictionary.characterDefinition(char_def);
         for (const token_info_id in dictionary_entries) {
             const class_name = dictionary_entries[token_info_id];
-            if (char_def.invoke_definition_map == null) {
-                throw new Error("invoke_definition_map is null");
-            }
             const class_id = char_def.invoke_definition_map.lookup(class_name);
-            if (class_id == null) console.warn(`${token_info_id} is not found in invoke_definition_map`);
             // Assertion
             // if (trie_id < 0) {
             //     console.log("Not Found:" + surface_form);
-            // }
+            //}
             if (class_id !== null) {
                 unk_dictionary.addMapping(class_id, Number.parseInt(token_info_id));
+            } else {
+                console.warn("Not found class name: " + class_name);
             }
         }
-    
+        
         return unk_dictionary;
     }
 
