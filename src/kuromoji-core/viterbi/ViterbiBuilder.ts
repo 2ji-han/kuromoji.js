@@ -1,4 +1,4 @@
-import type { DoubleArray } from "../../DoubleArray";
+import type { DoubleArray } from "../../DoubleArray/index";
 import type DynamicDictionaries from "../dict/DynamicDictionaries";
 import type TokenInfoDictionary from "../dict/TokenInfoDictionary";
 import type UnknownDictionary from "../dict/UnknownDictionary";
@@ -38,7 +38,7 @@ class ViterbiBuilder {
                 // Words in dictionary do not have surrogate pair (only UCS2 set)
                 const trie_id = vocabulary[n].v;
                 const key = vocabulary[n].k;
-                const token_info_ids = this.#token_info_dictionary.target_map.get(trie_id);
+                const token_info_ids = this.#token_info_dictionary.target_map[trie_id];
                 if (!token_info_ids) throw new Error("TokenInfo dictionary is broken");
                 for (const token_info_id of token_info_ids) {
                     const left_id = this.#token_info_dictionary.dictionary.getShort(token_info_id);
@@ -66,7 +66,7 @@ class ViterbiBuilder {
                         key += next_char;
                     }
                 }
-                const unk_ids = this.#unknown_dictionary.target_map.get(head_char_class.class_id);
+                const unk_ids = this.#unknown_dictionary.target_map[head_char_class.class_id];
                 if (!unk_ids) throw new Error("Unknown dictionary is broken");
                 const unk_length = unk_ids.length;
                 const unknown_dict = this.#unknown_dictionary.dictionary;
