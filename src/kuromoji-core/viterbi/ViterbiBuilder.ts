@@ -1,4 +1,4 @@
-import type { DoubleArray } from "../../DoubleArray/index";
+import type { DoubleArray } from "../../DoubleArray";
 import type DynamicDictionaries from "../dict/DynamicDictionaries";
 import type TokenInfoDictionary from "../dict/TokenInfoDictionary";
 import type UnknownDictionary from "../dict/UnknownDictionary";

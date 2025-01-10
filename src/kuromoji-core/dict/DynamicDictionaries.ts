@@ -1,5 +1,4 @@
-import doublearray from "../../DoubleArray/index";
-import type { DoubleArray } from "../../DoubleArray/index";
+import doublearray, { type DoubleArray } from "../../DoubleArray";
 import ConnectionCosts from "./ConnectionCosts";
 import TokenInfoDictionary from "./TokenInfoDictionary";
 import UnknownDictionary from "./UnknownDictionary";

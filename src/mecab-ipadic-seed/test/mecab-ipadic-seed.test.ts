@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import IPADic from "../../mecab-ipadic-seed/index";
+import IPADic from "../../mecab-ipadic-seed";
 
 describe("IPADic", () => {
     it("constructor", () => {

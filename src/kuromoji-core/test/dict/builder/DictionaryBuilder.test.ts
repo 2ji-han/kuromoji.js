@@ -18,8 +18,8 @@
 import { beforeEach, describe, expect, it } from "bun:test";
 import fs from "node:fs";
 
-import type DynamicDictionaries from "../../../dict/DynamicDictionaries.js";
-import kuromoji from "../../../../kuromoji.js/index";
+import type DynamicDictionaries from "../../../dict/DynamicDictionaries";
+import kuromoji from "../../../../kuromoji.js";
 
 const DIC_DIR = "src/kuromoji-core/test/_resource/minimum-dic/";
 const connection_costs_file = `${DIC_DIR}matrix.def`;

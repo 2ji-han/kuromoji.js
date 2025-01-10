@@ -1,4 +1,4 @@
-import doublearray from "../../../DoubleArray/index";
+import doublearray from "../../../DoubleArray";
 import DynamicDictionaries from "../DynamicDictionaries";
 import TokenInfoDictionary from "../TokenInfoDictionary";
 import UnknownDictionary from "../UnknownDictionary";

@@ -12,6 +12,7 @@
         "outDir": "dist/types",
         "declaration": true,
         "emitDeclarationOnly": true,
+        "moduleResolution": "node",
 
         // Best practices
         "strict": true,

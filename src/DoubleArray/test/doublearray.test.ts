@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "bun:test";
-import doublearray, { type DoubleArray } from "../index";
+import doublearray, { type DoubleArray } from "../";
 
 describe("doublearray", () => {
     describe("contain", () => {

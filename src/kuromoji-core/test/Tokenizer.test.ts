@@ -17,7 +17,7 @@
 
 import { beforeEach, describe, expect, it } from "bun:test";
 import type Tokenizer from "../../kuromoji-core/Tokenizer";
-import kuromoji from "../../kuromoji.js/index";
+import kuromoji from "../../kuromoji.js";
 
 const DIC_DIR = "dict/";
 describe("Tokenizer for IPADic", () => {
