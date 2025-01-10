@@ -1,14 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
 import { gzip } from "node:zlib";
+import type { TypedArrayBuffer } from "../DoubleArray";
 import kuromoji from "../kuromoji.js";
 import IPADic from "../mecab-ipadic-seed";
-import type { TypedArrayBuffer } from "../DoubleArray";
 
 console.log("Dictionary builder for kuromoji.js");
 
-const dictPath = process.argv[2] ?? "dict/"
-const dicPath = process.argv[3]
+const dictPath = process.argv[2] ?? "dict/";
+const dicPath = process.argv[3];
 
 if (dictPath) {
     console.log(`Using output dictionary path: ${dictPath}`);
@@ -32,43 +32,40 @@ const dic = new IPADic(dicPath);
 const builder = kuromoji.dictionaryBuilder();
 
 // Build token info dictionary
-const tokenInfoPromise = dic
-    .readTokenInfo((line) => {
-        builder.addTokenInfoDictionary(line);
-    })
+const tokenInfoPromise = dic.readTokenInfo((line) => {
+    builder.addTokenInfoDictionary(line);
+});
 
 // Build connection costs matrix
-const matrixDefPromise = dic
-    .readMatrixDef((line) => {
-        builder.putCostMatrixLine(line);
-    })
+const matrixDefPromise = dic.readMatrixDef((line) => {
+    builder.putCostMatrixLine(line);
+});
 
 // Build unknown dictionary
-const unkDefPromise = dic
-    .readUnkDef((line) => {
-        builder.putUnkDefLine(line);
-    })
+const unkDefPromise = dic.readUnkDef((line) => {
+    builder.putUnkDefLine(line);
+});
 
 // Build character definition dictionary
-const charDefPromise = dic
-    .readCharDef((line) => {
-        builder.putCharDefLine(line);
-    })
+const charDefPromise = dic.readCharDef((line) => {
+    builder.putCharDefLine(line);
+});
 
-const writeDictionaryFiles = (buffer: TypedArrayBuffer, savePath: string) => new Promise<void>((resolve, reject) => {
-    gzip(buffer, (err, gzipbuffer) => {
-        if (err) {
-            reject(err);
-        }
-        const writeableBuffer = new Uint8Array(gzipbuffer);
-        fs.writeFile(path.join(dictPath, savePath), writeableBuffer, (err) => {
+const writeDictionaryFiles = (buffer: TypedArrayBuffer, savePath: string) =>
+    new Promise<void>((resolve, reject) => {
+        gzip(buffer, (err, gzipbuffer) => {
             if (err) {
                 reject(err);
             }
-            resolve();
+            const writeableBuffer = new Uint8Array(gzipbuffer);
+            fs.writeFile(path.join(dictPath, savePath), writeableBuffer, (err) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve();
+            });
         });
-    })
-})
+    });
 
 // Wait for all promises to complete
 Promise.all([tokenInfoPromise, matrixDefPromise, unkDefPromise, charDefPromise])
@@ -114,8 +111,10 @@ Promise.all([tokenInfoPromise, matrixDefPromise, unkDefPromise, charDefPromise])
             writeDictionaryFiles(char_map_buffer, "unk_char.dat.gz"),
             writeDictionaryFiles(char_compat_map_buffer, "unk_compat.dat.gz"),
             writeDictionaryFiles(invoke_definition_map_buffer, "unk_invoke.dat.gz"),
-        ]).then(() => {
-            console.log("Dictionary files have been written.");
-        }).catch(console.error);
+        ])
+            .then(() => {
+                console.log("Dictionary files have been written.");
+            })
+            .catch(console.error);
     })
     .catch(console.error);
