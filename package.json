@@ -23,6 +23,9 @@
             "require": "./dist/kuromoji-promise/cjs/index.min.js"
         }
     },
+    "bin": {
+        "build-dict": "./dist/build-dict/index.min.js"
+    },
     "files": [
         "dist",
         "dict"
@@ -38,6 +41,7 @@
     "license": "Apache-2.0",
     "scripts": {
         "build": "bun scripts/build.ts",
+        "build-dict": "bun dist/build-dict/index.min.js",
         "clean": "bun scripts/clean.ts",
         "lint": "biome lint ./src",
         "format": "biome format ./src",
