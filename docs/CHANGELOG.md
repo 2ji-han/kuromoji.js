@@ -1,5 +1,17 @@
 # automatically generated file
 
+<a name="0.1.6"></a>
+## [0.1.6](https://github.com/takuyaa/kuromoji.js/compare/0.1.5...0.1.6) (2025-01-10)
+
+### Bug Fixes
+
+* fix dictionary builder
+
+### Miscellaneous
+
+* Support build-dict command
+* Add mecab-ipadic-seed
+
 <a name="0.1.5"></a>
 ## [0.1.5](https://github.com/takuyaa/kuromoji.js/compare/0.1.4...0.1.5) (2024-12-30)
 
