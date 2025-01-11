@@ -37,11 +37,15 @@ You can see how kuromoji.js works in [demo site](https://coco-ly.com/kuromoji.js
 ## Directory
 
 Directory tree is as follows:
-
-    dict/         -- Dictionaries for tokenizer (gzipped)
-    example/      -- Examples to use in Node.js
-    src/          -- JavaScript source
-    test/         -- Unit test
+```
+.github       -- Github settings
+dict/         -- Dictionaries for tokenizer (gzipped)
+docs/         -- kuromoji.js documents
+   - demo/     -- kuromoji.js demo page (https://coco-ly.com/kuromoji.js/)
+   - example/  -- Examples to use in Node.js
+scripts/      -- build scripts
+src/          -- Type Script source
+```
 
 ## Usage
 
@@ -56,15 +60,16 @@ Load this library as follows:
 ```typescript
 import kuromoji from "kuromoji.js";
 const kuromoji = require("kuromoji.js").default;
+//browser
+import kuromoji from 'https://cdn.jsdelivr.net/npm/kuromoji.js/dist/browser/index.min.js'
 ```
 
 You can tokenize sentences with only 5 lines of code.
 If you need working examples, you can see the files under the demo or example directory.
-
 ```typescript
 import kuromoji from "kuromoji.js";
 
-kuromoji.builder({ dicPath: "./node_modules/kuromoji.js/dict" }).build((err, tokenizer) => {
+kuromoji.builder().build((err, tokenizer) => {
     // tokenizer is ready
     const path = tokenizer.tokenize("すもももももももものうち");
     console.log(path);
@@ -72,20 +77,26 @@ kuromoji.builder({ dicPath: "./node_modules/kuromoji.js/dict" }).build((err, tok
 ```
 
 Also, Loading with top-level await is also supported as follows
-
 ```typescript
 import kuromoji from "kuromoji.js/promise";
 
-const tokenizer = await kuromoji.builder({ dicPath: "./node_modules/kuromoji.js/dict" }).build();
+const tokenizer = await kuromoji.builder().build();
 
 const path = tokenizer.tokenize("すもももももももものうち");
 console.log(path.length);
 ```
 
+## Build Dictionary
+
+We currently use mecab-ipadic for our dictionaries, but
+You can build and use your own dictionary as long as it is compatible with mecab-ipadic
+```
+bun build-dict <output path> <dict input path>
+```
+
 ## API
 
 The function tokenize() returns an JSON array like this:
-
 ```typescript
 [ {
     // word id in dictionary

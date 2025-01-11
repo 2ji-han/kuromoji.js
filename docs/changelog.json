@@ -1,4 +1,16 @@
 {
+    "0.1.6": {
+        "date": "2025-01-10",
+        "messages": {
+            "Bug Fixes": [
+                "fix dictionary builder"
+            ],
+            "Miscellaneous": [
+                "Support build-dict command",
+                "Add mecab-ipadic-seed"
+            ]
+        }
+    },
     "0.1.5": {
         "date": "2024-12-30",
         "messages": {

@@ -1,6 +1,6 @@
 {
     "name": "kuromoji.js",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "author": "f1w3",
     "type": "module",
     "types": "./dist/types/kuromoji.js/index.d.ts",

@@ -38,11 +38,15 @@ kuromoji.jsがどのように動くかは[オンラインデモ](https://coco-ly
 ## Directory
 
 ディレクトリは以下のようになっております:
-
-    dict/         -- 解析の為の辞書(圧縮済)
-    example/      -- 使い方の例
-    src/          -- ソースコード
-    test/         -- テスト
+```
+.github       -- Githubの設定ファイル
+dict/         -- 辞書ファイル
+docs/         -- kuromoji.jsのドキュメント
+   - demo/     -- kuromoji.jsデモページ (https://coco-ly.com/kuromoji.js/)
+   - example/  -- 使い方の例
+scripts/      -- ビルドスクリプト
+src/          -- ソースコード
+```
 
 ## Usage
 
@@ -57,6 +61,8 @@ bun install kuromoji.js
 ```typescript
 import kuromoji from "kuromoji.js";
 const kuromoji = require("kuromoji.js").default;
+//browser
+import kuromoji from 'https://cdn.jsdelivr.net/npm/kuromoji.js/dist/browser/index.min.js'
 ```
 
 わずか5行のコードで文章をトークン化できます。
@@ -66,7 +72,7 @@ const kuromoji = require("kuromoji.js").default;
 ```typescript
 import kuromoji from "kuromoji.js";
 
-kuromoji.builder({ dicPath: "./node_modules/kuromoji.js/dict" }).build((err, tokenizer) => {
+kuromoji.builder().build((err, tokenizer) => {
     // tokenizer is ready
     const path = tokenizer.tokenize("すもももももももものうち");
     console.log(path);
@@ -77,10 +83,18 @@ kuromoji.builder({ dicPath: "./node_modules/kuromoji.js/dict" }).build((err, tok
 ```typescript
 import kuromoji from "kuromoji.js/promise";
 
-const tokenizer = await kuromoji.builder({ dicPath: "./node_modules/kuromoji.js/dict" }).build();
+const tokenizer = await kuromoji.builder().build();
 
 const path = tokenizer.tokenize("すもももももももものうち");
 console.log(path.length);
+```
+
+## Build Dictionary
+
+私たちは現在、辞書にmecab-ipadicを使っていますが
+mecab-ipadicと互換性がある限り、独自の辞書を作成して使用することができます。
+```
+bun build-dict <output path> <dict input path>
 ```
 
 ## API
