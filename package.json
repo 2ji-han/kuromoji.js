@@ -38,7 +38,7 @@
         "format:fix": "biome format ./src --write",
         "check:fix": "biome check ./src --write",
         "changelog": "pnpm scripts/changelog.ts",
-        "publish": "pnpm scripts/clean.ts && pnpm install && pnpm scripts/build.ts && pnpm test && pnpm publish"
+        "publish": "pnpm run build && pnpm publish"
     },
     "exports": {
         ".": {
