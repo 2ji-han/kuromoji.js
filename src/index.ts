@@ -26,9 +26,11 @@ export default {
     },
 };
 
-`
+/*
+
 import kuromoji from "@f1w3/kuromoji.js";
 const tokenizer = await kurmoji.fromURL("https://coco-ly.com/kuromoji.js/dict");
 const tokens = tokenizer.tokenize("すもももももももものうち");
 console.log(tokens);
-`
+
+*/

@@ -22,7 +22,7 @@ export declare class CharacterDefinition {
      * @returns {CharacterDefinition}
      */
     load(cat_map_buffer: Uint8Array, compat_cat_map_buffer: Uint32Array, invoke_def_buffer: Uint8Array): CharacterDefinition;
-    static parseCharCategory(class_id: number, parsed_category_def: RegExpExecArray): CharacterClass | null;
+    static parseCharCategory(class_id: number, parsed_category_def: RegExpExecArray): CharacterClass;
     static parseCategoryMapping(parsed_category_mapping: RegExpExecArray): {
         start: number;
         default: string;

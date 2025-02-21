@@ -39,8 +39,7 @@ export class ViterbiSearcher {
                 for (const prev_node of prev_nodes) {
                     let edge_cost;
                     if (node.left_id == null || prev_node.right_id == null) {
-                        // TODO assert
-                        console.log("Left or right is null");
+                        throw new Error("Left or right is null");
                         edge_cost = 0;
                     }
                     else {

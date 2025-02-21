@@ -68,16 +68,13 @@ export class CharacterDefinition {
         const grouping = Number.parseInt(parsed_category_def[3]!);
         const max_length = Number.parseInt(parsed_category_def[4]!);
         if (!Number.isFinite(invoke) || (invoke !== 0 && invoke !== 1)) {
-            console.log(`char.def parse error. INVOKE is 0 or 1 in:${invoke}`);
-            return null;
+            throw new Error(`char.def parse error. INVOKE is 0 or 1 in:${invoke}`);
         }
         if (!Number.isFinite(grouping) || (grouping !== 0 && grouping !== 1)) {
-            console.log(`char.def parse error. GROUP is 0 or 1 in:${grouping}`);
-            return null;
+            throw new Error(`char.def parse error. GROUP is 0 or 1 in:${grouping}`);
         }
         if (!Number.isFinite(max_length) || max_length < 0) {
-            console.log(`char.def parse error. LENGTH is 1 to n:${max_length}`);
-            return null;
+            throw new Error(`char.def parse error. LENGTH is 1 to n:${max_length}`);
         }
         return new CharacterClass(class_id, category, invoke === 1, grouping === 1, max_length);
     }
@@ -88,7 +85,7 @@ export class CharacterDefinition {
         }
         const start = Number.parseInt(parsed_category_mapping[1]!);
         if (!Number.isFinite(start) || start < 0 || start > 0xffff) {
-            console.log(`char.def parse error. CODE is invalid:${start}`);
+            throw new Error(`char.def parse error. CODE is invalid:${start}`);
         }
         return {
             start: start,
@@ -104,10 +101,10 @@ export class CharacterDefinition {
         const start = Number.parseInt(parsed_category_mapping[1]!);
         const end = Number.parseInt(parsed_category_mapping[2]!);
         if (!Number.isFinite(start) || start < 0 || start > 0xffff) {
-            console.log(`char.def parse error. CODE is invalid:${start}`);
+            throw new Error(`char.def parse error. CODE is invalid:${start}`);
         }
         if (!Number.isFinite(end) || end < 0 || end > 0xffff) {
-            console.log(`char.def parse error. CODE is invalid:${end}`);
+            throw new Error(`char.def parse error. CODE is invalid:${end}`);
         }
         return {
             start: start,

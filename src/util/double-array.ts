@@ -193,10 +193,6 @@ class BufferController {
         for (const data of this.#check_array) {
             dump_check += ` ${data}`;
         }
-
-        console.log(`base:${dump_base}`);
-        console.log(`check:${dump_check}`);
-
         return `base:${dump_base} check:${dump_check}`;
     }
 }
