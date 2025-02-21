@@ -1,8 +1,5 @@
-import kuromoji from "../../src/kuromoji.js";
+import kuromoji from "@f1w3/kuromoji.js";
 
-kuromoji.builder().build((err, tokenizer) => {
-    if (err) return;
-    // tokenizer is ready
-    const path = tokenizer.tokenize("すもももももももものうち");
-    console.log(path.length);
-});
+const tokenizer = await kuromoji.fromURL('https://coco-ly.com/kuromoji.js/dict');
+const path = tokenizer.tokenize("すもももももももものうち");
+console.log(path.length);

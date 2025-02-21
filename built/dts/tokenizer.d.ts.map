@@ -1,0 +1,1 @@
+{"version":3,"file":"tokenizer.d.ts","sourceRoot":"","sources":["../../src/tokenizer.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,mBAAmB,EAAE,MAAM,gCAAgC,CAAC;AAG1E,OAAO,EAAE,KAAK,KAAK,EAAmB,MAAM,4BAA4B,CAAC;AAKzE,qBAAa,SAAS;;gBAMN,GAAG,EAAE,mBAAmB;IAQpC,QAAQ,CAAC,IAAI,EAAE,MAAM;CAkDxB"}

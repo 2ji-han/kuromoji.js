@@ -1,59 +1,21 @@
 {
-    "name": "kuromoji.js",
+    "name": "@f1w3/kuromoji.js",
     "version": "0.1.6",
+    "description": "JavaScript implementation of Japanese morphological analyzer",
     "author": "f1w3",
+    "license": "Apache-2.0",
     "type": "module",
-    "types": "./dist/types/kuromoji.js/index.d.ts",
-    "main": "./dist/kuromoji.js/cjs/index.min.cjs",
-    "module": "./dist/kuromoji.js/index.min.js",
-    "exports": {
-        ".": {
-            "types": "./dist/types/kuromoji.js/index.d.ts",
-            "import": "./dist/kuromoji.js/index.min.js",
-            "require": "./dist/kuromoji.js/cjs/index.min.js"
-        },
-        "./browser": {
-            "types": "./dist/types/kuromoji-browser/index.d.ts",
-            "import": "./dist/kuromoji-browser/index.min.js",
-            "require": "./dist/kuromoji-browser/cjs/index.min.js"
-        },
-        "./promise": {
-            "types": "./dist/types/kuromoji-promise/index.d.ts",
-            "import": "./dist/kuromoji-promise/index.min.js",
-            "require": "./dist/kuromoji-promise/cjs/index.min.js"
-        }
-    },
-    "bin": {
-        "build-dict": "./dist/build-dict/index.min.js"
-    },
+    "keywords": [
+        "japanese",
+        "morphological analyzer",
+        "nlp",
+        "pos",
+        "pos tagger",
+        "tokenizer"
+    ],
     "files": [
         "dist",
         "dict"
-    ],
-    "devDependencies": {
-        "@types/bun": "^1.1.16",
-        "@biomejs/biome": "^1.9.4"
-    },
-    "peerDependencies": {
-        "typescript": "^5.7.2"
-    },
-    "description": "JavaScript implementation of Japanese morphological analyzer",
-    "license": "Apache-2.0",
-    "scripts": {
-        "build": "bun scripts/build.ts",
-        "build-dict": "bun dist/build-dict/index.min.js",
-        "clean": "bun scripts/clean.ts",
-        "lint": "biome lint ./src",
-        "format": "biome format ./src",
-        "check": "biome check ./src",
-        "lint:fix": "biome lint ./src --write",
-        "format:fix": "biome format ./src --write",
-        "check:fix": "biome check ./src --write",
-        "changelog": "bun scripts/changelog.ts",
-        "publish": "bun scripts/clean.ts && bun install && bun scripts/build.ts && bun test && bun publish"
-    },
-    "trustedDependencies": [
-        "@biomejs/biome"
     ],
     "repository": {
         "type": "git",
@@ -63,12 +25,44 @@
     "bugs": {
         "url": "https://github.com/f1w3/kuromoji.js/issues"
     },
-    "keywords": [
-        "japanese",
-        "morphological analyzer",
-        "nlp",
-        "pos",
-        "pos tagger",
-        "tokenizer"
+    "scripts": {
+        "build": "pnpm run ts-esm && pnpm run ts-dts",
+        "ts-dts": "tsc --outDir built/dts --declaration true --emitDeclarationOnly true --declarationMap true",
+        "ts-esm": "tsc --outDir built/esm",
+        "watch": "nodemon -w src -e ts,json --exec \"pnpm --workspace-root build\"",
+        "clean": "pnpm scripts/clean.ts",
+        "lint": "biome lint ./src",
+        "format": "biome format ./src",
+        "check": "biome check ./src",
+        "lint:fix": "biome lint ./src --write",
+        "format:fix": "biome format ./src --write",
+        "check:fix": "biome check ./src --write",
+        "changelog": "pnpm scripts/changelog.ts",
+        "publish": "pnpm scripts/clean.ts && pnpm install && pnpm scripts/build.ts && pnpm test && pnpm publish"
+    },
+    "exports": {
+        ".": {
+            "import": "./built/esm/index.js",
+            "types": "./built/dts/index.d.ts"
+        },
+        "./*": {
+            "import": "./built/esm/*",
+            "types": "./built/dts/*"
+        }
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^1.9.4",
+        "nodemon": "^3.1.9",
+        "typescript": "^5.0.0",
+        "vitest": "^3.0.6"
+    },
+    "peerDependencies": {
+        "typescript": "^5.7.2"
+    },
+    "trustedDependencies": [
+        "@biomejs/biome"
+    ],
+    "workspaces": [
+        "./playground"
     ]
 }
