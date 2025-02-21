@@ -26,7 +26,7 @@
         "url": "https://github.com/f1w3/kuromoji.js/issues"
     },
     "scripts": {
-        "prepare": "pnpm run build",
+        "postinstall": "pnpm run build",
         "build": "pnpm run ts-esm && pnpm run ts-dts",
         "ts-dts": "tsc --outDir built/dts --declaration true --emitDeclarationOnly true --declarationMap true",
         "ts-esm": "tsc --outDir built/esm",
