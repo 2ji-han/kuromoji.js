@@ -1,4 +1,4 @@
-import { type DoubleArray } from "../double-array.js";
+import { type DoubleArray } from "../util/double-array.js";
 import { ConnectionCosts } from "./connection-costs.js";
 import { TokenInfoDictionary } from "./token-info-dictionary.js";
 import { UnknownDictionary } from "./unknown-dictionary.js";

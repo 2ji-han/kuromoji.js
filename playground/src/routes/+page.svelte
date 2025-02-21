@@ -99,6 +99,7 @@
     .debug {
         min-width: 28rem;
         padding: 1rem;
+        margin: 3px;
         font-size: 0.75rem;
         background: #fff;
         white-space: pre-wrap;

@@ -1,4 +1,4 @@
-import type { DoubleArray } from "../double-array.js";
+import type { DoubleArray } from "../util/double-array.js";
 import type { DynamicDictionaries } from "../dict/dynamic-dictionaries.js";
 import type { TokenInfoDictionary } from "../dict/token-info-dictionary.js";
 import type { UnknownDictionary } from "../dict/unknown-dictionary.js";

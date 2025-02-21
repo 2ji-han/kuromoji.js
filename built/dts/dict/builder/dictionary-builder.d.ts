@@ -1,4 +1,4 @@
-import { DoubleArray } from "../../double-array.js";
+import { DoubleArray } from "../../util/double-array.js";
 import { DynamicDictionaries } from "../dynamic-dictionaries.js";
 import { UnknownDictionary } from "../unknown-dictionary.js";
 declare class DictionaryBuilder {
