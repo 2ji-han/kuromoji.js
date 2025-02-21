@@ -1,1 +1,0 @@
-{"version":3,"file":"viterbi-builder.d.ts","sourceRoot":"","sources":["../../../src/viterbi/viterbi-builder.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,mBAAmB,EAAE,MAAM,iCAAiC,CAAC;AAI3E,OAAO,EAAE,cAAc,EAAE,MAAM,sBAAsB,CAAC;AAGtD,qBAAa,cAAc;;IAIvB;;;;OAIG;gBACS,GAAG,EAAE,mBAAmB;IAMpC;;;;OAIG;IACH,KAAK,CAAC,YAAY,EAAE,MAAM,GAAG,cAAc;CA4D9C"}

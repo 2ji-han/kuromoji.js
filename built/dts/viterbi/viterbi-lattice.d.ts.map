@@ -1,1 +1,0 @@
-{"version":3,"file":"viterbi-lattice.d.ts","sourceRoot":"","sources":["../../../src/viterbi/viterbi-lattice.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,mBAAmB,CAAC;AAEhD,qBAAa,cAAc;IACvB,YAAY,EAAE,WAAW,EAAE,EAAE,CAAC;IAC9B,OAAO,EAAE,MAAM,CAAC;IAChB;;;OAGG;;IAOH;;;OAGG;IACH,MAAM,CAAC,IAAI,EAAE,WAAW;IAYxB;;OAEG;IACH,SAAS;CAKZ"}
