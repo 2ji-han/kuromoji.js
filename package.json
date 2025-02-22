@@ -1,6 +1,6 @@
 {
     "name": "@2ji-han/kuromoji.js",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "description": "JavaScript implementation of Japanese morphological analyzer",
     "author": "2ji-han",
     "contributors": [
