@@ -1,0 +1,56 @@
+name: Publish
+
+on:
+    workflow_dispatch:
+
+permissions:
+    contents: write # for checkout and tag
+    pull-requests: write # for comments
+    packages: write # for publish
+
+jobs:
+    publish-npm:
+        runs-on: ubuntu-latest
+        env:
+            NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+            NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+            GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: pnpm/action-setup@v4
+              with:
+                version: 9.12.2
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4.0.3
+              with:
+                cache: 'pnpm'
+                node-version: '20.18.2'
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4.0.3
+              with:
+                cache: 'pnpm'
+
+            - name: Install dependencies
+              run: pnpm i --frozen-lockfile
+
+            - name: Git Identity
+              run: |
+                  git config --global user.name 'github-actions[bot]'
+                  git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+                  git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/$GITHUB_REPOSITORY
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build
+              run: pnpm run build
+
+            - name: Setup npmrc
+              run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+
+            - name: Publish
+              run: pnpm publish -r --access public --no-git-checks
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
