@@ -4,6 +4,7 @@ example/
 node_modules/
 scripts/
 src/
+dict/
 biome.json
 bun.lockb
 NOTICE.md

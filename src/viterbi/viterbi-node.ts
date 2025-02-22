@@ -8,7 +8,7 @@ export class ViterbiNode {
     left_id: number;
     right_id: number;
     prev: null | ViterbiNode;
-    surface_form: string | Uint8Array;
+    surface_form: string;
     shortest_cost: number;
     type: WORD_TYPE;
 
@@ -32,7 +32,7 @@ export class ViterbiNode {
         type: WORD_TYPE,
         left_id: number,
         right_id: number,
-        surface_form: string | Uint8Array
+        surface_form: string
     ) {
         this.name = node_name;
         this.cost = node_cost;

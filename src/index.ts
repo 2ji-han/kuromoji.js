@@ -1,8 +1,8 @@
 import DictionaryBuilder from "./dict/builder/dictionary-builder.js";
 export { DictionaryBuilder };
 import { Tokenizer } from "./tokenizer.js";
-import { DictionaryLoader, GZipDictionaryLoader } from "./loader.js";
-import { DynamicDictionaries } from "./dict/dynamic-dictionaries.js";
+import { type DictionaryLoader, GZipDictionaryLoader } from "./loader.js";
+import type { DynamicDictionaries } from "./dict/dynamic-dictionaries.js";
 
 export type TokenizerBuilderOptions = {
     dicPath: URL | string;
@@ -28,7 +28,7 @@ export default {
 
 /*
 
-import kuromoji from "@f1w3/kuromoji.js";
+import kuromoji from "@2ji-han/kuromoji.js";
 const tokenizer = await kurmoji.fromURL("https://coco-ly.com/kuromoji.js/dict");
 const tokens = tokenizer.tokenize("すもももももももものうち");
 console.log(tokens);

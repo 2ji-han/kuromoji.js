@@ -23,12 +23,11 @@ export class ViterbiBuilder {
 
     /**
      * Build word lattice
-     * @param {string} sentence_str Input text
+     * @param {string} sentence Input text
      * @returns {ViterbiLattice} Word lattice
      */
-    build(sentence_str: string): ViterbiLattice {
+    build(sentence: string): ViterbiLattice {
         const lattice = new ViterbiLattice();
-        const sentence = new SurrogateAwareString(sentence_str);
         const sentence_length = sentence.length;
         for (let pos = 0; pos < sentence_length; pos++) {
             const tail = sentence.slice(pos);

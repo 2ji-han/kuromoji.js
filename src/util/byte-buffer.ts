@@ -96,8 +96,8 @@ export class ByteBuffer {
         if (this.#_buffer.length < index + 2) {
             return 0;
         }
-        const lower = this.#_buffer[index]!;
-        const upper = this.#_buffer[index + 1]!;
+        const lower = this.#_buffer[index];
+        const upper = this.#_buffer[index + 1];
         let value = (upper << 8) + lower;
         if (value & 0x8000) {
             value = -((value - 1) ^ 0xffff);
@@ -130,10 +130,10 @@ export class ByteBuffer {
         if (this.#_buffer.length < index + 4) {
             return 0;
         }
-        const b0 = this.#_buffer[index]!;
-        const b1 = this.#_buffer[index + 1]!;
-        const b2 = this.#_buffer[index + 2]!;
-        const b3 = this.#_buffer[index + 3]!;
+        const b0 = this.#_buffer[index];
+        const b1 = this.#_buffer[index + 1];
+        const b2 = this.#_buffer[index + 2];
+        const b3 = this.#_buffer[index + 3];
 
         return (b3 << 24) + (b2 << 16) + (b1 << 8) + b0;
     }
@@ -159,7 +159,7 @@ export class ByteBuffer {
         let ch: number;
 
         while (index < this.#_buffer.length) {
-            ch = this.get(index++)!;
+            ch = this.get(index++);
             if (ch === 0) break;
             buf.push(ch);
         }

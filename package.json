@@ -1,8 +1,13 @@
 {
-    "name": "@f1w3/kuromoji.js",
+    "name": "@2ji-han/kuromoji.js",
     "version": "0.1.6",
     "description": "JavaScript implementation of Japanese morphological analyzer",
-    "author": "f1w3",
+    "author": "2ji-han",
+    "contributors": [
+        "Takuya Asano <takuya.a@gmail.com>",
+        "f1w3",
+        "2ji-han"
+    ],
     "license": "Apache-2.0",
     "type": "module",
     "keywords": [
@@ -19,25 +24,25 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/f1w3/kuromoji.js.git"
+        "url": "git+https://github.com/2ji-han/kuromoji.js.git"
     },
-    "homepage": "https://github.com/f1w3/kuromoji.js#readme",
+    "homepage": "https://github.com/2ji-han/kuromoji.js#readme",
     "bugs": {
-        "url": "https://github.com/f1w3/kuromoji.js/issues"
+        "url": "https://github.com/2ji-han/kuromoji.js/issues"
     },
     "scripts": {
-        "postinstall": "pnpm run build",
         "build": "pnpm run ts-esm && pnpm run ts-dts",
         "ts-dts": "tsc --outDir built/dts --declaration true --emitDeclarationOnly true --declarationMap true",
         "ts-esm": "tsc --outDir built/esm",
         "watch": "nodemon -w src -e ts,json --exec \"pnpm --workspace-root build\"",
+        "playground": "pnpm --filter playground run dev",
         "clean": "pnpm scripts/clean.ts",
-        "lint": "biome lint ./src",
-        "format": "biome format ./src",
-        "check": "biome check ./src",
-        "lint:fix": "biome lint ./src --write",
-        "format:fix": "biome format ./src --write",
-        "check:fix": "biome check ./src --write",
+        "lint": "biome lint ./src ./playground/src",
+        "format": "biome format ./src ./playground/src",
+        "check": "biome check ./src ./playground/src",
+        "lint:fix": "biome lint ./src ./playground/src --write",
+        "format:fix": "biome format ./src ./playground/src --write",
+        "check:fix": "biome check ./src ./playground/src --write",
         "changelog": "pnpm scripts/changelog.ts"
     },
     "exports": {

@@ -1,6 +1,6 @@
 <script lang="ts">
     import kuromoji from "@f1w3/kuromoji.js/index.js";
-    import type { Tokenizer } from "../../../built/esm/tokenizer.js";
+    import { type Tokenizer } from "@f1w3/kuromoji.js/tokenizer.js";
     import { onMount } from "svelte";
 
     let tokenizer = $state<Tokenizer>();

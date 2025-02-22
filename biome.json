@@ -47,5 +47,29 @@
             "indentWidth": 4,
             "lineWidth": 120
         }
-    }
+    },
+    "css": {
+        "formatter": {
+            "enabled": true,
+            "indentStyle": "space",
+            "indentWidth": 4,
+            "lineWidth": 120,
+            "lineEnding": "lf"
+        }
+    },
+    "overrides": [
+        {
+            "include": [
+                "*.svelte"
+            ],
+            "linter": {
+                "rules": {
+                    "style": {
+                        "useConst": "off",
+                        "useImportType": "off"
+                    }
+                }
+            }
+        }
+    ]
 }

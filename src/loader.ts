@@ -3,7 +3,7 @@ import { DynamicDictionaries } from "./dict/dynamic-dictionaries.js";
 function resolvePath(base: URL, path: string): URL {
     const { pathname } = base;
     return new URL(
-        pathname.endsWith("/") ? pathname + path : pathname + "/" + path,
+        pathname.endsWith("/") ? pathname + path : `${pathname}/${path}`,
         base
     );
 }
@@ -56,23 +56,23 @@ export class GZipDictionaryLoader implements DictionaryLoader {
             ].map((filename) => this.#loadArrayBuffer(resolvePath(this.#resourceBase, filename)))
         )
         // Trie
-        dictionaries.loadTrie(new Int32Array(buffers[0]!), new Int32Array(buffers[1]!));
+        dictionaries.loadTrie(new Int32Array(buffers[0]), new Int32Array(buffers[1]));
         // Token info dictionaries
         dictionaries.loadTokenInfoDictionaries(
-            new Uint8Array(buffers[2]!),
-            new Uint8Array(buffers[3]!),
-            new Uint8Array(buffers[4]!)
+            new Uint8Array(buffers[2]),
+            new Uint8Array(buffers[3]),
+            new Uint8Array(buffers[4])
         );
         // Connection cost matrix
-        dictionaries.loadConnectionCosts(new Int16Array(buffers[5]!));
+        dictionaries.loadConnectionCosts(new Int16Array(buffers[5]));
         // Unknown dictionaries
         dictionaries.loadUnknownDictionaries(
-            new Uint8Array(buffers[6]!),
-            new Uint8Array(buffers[7]!),
-            new Uint8Array(buffers[8]!),
-            new Uint8Array(buffers[9]!),
-            new Uint32Array(buffers[10]!),
-            new Uint8Array(buffers[11]!)
+            new Uint8Array(buffers[6]),
+            new Uint8Array(buffers[7]),
+            new Uint8Array(buffers[8]),
+            new Uint8Array(buffers[9]),
+            new Uint32Array(buffers[10]),
+            new Uint8Array(buffers[11])
         );
         return dictionaries;
     }

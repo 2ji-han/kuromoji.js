@@ -5,7 +5,6 @@
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
-        "noUncheckedIndexedAccess": true,
         "experimentalDecorators": true,
         "sourceMap": true,
         "target": "es2022",
@@ -18,7 +17,8 @@
         "rootDir": "./src",
         "noLib": false,
         "outDir": "built",
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "newLine": "lf",
     },
     "compileOnSave": false,
     "include": [

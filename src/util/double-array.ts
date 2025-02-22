@@ -67,9 +67,9 @@ class BufferController {
         for (let i = start; i < end; i++) {
             _base[i] = -i + 1;
         }
-        if (0 < this.#check_array[this.#check_array.length - 1]!) {
+        if (0 < this.#check_array[this.#check_array.length - 1]) {
             let last_used_id = this.#check_array.length - 2;
-            while (0 < this.#check_array[last_used_id]!) {
+            while (0 < this.#check_array[last_used_id]) {
                 last_used_id--;
             }
             _base[start] = -last_used_id;
@@ -161,7 +161,7 @@ class BufferController {
 
     shrink() {
         let last_index = Math.max(this.#base_array.length, this.#check_array.length) - 1;
-        while (last_index > 0 && this.#check_array.length > last_index && this.#check_array[last_index]! >= 0) {
+        while (last_index > 0 && this.#check_array.length > last_index && this.#check_array[last_index] >= 0) {
             last_index--;
         }
         this.#base_array = this.#base_array.subarray(0, last_index + 2);
@@ -248,10 +248,10 @@ class DoubleArrayBuilder {
                 const b2 = k2.k;
                 const min_length = Math.min(b1.length, b2.length);
                 for (let pos = 0; pos < min_length; pos++) {
-                    if (b1[pos]! === b2[pos]!) {
+                    if (b1[pos] === b2[pos]) {
                         continue;
                     }
-                    return b1[pos]! - b2[pos]!;
+                    return b1[pos] - b2[pos];
                 }
                 return b1.length - b2.length;
             });
@@ -271,12 +271,12 @@ class DoubleArrayBuilder {
         this.#setBufferController(parent_index, children_info, base);
 
         for (let i = 0; i < children_info.length; i = i + 3) {
-            const child_code = children_info[i]!;
+            const child_code = children_info[i];
             if (child_code === TERM_CODE) {
                 continue;
             }
-            const child_start = children_info[i + 1]!;
-            const child_len = children_info[i + 2]!;
+            const child_start = children_info[i + 1];
+            const child_len = children_info[i + 2];
             const child_index = base + child_code;
             this.#_build(child_index, position + 1, child_start, child_len);
         }
@@ -296,7 +296,7 @@ class DoubleArrayBuilder {
         let start_pos = start;
         for (; next_pos < start + length; next_pos++) {
             const next_key = this.#keys[next_pos];
-            if (next_key == undefined) {
+            if (next_key === undefined) {
                 throw new Error(`key is null. next_pos:${next_pos}`);
             }
             const next_char = next_key.k[position];
@@ -319,38 +319,24 @@ class DoubleArrayBuilder {
         const bufferController = this.#bufferController;
         bufferController.setBase(parent_id, _base); // Update BASE of parent node
         for (let i = 0; i < children_info.length; i = i + 3) {
-            const code = children_info[i]!;
+            const code = children_info[i];
             const child_id = _base + code;
-
-            // Update linked list of unused nodes
-
-            // Assertion
-            // if (child_id < 0) {
-            //     throw 'assertion error: child_id is negative'
-            // }
 
             const prev_unused_id = -bufferController.getBase(child_id);
             const next_unused_id = -bufferController.getCheck(child_id);
-            // if (prev_unused_id < 0) {
-            //     throw 'assertion error: setBC'
-            // }
-            // if (next_unused_id < 0) {
-            //     throw 'assertion error: setBC'
-            // }
             if (child_id !== bufferController.getFirstUnusedNode()) {
                 bufferController.setCheck(prev_unused_id, -next_unused_id);
             } else {
-                // Update first_unused_node
                 bufferController.setFirstUnusedNode(next_unused_id);
             }
             bufferController.setBase(next_unused_id, -prev_unused_id);
 
-            const check = parent_id; // CHECK is parent node index
-            bufferController.setCheck(child_id, check); // Update CHECK of child node
+            const check = parent_id;
+            bufferController.setCheck(child_id, check);
 
             // Update record
             if (code === TERM_CODE) {
-                const start_pos = children_info[i + 1]!;
+                const start_pos = children_info[i + 1];
                 if (this.#keys[start_pos] == null) {
                     throw new Error(`key is null. start_pos:${start_pos}`);
                 }
@@ -376,7 +362,7 @@ class DoubleArrayBuilder {
         let curr = bufferController.getFirstUnusedNode(); // current index
 
         while (children_info.length > 0) {
-            base = curr - children_info[0]!;
+            base = curr - children_info[0];
 
             if (base < 0) {
                 curr = -bufferController.getCheck(curr); // next
@@ -385,7 +371,7 @@ class DoubleArrayBuilder {
 
             let empty_area_found = true;
             for (let i = 0; i < children_info.length; i = i + 3) {
-                const code = children_info[i]!;
+                const code = children_info[i];
                 const candidate_id = base + code;
 
                 if (!this.#isUnusedNode(candidate_id)) {
