@@ -19,8 +19,7 @@
         "tokenizer"
     ],
     "files": [
-        "dist",
-        "dict"
+        "built"
     ],
     "repository": {
         "type": "git",
