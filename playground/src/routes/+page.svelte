@@ -1,6 +1,6 @@
 <script lang="ts">
-    import kuromoji from "@f1w3/kuromoji.js/index.js";
-    import { type Tokenizer } from "@f1w3/kuromoji.js/tokenizer.js";
+    import kuromoji from "@2ji-han/kuromoji.js/index.js";
+    import { type Tokenizer } from "@2ji-han/kuromoji.js/tokenizer.js";
     import { onMount } from "svelte";
 
     let tokenizer = $state<Tokenizer>();
@@ -58,7 +58,13 @@
         <div class="tokens">
             <h2>Merged Tokens</h2>
             {#each tokensMerged as token}
-                <ruby class:rt={token.pos === "名詞"}>
+                <ruby
+                    class:rt={token.pos === "名詞" &&
+                        token.pos_detail_1 !== "接尾" &&
+                        token.pos_detail_1 !== "非自立" &&
+                        token.pos_detail_1 !== "代名詞" &&
+                        token.pos_detail_1 !== "数"}
+                >
                     {token.surface_form}
                 </ruby>
             {/each}

@@ -11,8 +11,7 @@ export type TokenizerBuilderOptions = {
 // Public methods
 export default {
     async fromURL(url: string | URL): Promise<Tokenizer> {
-        const dicPath = typeof url === "string" ? new URL(url) : url;
-        const dictionary = await GZipDictionaryLoader.fromURL(dicPath);
+        const dictionary = await GZipDictionaryLoader.fromURL(url);
         return new Tokenizer(dictionary);
     },
 

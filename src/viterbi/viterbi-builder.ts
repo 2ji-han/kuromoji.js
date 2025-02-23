@@ -2,7 +2,6 @@ import type { DoubleArray } from "../util/double-array.js";
 import type { DynamicDictionaries } from "../dict/dynamic-dictionaries.js";
 import type { TokenInfoDictionary } from "../dict/token-info-dictionary.js";
 import type { UnknownDictionary } from "../dict/unknown-dictionary.js";
-import { SurrogateAwareString } from "../util/surrogate-aware-string.js";
 import { ViterbiLattice } from "./viterbi-lattice.js";
 import { ViterbiNode } from "./viterbi-node.js";
 
@@ -30,8 +29,8 @@ export class ViterbiBuilder {
         const lattice = new ViterbiLattice();
         const sentence_length = sentence.length;
         for (let pos = 0; pos < sentence_length; pos++) {
-            const tail = sentence.slice(pos);
-            const vocabulary = this.#trie.commonPrefixSearch(tail);
+            const remaining = sentence.slice(pos);
+            const vocabulary = this.#trie.commonPrefixSearch(remaining);
             for (const { k: key, v: trie_id } of vocabulary) {
                 const token_info_ids = this.#token_info_dictionary.target_map[trie_id];
                 if (!token_info_ids) throw new Error("TokenInfo dictionary is broken");
@@ -46,15 +45,14 @@ export class ViterbiBuilder {
                 }
             }
 
-            const head_char = tail.charAt(0);
+            const head_char = remaining.charAt(0);
             const head_char_class = this.#unknown_dictionary.lookup(head_char);
-            if (!vocabulary?.length || head_char_class.is_always_invoke) {
+            if (!vocabulary.length || head_char_class.is_always_invoke) {
                 let key = head_char;
-                const tail_length = tail.length;
+                const tail_length = remaining.length;
                 if (head_char_class.is_grouping && tail_length > 1) {
                     const class_name = head_char_class.class_name;
-                    for (let k = 1; k < tail_length; k++) {
-                        const next_char = tail.charAt(k);
+                    for (const next_char of remaining.slice(1)) {
                         if (this.#unknown_dictionary.lookup(next_char).class_name !== class_name) {
                             break;
                         }

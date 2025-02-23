@@ -26,8 +26,6 @@ export class TokenInfoDictionary {
     // ^ this position is token_info_id
     buildDictionary(entries: string[][]): { [word_id: number]: string } {
         const dictionary_entries: { [word_id: number]: string } = {}; // using as hashmap, string -> string (word_id -> surface_form) to build dictionary
-        // for (let i = 0; i < entries.length; i++) {
-        //     const entry = entries[i];
         for (const entry of entries) {
             if (entry.length < 4) {
                 throw new Error(`Invalid TokenInfoDictionary entry: ${entry}`);
