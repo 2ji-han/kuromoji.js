@@ -19,7 +19,8 @@
         "tokenizer"
     ],
     "files": [
-        "built"
+        "built",
+        "src"
     ],
     "repository": {
         "type": "git",
